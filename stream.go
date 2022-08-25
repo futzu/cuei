@@ -5,7 +5,6 @@ import (
 	"os"
 )
 
-
 type PacketData struct {
 	PacketNumber int     `json:",omitempty"`
 	Pid          uint16  `json:",omitempty"`
@@ -13,8 +12,6 @@ type PacketData struct {
 	Pcr          float64 `json:",omitempty"`
 	Pts          float64 `json:",omitempty"`
 }
-
-
 
 // pktSz is the size of an MPEG-TS packet in bytes.
 const pktSz = 188
@@ -32,6 +29,7 @@ type Stream struct {
 	partial  map[uint16][]byte // partial manages tables spread across multiple packets by pid
 	last     map[uint16][]byte // last compares current packet payload to last packet payload by pid
 	Pids
+	Cues []Cue
 }
 
 func (stream *Stream) mkMaps() {
@@ -43,7 +41,7 @@ func (stream *Stream) mkMaps() {
 }
 
 // Decode fname (a file name) for SCTE-35
-func (stream *Stream) Decode(fname string) {
+func (stream *Stream) Decode(fname string) []Cue {
 	stream.mkMaps()
 	stream.pktNum = 0
 	file, err := os.Open(fname)
@@ -64,6 +62,7 @@ func (stream *Stream) Decode(fname string) {
 			stream.parse(*pkt)
 		}
 	}
+	return stream.Cues
 }
 
 func (stream *Stream) mkPcr(prgm uint16) float64 {
@@ -262,6 +261,7 @@ func (stream *Stream) parseScte35(pay []byte, pid uint16) {
 	if stream.sectionDone(pay, pid, seclen) {
 		cue := stream.mkCue(pid)
 		if cue.Decode(pay) {
+			stream.Cues = append(stream.Cues, cue)
 			cue.Show()
 		} else {
 			stream.Pids.delScte35Pid(pid)
