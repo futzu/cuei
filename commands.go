@@ -2,11 +2,11 @@ package cuei
 
 type SpliceCommand struct {
 
-    Name                        string  
-    CommandType                 uint8
+    	Name                        string  
+    	CommandType                 uint8
 	Identifier                  uint64  `json:",omitempty"`
 	Bites                       []byte  `json:",omitempty"`
-    SpliceEventID               string  `json:",omitempty"`
+    	SpliceEventID               string  `json:",omitempty"`
 	SpliceEventCancelIndicator  bool    `json:",omitempty"`
 	OutOfNetworkIndicator       bool    `json:",omitempty"`
 	ProgramSpliceFlag           bool    `json:",omitempty"`
@@ -29,10 +29,8 @@ func (cmd *SpliceCommand) Decoder(cmdtype uint8,bitn *Bitn) {
     cmd.CommandType = cmdtype
 	switch cmdtype {
 	case 0:
-        return
-        cmd.SpliceNull(bitn)
+        	cmd.SpliceNull(bitn)
 	case 5:
-
 		cmd.SpliceInsert(bitn)
 	case 6:
 		cmd.TimeSignal(bitn)
