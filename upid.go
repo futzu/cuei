@@ -9,10 +9,10 @@ type Upid struct{
 	Name  	  string        `json:",omitempty"`
     	UpidType  uint8         `json:",omitempty"`
 	Value 	  string        `json:",omitempty"`
-    	TSID      uint64        `json:",omitempty"`
+    	TSID      uint16        `json:",omitempty"`
 	Reserved  uint8         `json:",omitempty"`
 	EndOfDay  uint8         `json:",omitempty"`
-	UniqueFor uint64        `json:",omitempty"`
+	UniqueFor uint16        `json:",omitempty"`
 	ContentID string        `json:",omitempty"`
     	Upids []Upid            `json:",omitempty"`
     	FormatIdentifier string `json:",omitempty"`
@@ -92,10 +92,10 @@ func (upid *Upid) URI(bitn *Bitn, upidlen uint8) {
 
 // Decode for ATSC Upid
 func (upid *Upid) ATSC(bitn *Bitn, upidlen uint8) {
-	upid.TSID = bitn.AsUInt64(16)
+	upid.TSID = bitn.AsUInt16(16)
 	upid.Reserved = bitn.AsUInt8(2)
 	upid.EndOfDay = bitn.AsUInt8(5)
-	upid.UniqueFor = bitn.AsUInt64(9)
+	upid.UniqueFor = bitn.AsUInt16(9)
 	upid.ContentID = bitn.AsAscii(uint((upidlen - 4) << 3))
 }
 
