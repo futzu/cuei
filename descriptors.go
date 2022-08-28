@@ -49,7 +49,7 @@ type SpliceDescriptor struct {
 	SegmentationMessage              string     `json:",omitempty"`
 	SegmentationUpidType             uint8      `json:",omitempty"`
 	SegmentationUpidLength           uint8      `json:",omitempty"`
-	SegmentationUpid                 Upid       `json:",omitempty"`
+	SegmentationUpid                 *Upid      `json:",omitempty"`
 	SegmentationTypeID               uint8      `json:",omitempty"`
 	SegmentNum                       uint8      `json:",omitempty"`
 	SegmentsExpected                 uint8      `json:",omitempty"`
