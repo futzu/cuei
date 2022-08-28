@@ -16,13 +16,12 @@ type Cue struct {
 func (cue *Cue) Decode(bites []byte) bool {
 	var bitn Bitn
 	bitn.Load(bites)
-	if !cue.InfoSection.Decode(&bitn) {
-		return false
-	}        
+	if cue.InfoSection.Decode(&bitn) {        
 		cue.Command.Decoder(cue.InfoSection.SpliceCommandType, &bitn)
 		cue.InfoSection.DescriptorLoopLength = bitn.AsUInt64(16)
 		cue.dscptrLoop(&bitn)
 		return true
+	}
 	return false
 }
 
