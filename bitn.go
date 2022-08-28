@@ -29,13 +29,24 @@ func (b *Bitn) Chunk(bitcount uint) *big.Int {
 	return j
 }
 
-// AsUInt8 trims AsUInt64 to 8 bits for smaller numbers
+// AsUInt8 trims AsUInt64 to 8 bits
 func (b *Bitn) AsUInt8(bitcount uint) uint8 {
 	j := b.AsUInt64(bitcount)
 	return uint8(j)
 
 }
+// AsUInt16 trims AsUInt64 to 16 bits 
+func (b *Bitn) AsUInt16(bitcount uint) uint16 {
+	j := b.AsUInt64(bitcount)
+	return uint16(j)
 
+}
+// AsUInt32 trims AsUInt64 to 32 bits 
+func (b *Bitn) AsUInt16(bitcount uint) uint32 {
+	j := b.AsUInt64(bitcount)
+	return uint32(j)
+
+}
 // AsUInt64 is a wrapper for Chunk
 func (b *Bitn) AsUInt64(bitcount uint) uint64 {
 	j := b.Chunk(bitcount)
