@@ -188,11 +188,11 @@ func (dscptr *SpliceDescriptor) decodeSegmentation(bitn *Bitn) {
 	if ok {
 		dscptr.SegmentationMessage = mesg
 	}
-	SegmentNum   = bitn.AsUInt8(8)     
-	SegmentsExpected   = bitn.AsUInt8(8) 
+	dscptr.SegmentNum   = bitn.AsUInt8(8)     
+	dscptr.SegmentsExpected   = bitn.AsUInt8(8) 
 	subSegIDs := []uint8{0x34,0x36,0x38,0x3a}
 	if isIn8(subSegIDs,dscptr.SegmentationTypeID){
-		SubSegmentNum          = bitn.AsUInt8(8)     
-		SubSegmentsExpected    = bitn.AsUInt8(8)
+		dscptr.SubSegmentNum          = bitn.AsUInt8(8)     
+		dscptr.SubSegmentsExpected    = bitn.AsUInt8(8)
 	}
 }
