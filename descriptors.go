@@ -7,7 +7,7 @@ package cuei
 // AudioCmpt is a struct for AudioDscptr Components
 type AudioCmpt struct {
 	ComponentTag  uint8
-	ISOCode       uint64
+	ISOCode       uint32
 	BitstreamMode uint8
 	NumChannels   uint8
 	FullSrvcAudio bool
@@ -26,7 +26,7 @@ type SpliceDescriptor struct {
     	Tag                             uint8       `json:",omitempty"`
 	Length                          uint8       `json:",omitempty"` 
     	Identifier                      string      `json:",omitempty"`
-	Name                            string     `json:",omitempty"`
+	Name                            string      `json:",omitempty"`
 	AudioComponents                 []AudioCmpt `json:",omitempty"`
 	ProviderAvailID                 uint32      `json:",omitempty"`
     	PreRoll                         uint8       `json:",omitempty"`
@@ -51,10 +51,10 @@ type SpliceDescriptor struct {
 	SegmentationUpidLength           uint8      `json:",omitempty"`
 	SegmentationUpid                 Upid       `json:",omitempty"`
 	SegmentationTypeID               uint8      `json:",omitempty"`
-	SegmentNum                       uint64     `json:",omitempty"`
-	SegmentsExpected                 uint64     `json:",omitempty"`
-	SubSegmentNum                    uint64     `json:",omitempty"`
-	SubSegmentsExpected              uint64     `json:",omitempty"`
+	SegmentNum                       uint8      `json:",omitempty"`
+	SegmentsExpected                 uint8      `json:",omitempty"`
+	SubSegmentNum                    uint8      `json:",omitempty"`
+	SubSegmentsExpected              uint8      `json:",omitempty"`
 }
 
 
@@ -89,7 +89,7 @@ func (dscptr *SpliceDescriptor) Audio(bitn *Bitn, tag uint8, length uint8) {
 	for ccount > 0 {
 		ccount--
 		ct := bitn.AsUInt8(8)
-		iso := bitn.AsUInt64(24)
+		iso := bitn.AsUInt32(24)
 		bsm := bitn.AsUInt8(3)
 		nc := bitn.AsUInt8(4)
 		fsa := bitn.AsBool()
@@ -188,5 +188,11 @@ func (dscptr *SpliceDescriptor) decodeSegmentation(bitn *Bitn) {
 	if ok {
 		dscptr.SegmentationMessage = mesg
 	}
-	bitn.Forward(16)
+	SegmentNum   = bitn.AsUInt8(8)     
+	SegmentsExpected   = bitn.AsUInt8(8) 
+	subSegIDs := []uint8{0x34,0x36,0x38,0x3a}
+	if isIn8(subSegIDs,dscptr.SegmentationTypeID){
+		SubSegmentNum          = bitn.AsUInt8(8)     
+		SubSegmentsExpected    = bitn.AsUInt8(8)
+	}
 }
