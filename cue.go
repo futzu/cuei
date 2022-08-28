@@ -8,7 +8,7 @@ import (
 type Cue struct {
 	InfoSection
 	Command SpliceCommand
-	Descriptors []SpliceDescriptor `json:",omitempty"`
+	Descriptors *[]SpliceDescriptor `json:",omitempty"`
 	Packet      *PacketData   `json:",omitempty"`
 }
 
@@ -27,6 +27,7 @@ func (cue *Cue) Decode(bites []byte) bool {
 
 // DscptrLoop loops over any splice descriptors
 func (cue *Cue) dscptrLoop(bitn *Bitn) {
+	Cue.Descriptors = &[]SpliceDescriptor{} 
 	var i uint16
 	i = 0
 	l := cue.InfoSection.DescriptorLoopLength
