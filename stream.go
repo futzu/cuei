@@ -76,16 +76,16 @@ func (stream *Stream) mkPts(prgm uint16) float64 {
 }
 
 func (stream *Stream) parsePusi(pkt []byte) bool {
-	if (pkt[1]>>6)&1 == 1 {
-		if pkt[6]&1 == 1 {
-			return true
-		}
-	}
-	return false
+	return (pkt[1] & 0x40 == 0x40) 
+	
 }
-
+		
+func (stream *Stream) ptsFlag(pkt []byte) bool {
+	return pkt[11] & 0x80 == 0x80
+}
+		
 func (stream *Stream) parsePts(pkt []byte, pid uint16) {
-	if stream.parsePusi(pkt) {
+	if stream.ptsFlag(pkt) {
 		prgm, ok := stream.pid2Prgm[pid]
 		if ok {
 			pts := (uint64(pkt[13]) >> 1 & 7) << 30
@@ -173,9 +173,10 @@ func (stream *Stream) parse(pkt []byte) {
 	}
 	if stream.isPcrPid(*pid) {
 		stream.parsePcr(pkt, *pid)
-	} 
-	stream.parsePts(pkt, *pid)
-	
+	}
+	if stream.parsePusi(pkt) {
+		stream.parsePts(pkt, *pid)
+	}
 	if stream.isScte35Pid(*pid) {
 		stream.parseScte35(*pay, *pid)
 	}
