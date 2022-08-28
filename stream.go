@@ -29,7 +29,7 @@ type Stream struct {
 	partial  map[uint16][]byte // partial manages tables spread across multiple packets by pid
 	last     map[uint16][]byte // last compares current packet payload to last packet payload by pid
 	Pids
-	Cues []Cue
+	Cues []*Cue
 }
 
 func (stream *Stream) mkMaps() {
@@ -271,7 +271,8 @@ func (stream *Stream) parseScte35(pay []byte, pid uint16) {
 }
 
 func (stream *Stream) mkCue(pid uint16) Cue {
-	var cue Cue
+	var cue = &Cue{}
+	var cue.Packet = &PacketData{}
 	cue.Packet.Pid = pid
 	p := stream.pid2Prgm[pid]
 	prgm := &p
