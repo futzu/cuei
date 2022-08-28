@@ -33,11 +33,11 @@ func (cue *Cue) dscptrLoop(bitn *Bitn) {
 	for i < l {
 		tag := bitn.AsUInt8(8)
 		i++
-		length := bitn.AsUInt8(8)
+		length := bitn.AsUInt16(8)
 		i++
 		i += length
         var sdr SpliceDescriptor
-        sdr.Decoder(bitn, tag, length)
+	sdr.Decoder(bitn, tag, uint8(length))
         cue.Descriptors = append(cue.Descriptors, sdr)
 		}
 }
