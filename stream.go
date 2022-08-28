@@ -272,7 +272,7 @@ func (stream *Stream) parseScte35(pay []byte, pid uint16) {
 
 func (stream *Stream) mkCue(pid uint16) *Cue {
 	cue := &Cue{}
-	cue.Packet := &PacketData{}
+	cue.Packet = &PacketData{}
 	cue.Packet.Pid = pid
 	p := stream.pid2Prgm[pid]
 	prgm := &p
