@@ -18,7 +18,7 @@ func (cue *Cue) Decode(bites []byte) bool {
 	bitn.Load(bites)
 	if cue.InfoSection.Decode(&bitn) {        
 		cue.Command.Decoder(cue.InfoSection.SpliceCommandType, &bitn)
-		cue.InfoSection.DescriptorLoopLength = bitn.AsUInt64(16)
+		cue.InfoSection.DescriptorLoopLength = bitn.AsUInt16(16)
 		cue.dscptrLoop(&bitn)
 		return true
 	}
@@ -27,17 +27,17 @@ func (cue *Cue) Decode(bites []byte) bool {
 
 // DscptrLoop loops over any splice descriptors
 func (cue *Cue) dscptrLoop(bitn *Bitn) {
-	var i uint64
+	var i uint16
 	i = 0
 	l := cue.InfoSection.DescriptorLoopLength
 	for i < l {
 		tag := bitn.AsUInt8(8)
 		i++
-		length := bitn.AsUInt64(8)
+		length := bitn.AsUInt8(8)
 		i++
 		i += length
         var sdr SpliceDescriptor
-        sdr.Decoder(bitn, tag, uint8(length))
+        sdr.Decoder(bitn, tag, length)
         cue.Descriptors = append(cue.Descriptors, sdr)
 		}
 }
