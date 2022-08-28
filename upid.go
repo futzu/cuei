@@ -28,50 +28,48 @@ func (upid *Upid) Decoder(bitn *Bitn, upidType uint8,  upidlen uint8) {
 	
     switch upidType {
 	case 0x01, 0x02:
-        upid.Name = "Deprecated"
+        	upid.Name = "Deprecated"
 		upid.URI(bitn,upidlen)
 	case 0x03:
 		upid.Name = "AdID"
-        upid.URI(bitn,upidlen)
+        	upid.URI(bitn,upidlen)
 	case 0x05, 0x06:
 		upid.Name ="ISAN"
-        upid.ISAN(bitn,upidlen)
+        	upid.ISAN(bitn,upidlen)
 	case 0x07:
 		upid.Name="TID"
-        upid.URI(bitn,upidlen)
+        	upid.URI(bitn,upidlen)
 	case 0x08:
 		upid.Name="AiringID"
-        upid.AirID(bitn,upidlen)
+        	upid.AirID(bitn,upidlen)
 	case 0x09:
 		upid.Name ="ADI"
-        upid.URI(bitn,upidlen)
+        	upid.URI(bitn,upidlen)
 	case 0x0a:
 		upid.Name= "EIDR"
-        upid.EIDR(bitn,upidlen)
+        	upid.EIDR(bitn,upidlen)
 	case 0x0b:
 		upid.Name = "ATSC"
-        upid.ATSC(bitn,upidlen)
+        	upid.ATSC(bitn,upidlen)
 	case 0x0c:
 		upid.Name= "MPU"
-        upid.MPU(bitn,upidlen)
+        	upid.MPU(bitn,upidlen)
 	case 0x0d:
 		upid.Name= "MID"
-        upid.MID(bitn,upidlen)
+        	upid.MID(bitn,upidlen)
 	case 0x0e:
 		upid.Name= "ADS Info"
-        upid.URI(bitn,upidlen)
+        	upid.URI(bitn,upidlen)
 	case 0x0f:
 		upid.Name= "URI"
-        upid.URI(bitn,upidlen)
+        	upid.URI(bitn,upidlen)
 	case 0x10:
 		upid.Name= "UUID"
-        upid.URI(bitn,upidlen)
+        	upid.URI(bitn,upidlen)
 	default:
 		upid.Name= "UPID"
-        upid.URI(bitn,upidlen)
-
+        	upid.URI(bitn,upidlen)
 	}
-
 }
 
 // Decode for AirId
@@ -115,7 +113,6 @@ func (upid *Upid) MPU(bitn *Bitn, upidlen uint8) {
 	ulb := uint(upidlen) << 3
 	upid.FormatIdentifier = bitn.AsHex(32)
 	upid.PrivateData = bitn.AsAscii(ulb - 32)
-
 }
 
 
@@ -132,6 +129,5 @@ func (upid *Upid) MID(bitn *Bitn, upidlen uint8) {
 		var mupid Upid
 		mupid.Decoder(bitn,utype, ulen)
 		upid.Upids = append(upid.Upids, mupid)
-
 	}
 }
