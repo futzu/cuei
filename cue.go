@@ -4,12 +4,15 @@ import (
 	"fmt"
 )
 
+type Descriptors struct {
+	[]SpliceDescriptor
+}	
 // Cue a SCTE35 cue.
 type Cue struct {
 	InfoSection
-	Command SpliceCommand
-	Descriptors *[]SpliceDescriptor `json:",omitempty"`
-	Packet      *PacketData   `json:",omitempty"`
+	Command     SpliceCommand
+	Descriptors  `json:",omitempty"`
+	Packet      *PacketData        `json:",omitempty"`
 }
 
 // Decode extracts bits for the Cue values.
@@ -27,7 +30,6 @@ func (cue *Cue) Decode(bites []byte) bool {
 
 // DscptrLoop loops over any splice descriptors
 func (cue *Cue) dscptrLoop(bitn *Bitn) {
-	Cue.Descriptors = &[]SpliceDescriptor{} 
 	var i uint16
 	i = 0
 	l := cue.InfoSection.DescriptorLoopLength
