@@ -80,19 +80,19 @@ func (stream *Stream) parsePusi(pkt []byte) bool {
 	
 }
 		
-func (stream *Stream) ptsFlag(pkt []byte) bool {
-	return pkt[11] & 0x80 == 0x80
+func (stream *Stream) ptsFlag(pay []byte) bool {
+	return (pay[7] & 0x80 == 0x80)
 }
 		
-func (stream *Stream) parsePts(pkt []byte, pid uint16) {
+func (stream *Stream) parsePts(pay []byte, pid uint16) {
 	if stream.ptsFlag(pkt) {
 		prgm, ok := stream.pid2Prgm[pid]
 		if ok {
-			pts := (uint64(pkt[13]) >> 1 & 7) << 30
-			pts |= uint64(pkt[14]) << 22
-			pts |= (uint64(pkt[15]) >> 1) << 15
-			pts |= uint64(pkt[16]) << 7
-			pts |= uint64(pkt[17]) >> 1
+			pts := (uint64(pay[9]) >> 1 & 7) << 30
+			pts |= uint64(pay[10]) << 22
+			pts |= (uint64(pay[11]) >> 1) << 15
+			pts |= uint64(pay[12]) << 7
+			pts |= uint64(pay[13]) >> 1
 			stream.prgm2pts[prgm] = pts
 		}
 	}
@@ -175,7 +175,7 @@ func (stream *Stream) parse(pkt []byte) {
 		stream.parsePcr(pkt, *pid)
 	}
 	if stream.parsePusi(pkt) {
-		stream.parsePts(pkt, *pid)
+		stream.parsePts(pay, *pid)
 	}
 	if stream.isScte35Pid(*pid) {
 		stream.parseScte35(*pay, *pid)
