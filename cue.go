@@ -9,7 +9,7 @@ type Cue struct {
 	InfoSection
 	Command SpliceCommand
 	Descriptors []SpliceDescriptor `json:",omitempty"`
-	Packet      *PacketData   `json:",omitempty"`
+	Packet      PacketData   `json:",omitempty"`
 }
 
 // Decode extracts bits for the Cue values.
