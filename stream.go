@@ -85,7 +85,7 @@ func (stream *Stream) ptsFlag(pay []byte) bool {
 }
 		
 func (stream *Stream) parsePts(pay []byte, pid uint16) {
-	if stream.ptsFlag(pkt) {
+	if stream.ptsFlag(pay) {
 		prgm, ok := stream.pid2Prgm[pid]
 		if ok {
 			pts := (uint64(pay[9]) >> 1 & 7) << 30
