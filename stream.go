@@ -41,7 +41,7 @@ func (stream *Stream) mkMaps() {
 }
 
 // Decode fname (a file name) for SCTE-35
-func (stream *Stream) Decode(fname string) []Cue {
+func (stream *Stream) Decode(fname string) []*Cue {
 	stream.mkMaps()
 	stream.pktNum = 0
 	file, err := os.Open(fname)
