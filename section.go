@@ -17,7 +17,7 @@ type InfoSection struct {
 	Tier                   string
 	SpliceCommandLength    uint16
 	SpliceCommandType      uint8
-	DescriptorLoopLength   uint64
+	DescriptorLoopLength   uint16
 }
 
 // Decode splice info section values.
