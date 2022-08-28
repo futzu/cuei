@@ -8,14 +8,14 @@ type InfoSection struct {
 	SectionSyntaxIndicator bool
 	Private                bool
 	Reserved               string
-	SectionLength          uint64
+	SectionLength          uint16
 	ProtocolVersion        uint8
 	EncryptedPacket        bool
 	EncryptionAlgorithm    uint8
 	PtsAdjustment          float64
 	CwIndex                string
 	Tier                   string
-	SpliceCommandLength    uint64
+	SpliceCommandLength    uint16
 	SpliceCommandType      uint8
 	DescriptorLoopLength   uint64
 }
@@ -33,7 +33,7 @@ func (infosec *InfoSection) Decode(bitn *Bitn) bool {
 	}
 	infosec.Private = bitn.AsBool()
 	infosec.Reserved = bitn.AsHex(2)
-	infosec.SectionLength = bitn.AsUInt64(12)
+	infosec.SectionLength = bitn.AsUInt16(12)
 	infosec.ProtocolVersion = bitn.AsUInt8(8)
 	if infosec.ProtocolVersion != 0 {
 		return false
@@ -43,7 +43,7 @@ func (infosec *InfoSection) Decode(bitn *Bitn) bool {
 	infosec.PtsAdjustment = bitn.As90k(33)
 	infosec.CwIndex = bitn.AsHex(8)
 	infosec.Tier = bitn.AsHex(12)
-	infosec.SpliceCommandLength = bitn.AsUInt64(12)
+	infosec.SpliceCommandLength = bitn.AsUInt16(12)
 	infosec.SpliceCommandType = bitn.AsUInt8(8)
 	return true
 }
