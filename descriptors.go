@@ -28,13 +28,13 @@ type SpliceDescriptor struct {
     	Identifier                      string      `json:",omitempty"`
 	Name                            string     `json:",omitempty"`
 	AudioComponents                 []AudioCmpt `json:",omitempty"`
-	ProviderAvailID                 uint64      `json:",omitempty"`
+	ProviderAvailID                 uint32      `json:",omitempty"`
     	PreRoll                         uint8       `json:",omitempty"`
 	DTMFCount                       uint8       `json:",omitempty"`
 	DTMFChars                       uint64      `json:",omitempty"`
     	TAISeconds                      uint64      `json:",omitempty"`
-	TAINano                         uint64      `json:",omitempty"`
-	UTCOffset                       uint64      `json:",omitempty"`
+	TAINano                         uint32      `json:",omitempty"`
+	UTCOffset                       uint16      `json:",omitempty"`
 	SegmentationEventID              string     `json:",omitempty"`
 	SegmentationEventCancelIndicator bool       `json:",omitempty"`
 	ProgramSegmentationFlag          bool       `json:",omitempty"`
@@ -104,7 +104,7 @@ func (dscptr *SpliceDescriptor) Avail(bitn *Bitn, tag uint8, length uint8) {
 	dscptr.Length = length
 	dscptr.Identifier = bitn.AsAscii(32)
 	dscptr.Name = "Avail Descriptor"
-	dscptr.ProviderAvailID = bitn.AsUInt64(32)
+	dscptr.ProviderAvailID = bitn.AsUInt32(32)
 }
 
 //  DTMF Splice Descriptor
@@ -127,8 +127,8 @@ func (dscptr *SpliceDescriptor) Time(bitn *Bitn, tag uint8, length uint8) {
 	dscptr.Identifier = bitn.AsAscii(32)
 	dscptr.Name = "Time Descriptor"
 	dscptr.TAISeconds = bitn.AsUInt64(48)
-	dscptr.TAINano = bitn.AsUInt64(32)
-	dscptr.UTCOffset = bitn.AsUInt64(16)
+	dscptr.TAINano = bitn.AsUInt32(32)
+	dscptr.UTCOffset = bitn.AsUInt16(16)
 }
 
 
