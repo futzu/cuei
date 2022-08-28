@@ -173,9 +173,9 @@ func (stream *Stream) parse(pkt []byte) {
 	}
 	if stream.isPcrPid(*pid) {
 		stream.parsePcr(pkt, *pid)
-	} else {
-		stream.parsePts(pkt, *pid)
-	}
+	} 
+	stream.parsePts(pkt, *pid)
+	
 	if stream.isScte35Pid(*pid) {
 		stream.parseScte35(*pay, *pid)
 	}
