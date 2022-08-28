@@ -4,14 +4,12 @@ import (
 	"fmt"
 )
 
-type Descriptors struct {
-	[]SpliceDescriptor
-}	
+
 // Cue a SCTE35 cue.
 type Cue struct {
 	InfoSection
 	Command     SpliceCommand
-	Descriptors  `json:",omitempty"`
+	Descriptors []SpliceDescriptor `json:",omitempty"`
 	Packet      *PacketData        `json:",omitempty"`
 }
 
