@@ -42,7 +42,7 @@ func (b *Bitn) AsUInt16(bitcount uint) uint16 {
 
 }
 // AsUInt32 trims AsUInt64 to 32 bits 
-func (b *Bitn) AsUInt16(bitcount uint) uint32 {
+func (b *Bitn) AsUInt32(bitcount uint) uint32 {
 	j := b.AsUInt64(bitcount)
 	return uint32(j)
 
