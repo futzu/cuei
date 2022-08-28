@@ -4,7 +4,7 @@ type SpliceCommand struct {
 
     	Name                        string  
     	CommandType                 uint8
-	Identifier                  uint64  `json:",omitempty"`
+	Identifier                  uint32  `json:",omitempty"`
 	Bites                       []byte  `json:",omitempty"`
     	SpliceEventID               string  `json:",omitempty"`
 	SpliceEventCancelIndicator  bool    `json:",omitempty"`
@@ -16,7 +16,7 @@ type SpliceCommand struct {
 	SpliceImmediateFlag         bool    `json:",omitempty"`
 	ComponentCount              uint8   `json:",omitempty"`
 	Components                  []uint8 `json:",omitempty"`
-	UniqueProgramID             uint64  `json:",omitempty"`
+	UniqueProgramID             uint16  `json:",omitempty"`
 	AvailNum                    uint8   `json:",omitempty"`
 	AvailExpected               uint8   `json:",omitempty"`
 	TimeSpecifiedFlag           bool    `json:",omitempty"`
@@ -51,7 +51,7 @@ func (cmd *SpliceCommand) BandwidthReservation(bitn *Bitn) {
 // Private Command
 func (cmd *SpliceCommand) Private(bitn *Bitn) {
 	cmd.Name = "Private Command"
-	cmd.Identifier = bitn.AsUInt64(32)
+	cmd.Identifier = bitn.AsUInt32(32)
 	cmd.Bites = bitn.AsBytes(24)
 }
 
@@ -92,7 +92,7 @@ func (cmd *SpliceCommand) SpliceInsert(bitn *Bitn) {
 	if cmd.DurationFlag == true {
 		cmd.parseBreak(bitn)
 	}
-	cmd.UniqueProgramID = bitn.AsUInt64(16)
+	cmd.UniqueProgramID = bitn.AsUInt16(16)
 	cmd.AvailNum = bitn.AsUInt8(8)
 	cmd.AvailExpected = bitn.AsUInt8(8)
 }
