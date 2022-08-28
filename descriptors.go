@@ -180,11 +180,9 @@ func (dscptr *SpliceDescriptor) decodeSegmentation(bitn *Bitn) {
 		dscptr.SegmentationDuration = bitn.As90k(40)
 	}
 	dscptr.SegmentationUpidType = bitn.AsUInt8(8)
-	if dscptr.SegmentationUpidType > 0 {
-		dscptr.SegmentationUpidLength = bitn.AsUInt8(8)
-		dscptr.SegmentationUpid = &Upid{}
-    		dscptr.SegmentationUpid.Decoder(bitn, dscptr.SegmentationUpidType,dscptr.SegmentationUpidLength )
-	}
+	dscptr.SegmentationUpidLength = bitn.AsUInt8(8)
+	dscptr.SegmentationUpid = &Upid{}
+    	dscptr.SegmentationUpid.Decoder(bitn, dscptr.SegmentationUpidType,dscptr.SegmentationUpidLength )
 	dscptr.SegmentationTypeID = bitn.AsUInt8(8)
 
 	mesg, ok := table22[dscptr.SegmentationTypeID]
