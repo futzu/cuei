@@ -25,23 +25,23 @@ type SpliceCommand struct {
 	AvailExpected               uint8   `json:",omitempty"`
 	TimeSpecifiedFlag           bool    `json:",omitempty"`
 	PTS                         float64 `json:",omitempty"`
-    
 }
 
 // CommandDecoder returns a Command by cmdtype
-func (cmd *SpliceCommand) Decoder(cmdtype uint8,gob *gob.Gob) {
+func (cmd *SpliceCommand) Decoder(cmdtype uint8,g *gob.Gob) {
+    
    
     //cmd.CommandType = cmdtype
-	cmdmap := map[uint8]func(*gob.Gob) {
+	cmdmap := map[uint8]func(*gob.Gob ) {
 	    0:cmd.SpliceNull,
 	    5:cmd.SpliceInsert,
 	    6:cmd.TimeSignal,
-            7:cmd.BandwidthReservation,
-          255:cmd.Private,
+        7:cmd.BandwidthReservation,
+        255:cmd.Private,
 	}
     fn, ok := cmdmap[cmd.CommandType]
 	if ok {
-		fn(gob)
+		fn(g)
 	}
 	
 }
