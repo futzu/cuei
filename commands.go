@@ -30,18 +30,18 @@ type SpliceCommand struct {
 
 // CommandDecoder returns a Command by cmdtype
 func (cmd *SpliceCommand) Decoder(cmdtype uint8,gob *gob.Gob) {
-    cmd.CommandType = cmdtype
-	switch cmdtype {
-	case 0:
-        	cmd.SpliceNull(gob)
-	case 5:
-		cmd.SpliceInsert(gob)
-	case 6:
-		cmd.TimeSignal(gob)
-	case 7:
-		cmd.BandwidthReservation(gob)
-	case 255:
-		cmd.Private(gob)
+   
+    //cmd.CommandType = cmdtype
+	cmdmap := map[uint8]func(*gob.Gob) {
+	    0:cmd.SpliceNull,
+	    5:cmd.SpliceInsert,
+	    6:cmd.TimeSignal,
+            7:cmd.BandwidthReservation,
+          255:cmd.Private,
+	}
+    fn, ok := cmdmap[cmd.CommandType]
+	if ok {
+		fn(gob)
 	}
 	
 }
