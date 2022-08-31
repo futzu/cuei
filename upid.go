@@ -2,7 +2,6 @@ package cuei
 
 import (
 	"fmt"
-	//    "github.com/futzu/gob"
 )
 
 // Upid is the Struct for Segmentation Upida
