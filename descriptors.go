@@ -1,6 +1,5 @@
 package cuei
 
-//import "github.com/futzu/gob"
 
 // AudioCmpt is a struct for AudioDscptr Components
 type AudioCmpt struct {
