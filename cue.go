@@ -2,7 +2,6 @@ package cuei
 
 import (
 	"fmt"
-	//    "github.com/futzu/gob"
 )
 
 // Cue a SCTE35 cue.
