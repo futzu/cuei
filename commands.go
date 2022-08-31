@@ -1,8 +1,5 @@
 package cuei
 
-import (
-//    "github.com/futzu/gob"
-)
 
 type SpliceCommand struct {
 	Name                       string
