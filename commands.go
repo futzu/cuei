@@ -25,100 +25,99 @@ type SpliceCommand struct {
 	AvailExpected               uint8   `json:",omitempty"`
 	TimeSpecifiedFlag           bool    `json:",omitempty"`
 	PTS                         float64 `json:",omitempty"`
-    
+    gob                          *gob.Gob
 }
 
 // CommandDecoder returns a Command by cmdtype
 func (cmd *SpliceCommand) Decoder(cmdtype uint8,gob *gob.Gob) {
-    cmd.CommandType = cmdtype
-	switch cmdtype {
-	case 0:
-        	cmd.SpliceNull(gob)
-	case 5:
-		cmd.SpliceInsert(gob)
-	case 6:
-		cmd.TimeSignal(gob)
-	case 7:
-		cmd.BandwidthReservation(gob)
-	case 255:
-		cmd.Private(gob)
+    cmd.gob = gob
+    //cmd.CommandType = cmdtype
+	cmdmap := map[uint8]func() {
+	    0:cmd.SpliceNull,
+	    5:cmd.SpliceInsert,
+	    6:cmd.TimeSignal,
+        7:cmd.BandwidthReservation,
+        255:cmd.Private,
+	}
+    fn, ok := cmdmap[cmd.CommandType]
+	if ok {
+		fn()
 	}
 	
 }
 
 
 // Bandwidth Reservation
-func (cmd *SpliceCommand) BandwidthReservation(gob *gob.Gob) {
+func (cmd *SpliceCommand) BandwidthReservation() {
 	cmd.Name = "Bandwidth Reservation"
-	gob.Forward(0)
+	cmd.gob.Forward(0)
 }
 // Private Command
-func (cmd *SpliceCommand) Private(gob *gob.Gob) {
+func (cmd *SpliceCommand) Private() {
 	cmd.Name = "Private Command"
-	cmd.Identifier = gob.UInt32(32)
-	cmd.Bites = gob.Bytes(24)
+	cmd.Identifier = cmd.gob.UInt32(32)
+	cmd.Bites = cmd.gob.Bytes(24)
 }
 
 // Splice Null
-func (cmd *SpliceCommand) SpliceNull(gob *gob.Gob) {
+func (cmd *SpliceCommand) SpliceNull() {
 	cmd.Name = "Splice Null"
-	gob.Forward(0)
 }
 
 // Splice Insert
-func (cmd *SpliceCommand) SpliceInsert(gob *gob.Gob) {
+func (cmd *SpliceCommand) SpliceInsert() {
 	cmd.Name = "Splice Insert"
-	cmd.SpliceEventID = gob.Hex(32)
-	cmd.SpliceEventCancelIndicator = gob.Bool()
-	gob.Forward(7)
+	cmd.SpliceEventID = cmd.gob.Hex(32)
+	cmd.SpliceEventCancelIndicator = cmd.gob.Bool()
+	cmd.gob.Forward(7)
 	if !cmd.SpliceEventCancelIndicator {
-		cmd.OutOfNetworkIndicator = gob.Bool()
-		cmd.ProgramSpliceFlag = gob.Bool()
-		cmd.DurationFlag = gob.Bool()
-		cmd.SpliceImmediateFlag = gob.Bool()
-		gob.Forward(4)
+		cmd.OutOfNetworkIndicator = cmd.gob.Bool()
+		cmd.ProgramSpliceFlag = cmd.gob.Bool()
+		cmd.DurationFlag = cmd.gob.Bool()
+		cmd.SpliceImmediateFlag = cmd.gob.Bool()
+		cmd.gob.Forward(4)
 	}
 	if cmd.ProgramSpliceFlag == true {
 		if !cmd.SpliceImmediateFlag {
-			cmd.spliceTime(gob)
+			cmd.spliceTime()
 		}
 	} else {
-		cmd.ComponentCount = gob.UInt8(8)
+		cmd.ComponentCount = cmd.gob.UInt8(8)
 		var Components [256]uint8
 		cmd.Components = Components[0:cmd.ComponentCount]
 		for i := range cmd.Components {
-			cmd.Components[i] = gob.UInt8(8)
+			cmd.Components[i] = cmd.gob.UInt8(8)
 		}
 		if !cmd.SpliceImmediateFlag {
-			cmd.spliceTime(gob)
+			cmd.spliceTime()
 		}
 	}
 	if cmd.DurationFlag == true {
-		cmd.parseBreak(gob)
+		cmd.parseBreak()
 	}
-	cmd.UniqueProgramID = gob.UInt16(16)
-	cmd.AvailNum = gob.UInt8(8)
-	cmd.AvailExpected = gob.UInt8(8)
+	cmd.UniqueProgramID = cmd.gob.UInt16(16)
+	cmd.AvailNum = cmd.gob.UInt8(8)
+	cmd.AvailExpected = cmd.gob.UInt8(8)
 }
 
-func (cmd *SpliceCommand) parseBreak(gob *gob.Gob) {
-	cmd.BreakAutoReturn = gob.Bool()
-	gob.Forward(6)
-	cmd.BreakDuration = gob.As90k(33)
+func (cmd *SpliceCommand) parseBreak() {
+	cmd.BreakAutoReturn = cmd.gob.Bool()
+	cmd.gob.Forward(6)
+	cmd.BreakDuration = cmd.gob.As90k(33)
 }
 
-func (cmd *SpliceCommand) spliceTime(gob *gob.Gob) {
-	cmd.TimeSpecifiedFlag = gob.Bool()
+func (cmd *SpliceCommand) spliceTime() {
+	cmd.TimeSpecifiedFlag = cmd.gob.Bool()
 	if cmd.TimeSpecifiedFlag {
-		gob.Forward(6)
-		cmd.PTS = gob.As90k(33)
+		cmd.gob.Forward(6)
+		cmd.PTS = cmd.gob.As90k(33)
 	} else {
-		gob.Forward(7)
+		cmd.gob.Forward(7)
 	}
 }
 
 // Time Signal
-func (cmd *SpliceCommand) TimeSignal(gob *gob.Gob) {
+func (cmd *SpliceCommand) TimeSignal() {
 	cmd.Name = "Time Signal"
-	cmd.spliceTime(gob)
+	cmd.spliceTime()
 }
