@@ -1,8 +1,5 @@
 package cuei
 
-import (
-//    "github.com/futzu/gob"
-)
 
 // InfoSection is the splice info section of the SCTE 35 cue.
 type InfoSection struct {
