@@ -79,7 +79,14 @@ func (stream *Stream) parsePusi(pkt []byte) bool {
 	return (pkt[1] & 0x40 == 0x40) 
 	
 }
-		
+
+func (stream *Stream) afcFlag(pkt []byte) bool {
+	return (pkt[3] & 0x20 == 0x20) 	
+}
+
+func (stream *Stream) pcrFlag(pkt []byte) bool {
+	return (pkt[5] & 0x10 == 0x10) 	
+}
 func (stream *Stream) ptsFlag(pay []byte) bool {
 	return (pay[7] & 0x80 == 0x80)
 }
@@ -100,8 +107,8 @@ func (stream *Stream) parsePts(pay []byte, pid uint16) {
 
 //
 func (stream *Stream) parsePcr(pkt []byte, pid uint16) {
-	if (pkt[3]>>5)&1 == 1 {
-		if (pkt[5]>>4)&1 == 1 {
+	if stream.afcFlag(pkt) {
+		if stream.pcrFlag(pkt) {
 			pcr := (uint64(pkt[6]) << 25)
 			pcr |= (uint64(pkt[7]) << 17)
 			pcr |= (uint64(pkt[8]) << 9)
@@ -116,8 +123,7 @@ func (stream *Stream) parsePcr(pkt []byte, pid uint16) {
 //parsePay packet payload starts after header and afc (if present)
 func (stream *Stream) parsePayload(pkt []byte) []byte {
 	head := 4
-	hasafc := (pkt[3] >> 5) & 1
-	if hasafc == 1 {
+	if stream.afcFlag(pkt){
 		afl := int(pkt[4])
 		head += afl + 1
 	}
