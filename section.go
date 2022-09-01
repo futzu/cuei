@@ -27,18 +27,18 @@ func (infosec *InfoSection) Decode(gob *Gob) bool {
 	if infosec.TableID != "0xfc" {
 		return false
 	}
-	infosec.SectionSyntaxIndicator = gob.Bool()
+	infosec.SectionSyntaxIndicator = gob.Flag()
 	if infosec.SectionSyntaxIndicator {
 		return false
 	}
-	infosec.Private = gob.Bool()
+	infosec.Private = gob.Flag()
 	infosec.Reserved = gob.Hex(2)
 	infosec.SectionLength = gob.UInt16(12)
 	infosec.ProtocolVersion = gob.UInt8(8)
 	if infosec.ProtocolVersion != 0 {
 		return false
 	}
-	infosec.EncryptedPacket = gob.Bool()
+	infosec.EncryptedPacket = gob.Flag()
 	infosec.EncryptionAlgorithm = gob.UInt8(6)
 	infosec.PtsAdjustment = gob.As90k(33)
 	infosec.CwIndex = gob.Hex(8)
