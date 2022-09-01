@@ -68,7 +68,8 @@ func (g *Gob) Flag() bool {
 
 func (g *Gob) Bool() bool {
 	return g.Flag()
-	
+}
+
 // Float slices bitcount of bits and returns  float64
 func (g *Gob) Float(bitcount uint) float64 {
 	j := g.UInt64(bitcount)
