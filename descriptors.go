@@ -1,4 +1,4 @@
-package cuei
+ppackage cuei
 
 
 // AudioCmpt is a struct for AudioDscptr Components
@@ -84,7 +84,7 @@ func (dscptr *SpliceDescriptor) Audio(gob *Gob, tag uint8, length uint8) {
 		iso := gob.UInt32(24)
 		bsm := gob.UInt8(3)
 		nc := gob.UInt8(4)
-		fsa := gob.Bool()
+		fsa := gob.Flag()
 		dscptr.AudioComponents = append(dscptr.AudioComponents, AudioCmpt{ct, iso, bsm, nc, fsa})
 	}
 }
@@ -129,7 +129,7 @@ func (dscptr *SpliceDescriptor) Segmentation(gob *Gob, tag uint8, length uint8) 
 	dscptr.Identifier = gob.Ascii(32)
 	dscptr.Name = "Segmentation Descriptor"
 	dscptr.SegmentationEventID = gob.Hex(32)
-	dscptr.SegmentationEventCancelIndicator = gob.Bool()
+	dscptr.SegmentationEventCancelIndicator = gob.Flag()
 	gob.Forward(7)
 	if !dscptr.SegmentationEventCancelIndicator {
 		dscptr.decodeSegFlags(gob)
@@ -141,13 +141,13 @@ func (dscptr *SpliceDescriptor) Segmentation(gob *Gob, tag uint8, length uint8) 
 }
 
 func (dscptr *SpliceDescriptor) decodeSegFlags(gob *Gob) {
-	dscptr.ProgramSegmentationFlag = gob.Bool()
-	dscptr.SegmentationDurationFlag = gob.Bool()
-	dscptr.DeliveryNotRestrictedFlag = gob.Bool()
-	if dscptr.DeliveryNotRestrictedFlag == false {
-		dscptr.WebDeliveryAllowedFlag = gob.Bool()
-		dscptr.NoRegionalBlackoutFlag = gob.Bool()
-		dscptr.ArchiveAllowedFlag = gob.Bool()
+	dscptr.ProgramSegmentationFlag = gob.Flag()
+	dscptr.SegmentationDurationFlag = gob.Flag()
+	dscptr.DeliveryNotRestrictedFlag = gob.Flag()
+	if !dscptr.DeliveryNotRestrictedFlag {
+		dscptr.WebDeliveryAllowedFlag = gob.Flag()
+		dscptr.NoRegionalBlackoutFlag = gob.Flag()
+		dscptr.ArchiveAllowedFlag = gob.Flag()
 		dscptr.DeviceRestrictions = table20[gob.UInt8(2)]
 		return
 	}
@@ -166,7 +166,7 @@ func (dscptr *SpliceDescriptor) decodeSegCmpnts(gob *Gob) {
 }
 
 func (dscptr *SpliceDescriptor) decodeSegmentation(gob *Gob) {
-	if dscptr.SegmentationDurationFlag == true {
+	if dscptr.SegmentationDurationFlag {
 		dscptr.SegmentationDuration = gob.As90k(40)
 	}
 	dscptr.SegmentationUpidType = gob.UInt8(8)
