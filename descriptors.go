@@ -1,4 +1,4 @@
-ppackage cuei
+package cuei
 
 
 // AudioCmpt is a struct for AudioDscptr Components
