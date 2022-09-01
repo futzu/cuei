@@ -64,13 +64,13 @@ func (cmd *SpliceCommand) SpliceNull(gob *Gob) {
 func (cmd *SpliceCommand) SpliceInsert(gob *Gob) {
 	cmd.Name = "Splice Insert"
 	cmd.SpliceEventID = gob.Hex(32)
-	cmd.SpliceEventCancelIndicator = gob.Bool()
+	cmd.SpliceEventCancelIndicator = gob.Flag()
 	gob.Forward(7)
 	if !cmd.SpliceEventCancelIndicator {
-		cmd.OutOfNetworkIndicator = gob.Bool()
-		cmd.ProgramSpliceFlag = gob.Bool()
-		cmd.DurationFlag = gob.Bool()
-		cmd.SpliceImmediateFlag = gob.Bool()
+		cmd.OutOfNetworkIndicator = gob.Flag()
+		cmd.ProgramSpliceFlag = gob.Flag()
+		cmd.DurationFlag = gob.Flag()
+		cmd.SpliceImmediateFlag = gob.Flag()
 		gob.Forward(4)
 	}
 	if cmd.ProgramSpliceFlag == true {
@@ -97,13 +97,13 @@ func (cmd *SpliceCommand) SpliceInsert(gob *Gob) {
 }
 
 func (cmd *SpliceCommand) parseBreak(gob *Gob) {
-	cmd.BreakAutoReturn = gob.Bool()
+	cmd.BreakAutoReturn = gob.Flag()
 	gob.Forward(6)
 	cmd.BreakDuration = gob.As90k(33)
 }
 
 func (cmd *SpliceCommand) spliceTime(gob *Gob) {
-	cmd.TimeSpecifiedFlag = gob.Bool()
+	cmd.TimeSpecifiedFlag = gob.Flag()
 	if cmd.TimeSpecifiedFlag {
 		gob.Forward(6)
 		cmd.PTS = gob.As90k(33)
