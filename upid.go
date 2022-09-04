@@ -24,53 +24,48 @@ func (upid *Upid) Decoder(gob *Gob, upidType uint8, upidlen uint8) {
 
 	upid.UpidType = upidType
 
-	switch upidType {
-	case 0x01, 0x02:
-		upid.Name = "Deprecated"
-		upid.URI(gob, upidlen)
-	case 0x03:
-		upid.Name = "AdID"
-		upid.URI(gob, upidlen)
-	case 0x05, 0x06:
-		upid.Name = "ISAN"
-		upid.ISAN(gob, upidlen)
-	case 0x07:
-		upid.Name = "TID"
-		upid.URI(gob, upidlen)
-	case 0x08:
-		upid.Name = "AiringID"
-		upid.AirID(gob, upidlen)
-	case 0x09:
-		upid.Name = "ADI"
-		upid.URI(gob, upidlen)
-	case 0x10:
-		upid.Name = "UUID"
-		upid.URI(gob, upidlen)
-	case 0x11:
-		upid.Name = "SCR"
-		upid.URI(gob, upidlen)
-	case 0x0a:
-		upid.Name = "EIDR"
-		upid.EIDR(gob, upidlen)
-	case 0x0b:
-		upid.Name = "ATSC"
-		upid.ATSC(gob, upidlen)
-	case 0x0c:
-		upid.Name = "MPU"
-		upid.MPU(gob, upidlen)
-	case 0x0d:
-		upid.Name = "MID"
-		upid.MID(gob, upidlen)
-	case 0x0e:
-		upid.Name = "ADS Info"
-		upid.URI(gob, upidlen)
-	case 0x0f:
-		upid.Name = "URI"
-		upid.URI(gob, upidlen)
+	var uri_upids = map[uint8]string{
+		0x01: "Deprecated",
+		0x02: "Deprecated",
+		0x03: "AdID",
+		0x07: "TID",
+		0x09: "ADI",
+		0x10: "UUID",
+		0x11: "SCR",
+		0x0e: "ADS Info",
+		0x0f: "URI",
+	}
 
-	default:
-		upid.Name = "UPID"
+	name, ok := uri_upids[upidType]
+	if ok {
+		upid.Name = name
 		upid.URI(gob, upidlen)
+	} else {
+
+		switch upidType {
+
+		case 0x05, 0x06:
+			upid.Name = "ISAN"
+			upid.ISAN(gob, upidlen)
+		case 0x08:
+			upid.Name = "AiringID"
+			upid.AirID(gob, upidlen)
+		case 0x0a:
+			upid.Name = "EIDR"
+			upid.EIDR(gob, upidlen)
+		case 0x0b:
+			upid.Name = "ATSC"
+			upid.ATSC(gob, upidlen)
+		case 0x0c:
+			upid.Name = "MPU"
+			upid.MPU(gob, upidlen)
+		case 0x0d:
+			upid.Name = "MID"
+			upid.MID(gob, upidlen)
+		default:
+			upid.Name = "UPID"
+			upid.URI(gob, upidlen)
+		}
 	}
 }
 
