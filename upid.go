@@ -43,6 +43,12 @@ func (upid *Upid) Decoder(gob *Gob, upidType uint8, upidlen uint8) {
 	case 0x09:
 		upid.Name = "ADI"
 		upid.URI(gob, upidlen)
+	case 0x10:
+		upid.Name = "UUID"
+		upid.URI(gob, upidlen)
+	case 0x11:
+		upid.Name = "SCR"
+		upid.URI(gob, upidlen)
 	case 0x0a:
 		upid.Name = "EIDR"
 		upid.EIDR(gob, upidlen)
@@ -61,9 +67,7 @@ func (upid *Upid) Decoder(gob *Gob, upidType uint8, upidlen uint8) {
 	case 0x0f:
 		upid.Name = "URI"
 		upid.URI(gob, upidlen)
-	case 0x10:
-		upid.Name = "UUID"
-		upid.URI(gob, upidlen)
+
 	default:
 		upid.Name = "UPID"
 		upid.URI(gob, upidlen)
