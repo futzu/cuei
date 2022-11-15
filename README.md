@@ -117,3 +117,64 @@ func main(){
         fmt.Printf("\nCue.Descriptors[0]\n\n%+v\n",cue.Descriptors[0])         
 }
 ```
+#### `Override a Cue struct method`
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/futzu/cuei"
+)
+
+type Cue2 struct {
+    cuei.Cue               		// Embed cuei.Cue
+}
+func (cue2 *Cue2) Show() {        	// Override Show
+	fmt.Printf("%+v",cue2.Command)
+}
+
+func main(){
+
+	var cue2 Cue2
+	data := cuei.DeB64("/DA7AAAAAAAAAP/wFAUAAAABf+/+AItfZn4AKTLgAAEAAAAWAhRDVUVJAAAAAX//AAApMuABACIBAIoXZrM=")
+        cue2.Decode(data) 
+        cue2.Show()
+	
+}
+
+```
+
+#### Override a method and call the original method.  ( like super() in python)
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/futzu/cuei"
+)
+
+type Cue2 struct {
+    cuei.Cue               		// Embed cuei.Cue
+}
+func (cue2 *Cue2) Show() {        	// Override Show
+
+	fmt.Println("Cue2.Show()")
+	fmt.Printf("%+v",cue2.Command) 
+	
+	fmt.Println("\n\ncuei.Cue.Show() from cue2.Show()")
+	
+	cue2.Cue.Show()			// Call the Show method from embedded cuei.Cue
+}
+
+func main(){
+
+	var cue2 Cue2
+	data := cuei.DeB64("/DA7AAAAAAAAAP/wFAUAAAABf+/+AItfZn4AKTLgAAEAAAAWAhRDVUVJAAAAAX//AAApMuABACIBAIoXZrM=")
+        cue2.Decode(data) 
+        cue2.Show()
+	
+}
+
+
+```
+
