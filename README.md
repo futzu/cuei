@@ -3,11 +3,11 @@ install
 
 #### `install cuei`
 
-```sh
+```go
 go install github.com/futzu/cuei
 ```
 #### `fetch cueidemo.go`
-```sh
+```rebol
 curl http://iodisco.com/cueidemo.go -o cueidemo.go
 ```
 #### `build cueidemo`
@@ -15,12 +15,12 @@ curl http://iodisco.com/cueidemo.go -o cueidemo.go
 go build cueidemo.go
 ```
 #### `parse mpegts video for scte35` 
-```go
+```rebol
 ./cueidemo a_video_with_scte35.ts
 ```
 
 #### `output`
-```js
+```rebol
 Next File: mpegts/out.ts
 
 {
