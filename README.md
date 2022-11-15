@@ -98,7 +98,7 @@ func main(){
 
 ```
 #### `parse base64 encoded SCTE-35`
-```
+```go
 package main
 
 import (
