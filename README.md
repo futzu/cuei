@@ -1,5 +1,13 @@
 # cuei
-install
+
+* [Install](#install-cuei)
+* [Parse Base64 Encoded SCTE-35](#parse-base64-encoded-scte-35)      
+* [Parse SCTE-35 from MPEGTS](#parse-mpegts-video-for-scte35)
+* [Shadow a Cue Struct Method(override)](#shadow-a-cue-struct-method)
+* [Shadow a Cue Method and call the Shadowed Method like super in python](#call-a-shadowed-method)
+
+
+
 
 #### `install cuei`
 
@@ -117,7 +125,7 @@ func main(){
         fmt.Printf("\nCue.Descriptors[0]\n\n%+v\n",cue.Descriptors[0])         
 }
 ```
-#### `Override a Cue struct method`
+#### `Shadow a Cue struct method`
 ```go
 package main
 
@@ -144,7 +152,7 @@ func main(){
 
 ```
 
-#### Override a method and call the original method.  ( like super() in python)
+#### Call a shadowed method
 ```go
 package main
 
