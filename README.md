@@ -1,25 +1,25 @@
 # cuei
 install
 
-* install cuei
+#### `install cuei`
 
 ```sh
 go install github.com/futzu/cuei
 ```
-* fetch cueidemo.go
+#### `fetch cueidemo.go`
 ```sh
 curl http://iodisco.com/cueidemo.go -o cueidemo.go
 ```
-* build cueidemo
+#### `build cueidemo`
 ```go
 go build cueidemo.go
 ```
-* use cuei to parse mpegts video for scte35 
+#### `parse mpegts video for scte35` 
 ```go
 ./cueidemo a_video_with_scte35.ts
 ```
 
-* output looks like
+#### `output`
 ```js
 Next File: mpegts/out.ts
 
@@ -96,4 +96,24 @@ func main(){
 } 
 
 
+```
+#### `parse base64 encoded SCTE-35`
+```
+package main
+
+import (
+	"fmt"
+	"github.com/futzu/cuei"
+)
+
+func main(){
+
+	var cue cuei.Cue
+	data := cuei.DeB64("/DA7AAAAAAAAAP/wFAUAAAABf+/+AItfZn4AKTLgAAEAAAAWAhRDVUVJAAAAAX//AAApMuABACIBAIoXZrM=")
+        cue.Decode(data) 
+        fmt.Println("Cue as Json")
+        cue.Show()
+        fmt.Printf("\nCue.Command\n\n%+v\n",cue.Command)          
+        fmt.Printf("\nCue.Descriptors[0]\n\n%+v\n",cue.Descriptors[0])         
+}
 ```
