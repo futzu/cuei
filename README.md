@@ -1,10 +1,11 @@
 # cuei
 
 * [Install](#install-cuei)
-* [Parse Base64 Encoded SCTE-35](#parse-base64-encoded-scte-35)      
-* [Parse SCTE-35 from MPEGTS](#parse-mpegts-video-for-scte35)
-* [Shadow a Cue Struct Method(override)](#shadow-a-cue-struct-method)
-* [Shadow a Cue Method and call the Shadowed Method like super in python](#call-a-shadowed-method)
+* Examples
+	* [Parse Base64 encoded SCTE-35](#parse-base64-encoded-scte-35)      
+	* [Parse SCTE-35 from MPEGTS](#parse-mpegts-video-for-scte35)
+	* [Shadow a Cue Struct Method ( override ) ](#shadow-a-cue-struct-method)
+	* [Shadow a Cue Method and call the Shadowed Method ( like super in python )](#call-a-shadowed-method)
 
 
 
