@@ -11,7 +11,7 @@
 	* [Parse SCTE-35 from MPEGTS](#parse-mpegts-video-for-scte35)
 	* [Shadow a Cue Struct Method ( override ) ](#shadow-a-cue-struct-method)
 	* [Shadow a Cue Method and call the Shadowed Method ( like super in python )](#call-a-shadowed-method)
-
+	* [Use Dot Notation to access SCTE-35 Cue values](#use-dot-notation-to-access-scte-35-cue-values)
 
 
 
@@ -189,4 +189,33 @@ func main(){
 
 
 ```
+#### Use Dot notation to access SCTE-35 Cue values
+```go
 
+/**
+Show  the packet PTS time and Splice Command Name of SCTE-35 Cues
+in a MPEGTS stream.
+**/
+
+
+package main
+
+import (
+	"os"
+	"fmt"
+	"github.com/futzu/cuei"
+)
+
+func main() {
+
+	args := os.Args[1:]
+	for _,arg := range args {
+		fmt.Printf("\nNext File: %s\n\n", arg)
+		var stream cuei.Stream
+		stream.Decode(arg)
+		for _,c:= range stream.Cues {
+			fmt.Printf("PTS: %v, Splice Command: %v\n",c.Packet.Pts, c.Command.Name )
+		}
+	}
+}
+```
