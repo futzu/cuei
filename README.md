@@ -1,5 +1,11 @@
 # cuei
 
+- [x] Parses SCTE-35 Cues from MPEGTS or Bytes or Base64
+- [x] Parses all 2022 Splice Commands, Splice Descriptors and UPIDS
+- [x] Parses SCTE-35 Cues spread over multiple MPEGTS packets
+- [x] Supports multi-packet PAT and PMT tables
+- [x] Supports multiple MPEGTS Programs and multiple SCTE-35 streams
+
 * [Install](#install-cuei)
 * Examples
 	* [Parse Base64 encoded SCTE-35](#parse-base64-encoded-scte-35)      
