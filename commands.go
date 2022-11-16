@@ -1,6 +1,5 @@
 package cuei
 
-
 type SpliceCommand struct {
 	Name                       string
 	CommandType                uint8
