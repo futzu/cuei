@@ -1,4 +1,4 @@
-# cuei
+# cuei is a SCTE35 parser in Go.
 
 - [x] Parses SCTE-35 Cues from MPEGTS or Bytes or Base64
 - [x] Parses all 2022 Splice Commands, Splice Descriptors and UPIDS
