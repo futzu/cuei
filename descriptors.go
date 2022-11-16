@@ -1,6 +1,5 @@
 package cuei
 
-
 // AudioCmpt is a struct for AudioDscptr Components
 type AudioCmpt struct {
 	ComponentTag  uint8
@@ -98,7 +97,7 @@ func (dscptr *SpliceDescriptor) Avail(gob *Gob, tag uint8, length uint8) {
 	dscptr.ProviderAvailID = gob.UInt32(32)
 }
 
-//  DTMF Splice Descriptor
+// DTMF Splice Descriptor
 func (dscptr *SpliceDescriptor) DTMF(gob *Gob, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
