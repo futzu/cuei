@@ -1,6 +1,5 @@
 package cuei
 
-
 // InfoSection is the splice info section of the SCTE 35 cue.
 type InfoSection struct {
 	Name                   string
