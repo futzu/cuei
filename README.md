@@ -127,8 +127,6 @@ func main(){
         cue.Decode(data) 
         fmt.Println("Cue as Json")
         cue.Show()
-        fmt.Printf("\nCue.Command\n\n%+v\n",cue.Command)          
-        fmt.Printf("\nCue.Descriptors[0]\n\n%+v\n",cue.Descriptors[0])         
 }
 ```
 #### `Shadow a Cue struct method`
