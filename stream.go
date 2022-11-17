@@ -17,7 +17,7 @@ type PacketData struct {
 const pktSz = 188
 
 // bufSz is the size of a read when parsing files.
-const bufSz = 150000 * pktSz
+const bufSz = 16384 * pktSz
 
 // Stream for parsing MPEGTS for SCTE-35
 type Stream struct {
