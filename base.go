@@ -7,19 +7,12 @@ import (
 	"fmt"
 )
 
-//chk generic catchall error checking
+// chk generic catchall error checking
 func chk(e error) {
 	if e != nil {
 		fmt.Println(e)
 
 	}
-}
-
-// MkJson structs to JSON
-func MkJson(i interface{}) string {
-	jason, err := json.MarshalIndent(&i, "", "    ")
-	chk(err)
-	return string(jason)
 }
 
 // DeB64 decodes base64 strings.
@@ -29,18 +22,8 @@ func DeB64(b64 string) []byte {
 	return deb64
 }
 
-// isIn16 is a test for slice membership
-func isIn16(slice []uint16, val uint16) bool {
-	for _, item := range slice {
-		if item == val {
-			return true
-		}
-	}
-	return false
-}
-
-// isIn8 is a test for slice membership
-func isIn8(slice []uint8, val uint8) bool {
+// IsIn is a test for slice membership
+func IsIn[T comparable](slice []T, val T) bool {
 	for _, item := range slice {
 		if item == val {
 			return true
@@ -52,6 +35,13 @@ func isIn8(slice []uint8, val uint8) bool {
 func mk90k(raw uint64) float64 {
 	nk := float64(raw) / 90000.0
 	return float64(uint64(nk*1000000)) / 1000000
+}
+
+// MkJson structs to JSON
+func MkJson(i interface{}) string {
+	jason, err := json.MarshalIndent(&i, "", "    ")
+	chk(err)
+	return string(jason)
 }
 
 func parseLen(byte1 byte, byte2 byte) uint16 {
