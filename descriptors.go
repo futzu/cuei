@@ -181,7 +181,7 @@ func (dscptr *SpliceDescriptor) decodeSegmentation(gob *Gob) {
 	dscptr.SegmentNum = gob.UInt8(8)
 	dscptr.SegmentsExpected = gob.UInt8(8)
 	subSegIDs := []uint8{0x34, 0x36, 0x38, 0x3a}
-	if isIn8(subSegIDs, dscptr.SegmentationTypeID) {
+	if IsIn(subSegIDs, dscptr.SegmentationTypeID) {
 		dscptr.SubSegmentNum = gob.UInt8(8)
 		dscptr.SubSegmentsExpected = gob.UInt8(8)
 	}
