@@ -27,40 +27,40 @@ func (cmd *SpliceCommand) Decoder(cmdtype uint8, gob *Gob) {
 	cmd.CommandType = cmdtype
 	switch cmdtype {
 	case 0:
-		cmd.SpliceNull(gob)
+		cmd.spliceNull(gob)
 	case 5:
-		cmd.SpliceInsert(gob)
+		cmd.spliceInsert(gob)
 	case 6:
-		cmd.TimeSignal(gob)
+		cmd.timeSignal(gob)
 	case 7:
-		cmd.BandwidthReservation(gob)
+		cmd.bandwidthReservation(gob)
 	case 255:
-		cmd.Private(gob)
+		cmd.private(gob)
 	}
 
 }
 
-// Bandwidth Reservation
-func (cmd *SpliceCommand) BandwidthReservation(gob *Gob) {
+// bandwidth Reservation
+func (cmd *SpliceCommand) bandwidthReservation(gob *Gob) {
 	cmd.Name = "Bandwidth Reservation"
 	gob.Forward(0)
 }
 
-// Private Command
-func (cmd *SpliceCommand) Private(gob *Gob) {
+// private Command
+func (cmd *SpliceCommand) private(gob *Gob) {
 	cmd.Name = "Private Command"
 	cmd.Identifier = gob.UInt32(32)
 	cmd.Bites = gob.Bytes(24)
 }
 
-// Splice Null
-func (cmd *SpliceCommand) SpliceNull(gob *Gob) {
+// splice Null
+func (cmd *SpliceCommand) spliceNull(gob *Gob) {
 	cmd.Name = "Splice Null"
 	gob.Forward(0)
 }
 
-// Splice Insert
-func (cmd *SpliceCommand) SpliceInsert(gob *Gob) {
+// splice Insert
+func (cmd *SpliceCommand) spliceInsert(gob *Gob) {
 	cmd.Name = "Splice Insert"
 	cmd.SpliceEventID = gob.Hex(32)
 	cmd.SpliceEventCancelIndicator = gob.Flag()
@@ -111,8 +111,8 @@ func (cmd *SpliceCommand) spliceTime(gob *Gob) {
 	}
 }
 
-// Time Signal
-func (cmd *SpliceCommand) TimeSignal(gob *Gob) {
+// time Signal
+func (cmd *SpliceCommand) timeSignal(gob *Gob) {
 	cmd.Name = "Time Signal"
 	cmd.spliceTime(gob)
 }
