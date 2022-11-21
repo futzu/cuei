@@ -55,23 +55,23 @@ func (dscptr *SpliceDescriptor) Decoder(gob *Gob, tag uint8, length uint8) {
 	switch tag {
 	case 0:
 		dscptr.Tag = 0
-		dscptr.Avail(gob, tag, length)
+		dscptr.availDescriptor(gob, tag, length)
 	case 1:
 		dscptr.Tag = 1
-		dscptr.DTMF(gob, tag, length)
+		dscptr.dtmfDescriptor(gob, tag, length)
 	case 2:
 		dscptr.Tag = 2
-		dscptr.Segmentation(gob, tag, length)
+		dscptr.segmentationDescriptor(gob, tag, length)
 	case 3:
 		dscptr.Tag = 3
-		dscptr.Time(gob, tag, length)
+		dscptr.timeDescriptor(gob, tag, length)
 	case 4:
 		dscptr.Tag = 4
-		dscptr.Audio(gob, tag, length)
+		dscptr.audioDescriptor(gob, tag, length)
 	}
 }
 
-func (dscptr *SpliceDescriptor) Audio(gob *Gob, tag uint8, length uint8) {
+func (dscptr *SpliceDescriptor) audioDescriptor(gob *Gob, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
 	dscptr.Identifier = gob.Ascii(32)
@@ -88,8 +88,8 @@ func (dscptr *SpliceDescriptor) Audio(gob *Gob, tag uint8, length uint8) {
 	}
 }
 
-// Decode for the Avail
-func (dscptr *SpliceDescriptor) Avail(gob *Gob, tag uint8, length uint8) {
+// Decode for the avail Splice Descriptors
+func (dscptr *SpliceDescriptor) availDescriptor(gob *Gob, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
 	dscptr.Identifier = gob.Ascii(32)
@@ -98,7 +98,7 @@ func (dscptr *SpliceDescriptor) Avail(gob *Gob, tag uint8, length uint8) {
 }
 
 // DTMF Splice Descriptor
-func (dscptr *SpliceDescriptor) DTMF(gob *Gob, tag uint8, length uint8) {
+func (dscptr *SpliceDescriptor) dtmfDescriptor(gob *Gob, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
 	dscptr.Identifier = gob.Ascii(32)
@@ -111,7 +111,7 @@ func (dscptr *SpliceDescriptor) DTMF(gob *Gob, tag uint8, length uint8) {
 }
 
 // Decode for the Time Descriptor
-func (dscptr *SpliceDescriptor) Time(gob *Gob, tag uint8, length uint8) {
+func (dscptr *SpliceDescriptor) timeDescriptor(gob *Gob, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
 	dscptr.Identifier = gob.Ascii(32)
@@ -122,7 +122,7 @@ func (dscptr *SpliceDescriptor) Time(gob *Gob, tag uint8, length uint8) {
 }
 
 // Decode for the Segmentation Descriptor
-func (dscptr *SpliceDescriptor) Segmentation(gob *Gob, tag uint8, length uint8) {
+func (dscptr *SpliceDescriptor) segmentationDescriptor(gob *Gob, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
 	dscptr.Identifier = gob.Ascii(32)
