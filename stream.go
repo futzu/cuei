@@ -106,7 +106,7 @@ func (stream *Stream) parsePts(pay []byte, pid uint16) {
 	if stream.ptsFlag(pay) {
 		prgm, ok := stream.Pid2Prgm[pid]
 		if ok {
-			pts := (uint64(pay[9]) >> 1 & 7) << 30
+			pts := uint64(pay[9]&14) << 29
 			pts |= uint64(pay[10]) << 22
 			pts |= (uint64(pay[11]) >> 1) << 15
 			pts |= uint64(pay[12]) << 7
@@ -217,7 +217,7 @@ func (stream *Stream) parsePat(pay []byte, pid uint16) {
 		for idx < end {
 			prgm := parsePrgm(pay[idx], pay[idx+1])
 			if prgm > 0 {
-				if !isIn16(stream.Programs, prgm) {
+				if !IsIn(stream.Programs, prgm) {
 					stream.Programs = append(stream.Programs, prgm)
 				}
 				pmtpid := parsePid(pay[idx+2], pay[idx+3])
