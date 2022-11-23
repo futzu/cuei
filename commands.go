@@ -26,19 +26,28 @@ type SpliceCommand struct {
 	PTS                        float64 `json:",omitempty"`
 }
 
-// CommandDecoder returns a Command by cmdtype
-func (cmd *SpliceCommand) Decoder(cmdtype uint8, gob *goober.Gob) {
+/**
+Decode returns a Command by cmdtype
+
+    Supported Commands:
+    	0x0: Splice Null,
+    	0x5: Splice Insert,
+    	0x6: Time Signal,
+    	0x7: Bandwidth Reservation,
+    	0xff: Private,
+**/
+func (cmd *SpliceCommand) Decode(cmdtype uint8, gob *goober.Gob) {
 	cmd.CommandType = cmdtype
 	switch cmdtype {
-	case 0:
+	case 0x0:
 		cmd.spliceNull(gob)
-	case 5:
+	case 0x5:
 		cmd.spliceInsert(gob)
-	case 6:
+	case 0x6:
 		cmd.timeSignal(gob)
-	case 7:
+	case 0x7:
 		cmd.bandwidthReservation(gob)
-	case 255:
+	case 0xff:
 		cmd.private(gob)
 	}
 
