@@ -19,7 +19,7 @@ var table22 = map[uint8]string{
 	0x16: "Program RunoverUnplanned",
 	0x17: "Program Overlap Start",
 	0x18: "Program Blackout Override",
-	0x19: "Program Start ??? In Progress",
+	0x19: "Program Start In Progress",
 	0x20: "Chapter Start",
 	0x21: "Chapter End",
 	0x22: "Break Start",
