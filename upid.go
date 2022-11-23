@@ -1,7 +1,9 @@
 package cuei
 
+
 import (
 	"fmt"
+    goober "github.com/futzu/gob"
 )
 
 // Upid is the Struct for Segmentation Upida
@@ -20,7 +22,7 @@ type Upid struct {
 }
 
 // UpidDecoder calls a method based on upidType
-func (upid *Upid) Decoder(gob *Gob, upidType uint8, upidlen uint8) {
+func (upid *Upid) Decoder(gob *goober.Gob, upidType uint8, upidlen uint8) {
 
 	upid.UpidType = upidType
 
@@ -31,7 +33,7 @@ func (upid *Upid) Decoder(gob *Gob, upidType uint8, upidlen uint8) {
 		0x07: "TID",
 		0x09: "ADI",
 		0x10: "UUID",
-		0x11: "SCR",
+		0x11: "ACR",
 		0x0e: "ADS Info",
 		0x0f: "URI",
 	}
@@ -39,53 +41,53 @@ func (upid *Upid) Decoder(gob *Gob, upidType uint8, upidlen uint8) {
 	name, ok := uri_upids[upidType]
 	if ok {
 		upid.Name = name
-		upid.URI(gob, upidlen)
+		upid.uri(gob, upidlen)
 	} else {
 
 		switch upidType {
 
 		case 0x05, 0x06:
 			upid.Name = "ISAN"
-			upid.ISAN(gob, upidlen)
+			upid.isan(gob, upidlen)
 		case 0x08:
 			upid.Name = "AiringID"
-			upid.AirID(gob, upidlen)
+			upid.airid(gob, upidlen)
 		case 0x0a:
 			upid.Name = "EIDR"
-			upid.EIDR(gob, upidlen)
+			upid.eidr(gob, upidlen)
 		case 0x0b:
 			upid.Name = "ATSC"
-			upid.ATSC(gob, upidlen)
+			upid.atsc(gob, upidlen)
 		case 0x0c:
 			upid.Name = "MPU"
-			upid.MPU(gob, upidlen)
+			upid.mpu(gob, upidlen)
 		case 0x0d:
 			upid.Name = "MID"
-			upid.MID(gob, upidlen)
+			upid.mid(gob, upidlen)
 		default:
 			upid.Name = "UPID"
-			upid.URI(gob, upidlen)
+			upid.uri(gob, upidlen)
 		}
 	}
 }
 
 // Decode for AirId
-func (upid *Upid) AirID(gob *Gob, upidlen uint8) {
+func (upid *Upid) airid(gob *goober.Gob, upidlen uint8) {
 	upid.Value = gob.Hex(uint(upidlen << 3))
 }
 
 // Decode for Isan Upid
-func (upid *Upid) ISAN(gob *Gob, upidlen uint8) {
+func (upid *Upid) isan(gob *goober.Gob, upidlen uint8) {
 	upid.Value = gob.Ascii(uint(upidlen << 3))
 }
 
 // Decode for URI Upid
-func (upid *Upid) URI(gob *Gob, upidlen uint8) {
+func (upid *Upid) uri(gob *goober.Gob, upidlen uint8) {
 	upid.Value = gob.Ascii(uint(upidlen) << 3)
 }
 
 // Decode for ATSC Upid
-func (upid *Upid) ATSC(gob *Gob, upidlen uint8) {
+func (upid *Upid) atsc(gob *goober.Gob, upidlen uint8) {
 	upid.TSID = gob.UInt16(16)
 	upid.Reserved = gob.UInt8(2)
 	upid.EndOfDay = gob.UInt8(5)
@@ -94,7 +96,7 @@ func (upid *Upid) ATSC(gob *Gob, upidlen uint8) {
 }
 
 // Decode for EIDR Upid
-func (upid *Upid) EIDR(gob *Gob, upidlen uint8) {
+func (upid *Upid) eidr(gob *goober.Gob, upidlen uint8) {
 	if upidlen == 12 {
 		head := gob.UInt64(16)
 		tail := gob.Hex(80)
@@ -103,14 +105,14 @@ func (upid *Upid) EIDR(gob *Gob, upidlen uint8) {
 }
 
 // Decode for MPU Upid
-func (upid *Upid) MPU(gob *Gob, upidlen uint8) {
+func (upid *Upid) mpu(gob *goober.Gob, upidlen uint8) {
 	ulb := uint(upidlen) << 3
 	upid.FormatIdentifier = gob.Hex(32)
 	upid.PrivateData = gob.Ascii(ulb - 32)
 }
 
 // Decode for MID Upid
-func (upid *Upid) MID(gob *Gob, upidlen uint8) {
+func (upid *Upid) mid(gob *goober.Gob, upidlen uint8) {
 	var i uint8
 	i = 0
 	for i < upidlen {
