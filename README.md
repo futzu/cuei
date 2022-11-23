@@ -6,13 +6,13 @@
 - [x] Supports multiple MPEGTS Programs and multiple SCTE-35 streams
 
 * [Install](#install-cuei)
-* Examples
+* [Go Docs](https://pkg.go.dev/github.com/futzu/cuei)
+* [Examples](#parse-base64-encoded-scte-35) 
 	* [Parse Base64 encoded SCTE-35](#parse-base64-encoded-scte-35)      
 	* [Parse SCTE-35 from MPEGTS](#parse-mpegts-video-for-scte35)
 	* [Shadow a Cue Struct Method ( override ) ](#shadow-a-cue-struct-method)
 	* [Shadow a Cue Method and call the Shadowed Method ( like super in python )](#call-a-shadowed-method)
 	* [Use Dot Notation to access SCTE-35 Cue values](#use-dot-notation-to-access-scte-35-cue-values)
-
 
 
 #### `install cuei`
