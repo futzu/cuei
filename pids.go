@@ -1,6 +1,6 @@
 package cuei
 
-// Pids holds collections of pids by type for threefive.Stream.
+// Pids holds collections of pids by type for cuei.Stream.
 type Pids struct {
 	PmtPids    []uint16
 	PcrPids    []uint16
