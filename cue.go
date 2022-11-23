@@ -2,6 +2,7 @@ package cuei
 
 import (
 	"fmt"
+	goober "github.com/futzu/gob"
 )
 
 // Cue a SCTE35 cue.
@@ -14,7 +15,7 @@ type Cue struct {
 
 // Decode extracts bits for the Cue values.
 func (cue *Cue) Decode(bites []byte) bool {
-	var gob Gob
+	var gob goober.Gob
 	gob.Load(bites)
 	if cue.InfoSection.Decode(&gob) {
 		cue.Command.Decoder(cue.InfoSection.SpliceCommandType, &gob)
@@ -26,7 +27,7 @@ func (cue *Cue) Decode(bites []byte) bool {
 }
 
 // DscptrLoop loops over any splice descriptors
-func (cue *Cue) dscptrLoop(gob *Gob) {
+func (cue *Cue) dscptrLoop(gob *goober.Gob) {
 	var i uint16
 	i = 0
 	l := cue.InfoSection.DescriptorLoopLength
@@ -42,7 +43,7 @@ func (cue *Cue) dscptrLoop(gob *Gob) {
 	}
 }
 
-//Show display SCTE-35 data as JSON.
+// Show display SCTE-35 data as JSON.
 func (cue *Cue) Show() {
 	fmt.Println(MkJson(&cue))
 }
