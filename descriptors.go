@@ -54,23 +54,34 @@ type SpliceDescriptor struct {
 	SubSegmentsExpected              uint8       `json:",omitempty"`
 }
 
-// DescriptorDecoder returns a Descriptor by tag
-func (dscptr *SpliceDescriptor) Decoder(gob *goober.Gob, tag uint8, length uint8) {
+/** 
+Decode returns a Splice Descriptor by tag.
+
+    The following Splice Descriptors are recognized.
+    
+        0x0: Avail Descriptor,
+        0x1: DTMF Descriptor,
+        0x2: Segmentation Descriptor,
+        0x3: Time Descriptor,
+        0x4: Audio Descrioptor,
+    
+**/
+func (dscptr *SpliceDescriptor) Decode(gob *goober.Gob, tag uint8, length uint8) {
 	switch tag {
-	case 0:
-		dscptr.Tag = 0
+	case 0x0:
+		dscptr.Tag = 0x0
 		dscptr.availDescriptor(gob, tag, length)
-	case 1:
-		dscptr.Tag = 1
+	case 0x1:
+		dscptr.Tag = 0x1
 		dscptr.dtmfDescriptor(gob, tag, length)
-	case 2:
-		dscptr.Tag = 2
+	case 0x2:
+		dscptr.Tag = 0x2
 		dscptr.segmentationDescriptor(gob, tag, length)
-	case 3:
-		dscptr.Tag = 3
+	case 0x3:
+		dscptr.Tag = 0x3
 		dscptr.timeDescriptor(gob, tag, length)
-	case 4:
-		dscptr.Tag = 4
+	case 0x4:
+		dscptr.Tag = 0x4
 		dscptr.audioDescriptor(gob, tag, length)
 	}
 }
@@ -165,5 +176,28 @@ func (dscptr *SpliceDescriptor) decodeSegCmpnts(gob *goober.Gob) {
 		gob.Forward(7)
 		po := gob.As90k(33)
 		dscptr.Components = append(dscptr.Components, segCmpt{ct, po})
+	}
+}
+
+func (dscptr *SpliceDescriptor) decodeSegmentation(gob *goober.Gob) {
+	if dscptr.SegmentationDurationFlag {
+		dscptr.SegmentationDuration = gob.As90k(40)
+	}
+	dscptr.SegmentationUpidType = gob.UInt8(8)
+	dscptr.SegmentationUpidLength = gob.UInt8(8)
+	dscptr.SegmentationUpid = &Upid{}
+	dscptr.SegmentationUpid.Decode(gob, dscptr.SegmentationUpidType, dscptr.SegmentationUpidLength)
+	dscptr.SegmentationTypeID = gob.UInt8(8)
+
+	mesg, ok := table22[dscptr.SegmentationTypeID]
+	if ok {
+		dscptr.SegmentationMessage = mesg
+	}
+	dscptr.SegmentNum = gob.UInt8(8)
+	dscptr.SegmentsExpected = gob.UInt8(8)
+	subSegIDs := []uint8{0x34, 0x36, 0x38, 0x3a}
+	if IsIn(subSegIDs, dscptr.SegmentationTypeID) {
+		dscptr.SubSegmentNum = gob.UInt8(8)
+		dscptr.SubSegmentsExpected = gob.UInt8(8)
 	}
 }
