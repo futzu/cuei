@@ -44,15 +44,15 @@ func MkJson(i interface{}) string {
 	return string(jason)
 }
 
-func parseLen(byte1 byte, byte2 byte) uint16 {
+func parseLen(byte1, byte2 byte) uint16 {
 	return uint16(byte1&0xf)<<8 | uint16(byte2)
 }
 
-func parsePid(byte1 byte, byte2 byte) uint16 {
+func parsePid(byte1, byte2 byte) uint16 {
 	return uint16(byte1&0x1f)<<8 | uint16(byte2)
 }
 
-func parsePrgm(byte1 byte, byte2 byte) uint16 {
+func parsePrgm(byte1, byte2 byte) uint16 {
 	return uint16(byte1)<<8 | uint16(byte2)
 }
 
