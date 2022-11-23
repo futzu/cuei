@@ -18,7 +18,7 @@ func (cue *Cue) Decode(bites []byte) bool {
 	var gob goober.Gob
 	gob.Load(bites)
 	if cue.InfoSection.Decode(&gob) {
-		cue.Command.Decoder(cue.InfoSection.SpliceCommandType, &gob)
+		cue.Command.Decode(cue.InfoSection.SpliceCommandType, &gob)
 		cue.InfoSection.DescriptorLoopLength = gob.UInt16(16)
 		cue.dscptrLoop(&gob)
 		return true
@@ -38,7 +38,7 @@ func (cue *Cue) dscptrLoop(gob *goober.Gob) {
 		i++
 		i += length
 		var sdr SpliceDescriptor
-		sdr.Decoder(gob, tag, uint8(length))
+		sdr.Decode(gob, tag, uint8(length))
 		cue.Descriptors = append(cue.Descriptors, sdr)
 	}
 }
