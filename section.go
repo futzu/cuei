@@ -1,5 +1,9 @@
 package cuei
 
+import (
+	goober "github.com/futzu/gob"
+)
+
 // InfoSection is the splice info section of the SCTE 35 cue.
 type InfoSection struct {
 	Name                   string
@@ -20,7 +24,7 @@ type InfoSection struct {
 }
 
 // Decode splice info section values.
-func (infosec *InfoSection) Decode(gob *Gob) bool {
+func (infosec *InfoSection) Decode(gob *goober.Gob) bool {
 	infosec.Name = "Splice Info Section"
 	infosec.TableID = gob.Hex(8)
 	if infosec.TableID != "0xfc" {
