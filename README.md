@@ -18,7 +18,7 @@
 #### `install cuei`
 
 ```go
-go install github.com/futzu/cuei
+go get github.com/futzu/cuei
 ```
 #### `fetch cueidemo.go`
 ```rebol
