@@ -29,12 +29,15 @@ type SpliceCommand struct {
 /**
 Decode returns a Command by cmdtype
 
-    Supported Commands:
-    	0x0: Splice Null,
-    	0x5: Splice Insert,
-    	0x6: Time Signal,
-    	0x7: Bandwidth Reservation,
-    	0xff: Private,
+    	These Splice Commands are recognized.
+    
+    		0x0: Splice Null,
+    		0x5: Splice Insert,
+    		0x6: Time Signal,
+    		0x7: Bandwidth Reservation,
+    		0xff: Private,
+		
+		
 **/
 func (cmd *SpliceCommand) Decode(cmdtype uint8, gob *goober.Gob) {
 	cmd.CommandType = cmdtype
