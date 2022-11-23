@@ -1,12 +1,11 @@
 package cuei
 
-
 import (
 	"fmt"
-    goober "github.com/futzu/gob"
+	goober "github.com/futzu/gob"
 )
 
-// Upid is the Struct for Segmentation Upida
+// Upid is the Struct for Segmentation Upids
 type Upid struct {
 	Name             string `json:",omitempty"`
 	UpidType         uint8  `json:",omitempty"`
@@ -15,14 +14,39 @@ type Upid struct {
 	Reserved         uint8  `json:",omitempty"`
 	EndOfDay         uint8  `json:",omitempty"`
 	UniqueFor        uint16 `json:",omitempty"`
-	ContentID        string `json:",omitempty"`
+	ContentID        []byte `json:",omitempty"`
 	Upids            []Upid `json:",omitempty"`
 	FormatIdentifier string `json:",omitempty"`
-	PrivateData      string `json:",omitempty"`
+	PrivateData      []byte `json:",omitempty"`
 }
 
-// UpidDecoder calls a method based on upidType
-func (upid *Upid) Decoder(gob *goober.Gob, upidType uint8, upidlen uint8) {
+/*
+*
+UpidDecoder Decodes Segmentation UPIDs
+
+	    These are the UPIDs types recognized.
+
+			0x01, 0x02: "Deprecated",
+	        0x03: "AdID",
+	        0x05: "ISAN"
+	        0x06: "ISAN"
+			0x07: "TID",
+	        0x08: "AiringID",
+			0x09: "ADI",
+			0x10: "UUID",
+	        0x11: "ACR",
+	        0x0a: "EIDR",
+	        0x0b: "ATSC",
+	        0x0c: "MPU",
+	        0x0d: "MID",
+			0x0e: "ADS Info",
+			0x0f: "URI",
+
+	    Non-standard UPID types are returned as bytes.
+
+*
+*/
+func (upid *Upid) Decode(gob *goober.Gob, upidType uint8, upidlen uint8) {
 
 	upid.UpidType = upidType
 
@@ -31,9 +55,14 @@ func (upid *Upid) Decoder(gob *goober.Gob, upidType uint8, upidlen uint8) {
 		0x02: "Deprecated",
 		0x03: "AdID",
 		0x07: "TID",
+		0x08: "AiringID",
 		0x09: "ADI",
 		0x10: "UUID",
 		0x11: "ACR",
+		0x0a: "EIDR",
+		0x0b: "ATSC",
+		0x0c: "MPU",
+		0x0d: "MID",
 		0x0e: "ADS Info",
 		0x0f: "URI",
 	}
@@ -92,7 +121,7 @@ func (upid *Upid) atsc(gob *goober.Gob, upidlen uint8) {
 	upid.Reserved = gob.UInt8(2)
 	upid.EndOfDay = gob.UInt8(5)
 	upid.UniqueFor = gob.UInt16(9)
-	upid.ContentID = gob.Ascii(uint((upidlen - 4) << 3))
+	upid.ContentID = gob.Bytes(uint((upidlen - 4) << 3))
 }
 
 // Decode for EIDR Upid
@@ -108,7 +137,7 @@ func (upid *Upid) eidr(gob *goober.Gob, upidlen uint8) {
 func (upid *Upid) mpu(gob *goober.Gob, upidlen uint8) {
 	ulb := uint(upidlen) << 3
 	upid.FormatIdentifier = gob.Hex(32)
-	upid.PrivateData = gob.Ascii(ulb - 32)
+	upid.PrivateData = gob.Bytes(ulb - 32)
 }
 
 // Decode for MID Upid
@@ -122,7 +151,7 @@ func (upid *Upid) mid(gob *goober.Gob, upidlen uint8) {
 		i++
 		i += ulen
 		var mupid Upid
-		mupid.Decoder(gob, utype, ulen)
+		upid.Decode(gob, utype, ulen)
 		upid.Upids = append(upid.Upids, mupid)
 	}
 }
