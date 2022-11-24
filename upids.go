@@ -2,7 +2,7 @@ package cuei
 
 import (
 	"fmt"
-	goober "github.com/futzu/gob"
+	gobs "github.com/futzu/gob"
 )
 
 // Upid is the Struct for Segmentation Upids
@@ -22,11 +22,12 @@ type Upid struct {
 
 /*
 *
-Upid.Decode Decodes Segmentation UPIDs
+UpidDecoder Decodes Segmentation UPIDs
 
 	    These are the UPIDs types recognized.
 
-		0x01, 0x02: "Deprecated",
+		0x01: "Deprecated",
+		0x02: "Deprecated",
 	        0x03: "AdID",
 	        0x05: "ISAN"
 	        0x06: "ISAN"
@@ -46,7 +47,7 @@ Upid.Decode Decodes Segmentation UPIDs
 
 *
 */
-func (upid *Upid) Decode(gob *goober.Gob, upidType uint8, upidlen uint8) {
+func (upid *Upid) Decode(gob *gobs.Gob, upidType uint8, upidlen uint8) {
 
 	upid.UpidType = upidType
 
@@ -101,22 +102,22 @@ func (upid *Upid) Decode(gob *goober.Gob, upidType uint8, upidlen uint8) {
 }
 
 // Decode for AirId
-func (upid *Upid) airid(gob *goober.Gob, upidlen uint8) {
+func (upid *Upid) airid(gob *gobs.Gob, upidlen uint8) {
 	upid.Value = gob.Hex(uint(upidlen << 3))
 }
 
 // Decode for Isan Upid
-func (upid *Upid) isan(gob *goober.Gob, upidlen uint8) {
+func (upid *Upid) isan(gob *gobs.Gob, upidlen uint8) {
 	upid.Value = gob.Ascii(uint(upidlen << 3))
 }
 
 // Decode for URI Upid
-func (upid *Upid) uri(gob *goober.Gob, upidlen uint8) {
+func (upid *Upid) uri(gob *gobs.Gob, upidlen uint8) {
 	upid.Value = gob.Ascii(uint(upidlen) << 3)
 }
 
 // Decode for ATSC Upid
-func (upid *Upid) atsc(gob *goober.Gob, upidlen uint8) {
+func (upid *Upid) atsc(gob *gobs.Gob, upidlen uint8) {
 	upid.TSID = gob.UInt16(16)
 	upid.Reserved = gob.UInt8(2)
 	upid.EndOfDay = gob.UInt8(5)
@@ -125,7 +126,7 @@ func (upid *Upid) atsc(gob *goober.Gob, upidlen uint8) {
 }
 
 // Decode for EIDR Upid
-func (upid *Upid) eidr(gob *goober.Gob, upidlen uint8) {
+func (upid *Upid) eidr(gob *gobs.Gob, upidlen uint8) {
 	if upidlen == 12 {
 		head := gob.UInt64(16)
 		tail := gob.Hex(80)
@@ -134,14 +135,14 @@ func (upid *Upid) eidr(gob *goober.Gob, upidlen uint8) {
 }
 
 // Decode for MPU Upid
-func (upid *Upid) mpu(gob *goober.Gob, upidlen uint8) {
+func (upid *Upid) mpu(gob *gobs.Gob, upidlen uint8) {
 	ulb := uint(upidlen) << 3
 	upid.FormatIdentifier = gob.Hex(32)
 	upid.PrivateData = gob.Bytes(ulb - 32)
 }
 
 // Decode for MID Upid
-func (upid *Upid) mid(gob *goober.Gob, upidlen uint8) {
+func (upid *Upid) mid(gob *gobs.Gob, upidlen uint8) {
 	var i uint8
 	i = 0
 	for i < upidlen {
