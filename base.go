@@ -23,7 +23,7 @@ func DeB64(b64 string) []byte {
 }
 
 // IsIn is a test for slice membership
-func IsIn[T comparable](slice []T, val T) bool {
+func IsIn(slice []uint16, val uint16) bool {
 	for _, item := range slice {
 		if item == val {
 			return true
