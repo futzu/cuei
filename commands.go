@@ -4,6 +4,18 @@ import (
 	gobs "github.com/futzu/gob"
 )
 
+/*
+*
+SpliceCommand 
+   These Splice Command types are consolidated into SpliceCommand.
+
+        0x0: Splice Null,
+        0x5: Splice Insert,
+        0x6: Time Signal,
+        0x7: Bandwidth Reservation,
+        0xff: Private,
+*
+*/
 type SpliceCommand struct {
 	Name                       string
 	CommandType                uint8
@@ -26,16 +38,8 @@ type SpliceCommand struct {
 	PTS                        float64 `json:",omitempty"`
 }
 
-/**
-Decode returns a Command by cmdtype
 
-    Supported Commands:
-    0x0: Splice Null,
-    0x5: Splice Insert,
-    0x6: Time Signal,
-    0x7: Bandwidth Reservation,
-    0xff: Private,
-**/
+//Decode returns a Command by type
 func (cmd *SpliceCommand) Decode(cmdtype uint8, gob *gobs.Gob) {
 	cmd.CommandType = cmdtype
 	switch cmdtype {
