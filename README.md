@@ -215,7 +215,7 @@ func main() {
 		var stream cuei.Stream
 		stream.Decode(arg)
 		for _,c:= range stream.Cues {
-			fmt.Printf("PTS: %v, Splice Command: %v\n",c.Packet.Pts, c.Command.Name )
+			fmt.Printf("PTS: %v, Splice Command: %v\n",c.PacketData.Pts, c.Command.Name )
 		}
 	}
 }
