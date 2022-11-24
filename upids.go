@@ -28,22 +28,22 @@ UpidDecoder Decodes Segmentation UPIDs
 
 		0x01: "Deprecated",
 		0x02: "Deprecated",
-	        0x03: "AdID",
-	        0x05: "ISAN"
-	        0x06: "ISAN"
+		0x03: "AdID",
+		0x05: "ISAN"
+		0x06: "ISAN"
 		0x07: "TID",
-	        0x08: "AiringID",
+		0x08: "AiringID",
 		0x09: "ADI",
 		0x10: "UUID",
 	        0x11: "ACR",
 	        0x0a: "EIDR",
 	        0x0b: "ATSC",
-	        0x0c: "MPU",
-	        0x0d: "MID",
+		0x0c: "MPU",
+		0x0d: "MID",
 		0x0e: "ADS Info",
 		0x0f: "URI",
 
-	    Non-standard UPID types are returned as ascii strings.
+	    Non-standard UPID types are returned as bytes.
 
 *
 */
