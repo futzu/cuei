@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-type PacketData struct {
+type packetData struct {
 	PacketNumber int     `json:",omitempty"`
 	Pid          uint16  `json:",omitempty"`
 	Program      uint16  `json:",omitempty"`
@@ -80,11 +80,6 @@ func (stream *Stream) MkPts(prgm uint16) float64 {
 	return mk90k(pts)
 }
 
-// parsePusi returns true if PUSI flag is set
-func (stream *Stream) parsePusi(pkt []byte) bool {
-	return (pkt[1]&0x40 == 0x40)
-
-}
 
 // afcFlag returns true if AFC flag is set
 func (stream *Stream) afcFlag(pkt []byte) bool {
@@ -99,6 +94,12 @@ func (stream *Stream) pcrFlag(pkt []byte) bool {
 // ptsFlag returns true if PTS flag is set
 func (stream *Stream) ptsFlag(pay []byte) bool {
 	return (pay[7]&0x80 == 0x80)
+}
+
+// parsePusi returns true if PUSI flag is set
+func (stream *Stream) parsePusi(pkt []byte) bool {
+	return (pkt[1]&0x40 == 0x40)
+
 }
 
 // parsePts parses a packet for PTS
@@ -296,13 +297,13 @@ func (stream *Stream) parseScte35(pay []byte, pid uint16) {
 // mkCue adds PID,PCR, PTS and PacketNumber to a Cue
 func (stream *Stream) mkCue(pid uint16) *Cue {
 	cue := &Cue{}
-	cue.Packet = &PacketData{}
-	cue.Packet.Pid = pid
+	cue.PacketData = &packetData{}
+	cue.PacketData.Pid = pid
 	p := stream.Pid2Prgm[pid]
 	prgm := &p
-	cue.Packet.Program = *prgm
-	cue.Packet.Pcr = stream.MkPcr(*prgm)
-	cue.Packet.Pts = stream.MkPts(*prgm)
-	cue.Packet.PacketNumber = stream.pktNum
+	cue.PacketData.Program = *prgm
+	cue.PacketData.Pcr = stream.MkPcr(*prgm)
+	cue.PacketData.Pts = stream.MkPts(*prgm)
+	cue.PacketData.PacketNumber = stream.pktNum
 	return cue
 }
