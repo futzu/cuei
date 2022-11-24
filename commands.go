@@ -1,7 +1,7 @@
 package cuei
 
 import (
-	goober "github.com/futzu/gob"
+	gobs "github.com/futzu/gob"
 )
 
 type SpliceCommand struct {
@@ -29,17 +29,14 @@ type SpliceCommand struct {
 /**
 Decode returns a Command by cmdtype
 
-    	These Splice Commands are recognized.
-    
-    		0x0: Splice Null,
-    		0x5: Splice Insert,
-    		0x6: Time Signal,
-    		0x7: Bandwidth Reservation,
-    		0xff: Private,
-		
-		
+    Supported Commands:
+    0x0: Splice Null,
+    0x5: Splice Insert,
+    0x6: Time Signal,
+    0x7: Bandwidth Reservation,
+    0xff: Private,
 **/
-func (cmd *SpliceCommand) Decode(cmdtype uint8, gob *goober.Gob) {
+func (cmd *SpliceCommand) Decode(cmdtype uint8, gob *gobs.Gob) {
 	cmd.CommandType = cmdtype
 	switch cmdtype {
 	case 0x0:
@@ -57,26 +54,26 @@ func (cmd *SpliceCommand) Decode(cmdtype uint8, gob *goober.Gob) {
 }
 
 // bandwidth Reservation
-func (cmd *SpliceCommand) bandwidthReservation(gob *goober.Gob) {
+func (cmd *SpliceCommand) bandwidthReservation(gob *gobs.Gob) {
 	cmd.Name = "Bandwidth Reservation"
 	gob.Forward(0)
 }
 
 // private Command
-func (cmd *SpliceCommand) private(gob *goober.Gob) {
+func (cmd *SpliceCommand) private(gob *gobs.Gob) {
 	cmd.Name = "Private Command"
 	cmd.Identifier = gob.UInt32(32)
 	cmd.Bites = gob.Bytes(24)
 }
 
 // splice Null
-func (cmd *SpliceCommand) spliceNull(gob *goober.Gob) {
+func (cmd *SpliceCommand) spliceNull(gob *gobs.Gob) {
 	cmd.Name = "Splice Null"
 	gob.Forward(0)
 }
 
 // splice Insert
-func (cmd *SpliceCommand) spliceInsert(gob *goober.Gob) {
+func (cmd *SpliceCommand) spliceInsert(gob *gobs.Gob) {
 	cmd.Name = "Splice Insert"
 	cmd.SpliceEventID = gob.Hex(32)
 	cmd.SpliceEventCancelIndicator = gob.Flag()
@@ -111,13 +108,13 @@ func (cmd *SpliceCommand) spliceInsert(gob *goober.Gob) {
 	cmd.AvailExpected = gob.UInt8(8)
 }
 
-func (cmd *SpliceCommand) parseBreak(gob *goober.Gob) {
+func (cmd *SpliceCommand) parseBreak(gob *gobs.Gob) {
 	cmd.BreakAutoReturn = gob.Flag()
 	gob.Forward(6)
 	cmd.BreakDuration = gob.As90k(33)
 }
 
-func (cmd *SpliceCommand) spliceTime(gob *goober.Gob) {
+func (cmd *SpliceCommand) spliceTime(gob *gobs.Gob) {
 	cmd.TimeSpecifiedFlag = gob.Flag()
 	if cmd.TimeSpecifiedFlag {
 		gob.Forward(6)
@@ -128,7 +125,7 @@ func (cmd *SpliceCommand) spliceTime(gob *goober.Gob) {
 }
 
 // time Signal
-func (cmd *SpliceCommand) timeSignal(gob *goober.Gob) {
+func (cmd *SpliceCommand) timeSignal(gob *gobs.Gob) {
 	cmd.Name = "Time Signal"
 	cmd.spliceTime(gob)
 }
