@@ -23,7 +23,7 @@ type InfoSection struct {
 	DescriptorLoopLength   uint16
 }
 
-// Decode splice info section values.
+// Decode Splice Info Section values.
 func (infosec *InfoSection) Decode(gob *gobs.Gob) bool {
 	infosec.Name = "Splice Info Section"
 	infosec.TableID = gob.Hex(8)
@@ -31,16 +31,10 @@ func (infosec *InfoSection) Decode(gob *gobs.Gob) bool {
 		return false
 	}
 	infosec.SectionSyntaxIndicator = gob.Flag()
-	if infosec.SectionSyntaxIndicator {
-		return false
-	}
 	infosec.Private = gob.Flag()
 	infosec.Reserved = gob.Hex(2)
 	infosec.SectionLength = gob.UInt16(12)
 	infosec.ProtocolVersion = gob.UInt8(8)
-	if infosec.ProtocolVersion != 0 {
-		return false
-	}
 	infosec.EncryptedPacket = gob.Flag()
 	infosec.EncryptionAlgorithm = gob.UInt8(6)
 	infosec.PtsAdjustment = gob.As90k(33)
