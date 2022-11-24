@@ -5,19 +5,31 @@ import (
 	gobs "github.com/futzu/gob"
 )
 
-// Cue a SCTE35 cue.
+/*
+*
+Cue is a SCTE35 cue.
+
+    A Cue contains: 
+        1 InfoSection
+        1 SpliceCommand
+        0 or more Splice Descriptors
+        1 packetData (if parsed from MPEGTS)
+*
+*/
 type Cue struct {
-	InfoSection
-	Command     SpliceCommand
+	InfoSection *InfoSection
+	Command     *SpliceCommand
 	Descriptors []SpliceDescriptor `json:",omitempty"`
-	PacketData      *packetData    `json:",omitempty"`
+	PacketData  *packetData        `json:",omitempty"`
 }
 
 // Decode extracts bits for the Cue values.
 func (cue *Cue) Decode(bites []byte) bool {
 	var gob gobs.Gob
 	gob.Load(bites)
+	cue.InfoSection = &InfoSection{}
 	if cue.InfoSection.Decode(&gob) {
+		cue.Command = &SpliceCommand{}
 		cue.Command.Decode(cue.InfoSection.SpliceCommandType, &gob)
 		cue.InfoSection.DescriptorLoopLength = gob.UInt16(16)
 		cue.dscptrLoop(&gob)
