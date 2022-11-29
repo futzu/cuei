@@ -10,6 +10,7 @@
 * [Examples](#parse-base64-encoded-scte-35) 
 	* [Parse Base64 encoded SCTE-35](#parse-base64-encoded-scte-35)      
 	* [Parse SCTE-35 from MPEGTS](#parse-mpegts-video-for-scte35)
+	* [Use cuei with another MPEGTS stream parser / demuxer]()
 	* [Shadow a Cue Struct Method ( override ) ](#shadow-a-cue-struct-method)
 	* [Shadow a Cue Method and call the Shadowed Method ( like super in python )](#call-a-shadowed-method)
 	* [Use Dot Notation to access SCTE-35 Cue values](#use-dot-notation-to-access-scte-35-cue-values)
@@ -130,6 +131,32 @@ func main(){
         cue.Show()
 }
 ```
+#### `Use cuei with another MPEGTS stream parser / demuxer`
+* Scte35Parser is for incorporating with another MPEGTS parser.
+* Example
+```go
+	       import(
+	           "github.com/futzu/cuei"
+	           )
+	       scte35parser := cuei.Scte35Parser{}
+
+	       // Each time your parser/demuxer finds a SCTE-35 packet (stream type 0x86)
+
+	       // do something like
+
+	       cue := scte35parser.Parse(aScte35Packet)
+	       if cue != nil {
+	           // do something with the cue
+	       }
+
+```
+
+*  If the packet is a partial Cue
+	* The packet will be stored and aggregated with the next packet until complete.
+
+* Single packet Cues and completed multiple packet Cues 
+	* Are decoded into a Cue and returned.
+
 #### `Shadow a Cue struct method`
 ```go
 package main
