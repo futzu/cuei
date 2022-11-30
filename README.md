@@ -35,9 +35,9 @@ go install github.com/futzu/cuei@latest
 # `Nutshell`
 | Use this        |   To do this                                                  |
 |-----------------|---------------------------------------------------------------|
-|cuei.Cue         | Parse SCTE-35 from a Base64 or Byte string.                   |
-|cuei.Stream      |                     Parse SCTE35 Cues from MPEGTS packets.    |
-|cuei.Scte35Parser|     Parse SCTE-35 from MPEGTS packets from a external demuxer.|
+|[cuei.Cue](https://github.com/futzu/cuei/blob/eac3a19eeb26/cue.go#L19)         | Parse SCTE-35 from a Base64 or Byte string.                   |
+|[cuei.Stream](https://pkg.go.dev/github.com/futzu/cuei#Stream)      |                     Parse SCTE35 Cues from MPEGTS packets.    |
+|[cuei.Scte35Parser](https://pkg.go.dev/github.com/futzu/cuei#Scte35Parser)|     Parse SCTE-35 from MPEGTS packets from a external demuxer.|
 
 
 # `Quick Demo`
