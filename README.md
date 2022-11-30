@@ -1,4 +1,4 @@
-# cuei is a SCTE35 parser library, in Go.
+# cuei is a SCTE35 parser library in Go.
 
 - [x] Parses SCTE-35 Cues from MPEGTS or Bytes or Base64
 - [x] Parses SCTE-35 Cues spread over multiple MPEGTS packets
@@ -10,13 +10,13 @@
 * [Examples](#parse-base64-encoded-scte-35) 
 	* [Parse Base64 encoded SCTE-35](#parse-base64-encoded-scte-35)      
 	* [Parse SCTE-35 from MPEGTS](#parse-mpegts-video-for-scte35)
+	* [Use Dot Notation to access SCTE-35 Cue values](#use-dot-notation-to-access-scte-35-cue-values)
 	* [Use cuei with another MPEGTS stream parser / demuxer](#use-cuei-with-another-mpegts-stream-parser--demuxer)
 	* [Shadow a Cue Struct Method ( override ) ](#shadow-a-cue-struct-method)
 	* [Shadow a Cue Method and call the Shadowed Method ( like super in python )](#call-a-shadowed-method)
-	* [Use Dot Notation to access SCTE-35 Cue values](#use-dot-notation-to-access-scte-35-cue-values)
 
 
-#### `install cuei`
+## `Install cuei`
 
 ```go
 go install github.com/futzu/cuei@latest
@@ -113,7 +113,7 @@ func main(){
 
 
 ```
-#### `parse base64 encoded SCTE-35`
+## Parse base64 encoded SCTE-35
 ```go
 package main
 
@@ -131,7 +131,7 @@ func main(){
         cue.Show()
 }
 ```
-#### `Use cuei with another MPEGTS stream parser / demuxer`
+## Use cuei with another MPEGTS stream parser / demuxer
 * Scte35Parser is for incorporating with another MPEGTS parser.
 * Example
 ```go
@@ -151,13 +151,18 @@ func main(){
 
 ```
 
-*  If the packet is a partial Cue
-	* The packet will be stored and aggregated with the next packet until complete.
+* If the MPEGTS SCTE-35 packet contains a complete cue message
+	* The cue message is decoded into a Cue and returned.
 
-* Single packet Cues and completed multiple packet Cues 
-	* Are decoded into a Cue and returned.
 
-#### `Shadow a Cue struct method`
+* If the MPEGTS SCTE-35 packet is a partial cue message
+
+	 * It will be stored and aggregated with the next MPEGTS SCTE-35 packet until complete.
+
+	 * Completed cue messages are decoded into a Cue and returned.
+
+---
+## Shadow a Cue struct method
 ```go
 package main
 
@@ -184,7 +189,7 @@ func main(){
 
 ```
 
-#### Call a shadowed method
+## Call a shadowed method
 ```go
 package main
 
@@ -217,7 +222,7 @@ func main(){
 
 
 ```
-#### Use Dot notation to access SCTE-35 Cue values
+## Use Dot notation to access SCTE-35 Cue values
 ```go
 
 /**
