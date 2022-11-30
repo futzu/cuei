@@ -6,26 +6,66 @@
 - [x] Supports multiple MPEGTS Programs and multiple SCTE-35 streams
 
 * [Install](#install-cuei)
+
+* [In a nutshell](#nutshell)
+
 * [Go Docs](https://pkg.go.dev/github.com/futzu/cuei)
+
 * [Examples](#parse-base64-encoded-scte-35) 
-	* [Parse Base64 encoded SCTE-35](#parse-base64-encoded-scte-35)      
-	* [Parse SCTE-35 from MPEGTS](#parse-mpegts-video-for-scte35)
+
+	* [Parse SCTE-35 from MPEGTS](#quick-demo)
+	
+	* [Parse Base64 encoded SCTE-35](#parse-base64-encoded-scte-35)
+	      
 	* [Use Dot Notation to access SCTE-35 Cue values](#use-dot-notation-to-access-scte-35-cue-values)
+	
 	* [Use cuei with another MPEGTS stream parser / demuxer](#use-cuei-with-another-mpegts-stream-parser--demuxer)
+	
 	* [Shadow a Cue Struct Method ( override ) ](#shadow-a-cue-struct-method)
+	
 	* [Shadow a Cue Method and call the Shadowed Method ( like super in python )](#call-a-shadowed-method)
 
 
-## `Install cuei`
+# `Install cuei`
 
 ```go
 go install github.com/futzu/cuei@latest
 
 ```
-#### `fetch cueidemo.go`
-```rebol
-curl http://iodisco.com/cueidemo.go -o cueidemo.go
+# `Nutshell`
+| Use this        |   To do this                                                  |
+|-----------------|---------------------------------------------------------------|
+|cuei.Cue         | Parse SCTE-35 from a Base64 or Byte string.                   |
+|cuei.Stream      |                     Parse SCTE35 Cues from MPEGTS packets.    |
+|cuei.Scte35Parser|     Parse SCTE-35 from MPEGTS packets from a external demuxer.|
+
+
+# `Quick Demo`
+
+* cueidemo.go
+
+```go 
+package main
+
+import (
+	"os"
+	"fmt"
+	"github.com/futzu/cuei"
+)
+
+func main(){
+
+	args := os.Args[1:]
+	for i := range args{
+		fmt.Printf( "\nNext File: %s\n\n",args[i] )
+		var stream   cuei.Stream
+		stream.Decode(args[i])
+	}
+} 
+
+
 ```
+
 #### `build cueidemo`
 ```go
 go build cueidemo.go
@@ -89,31 +129,7 @@ Next File: mpegts/out.ts
 
 ```
 
-
-* cueidemo.go
-
-```go 
-package main
-
-import (
-	"os"
-	"fmt"
-	"github.com/futzu/cuei"
-)
-
-func main(){
-
-	args := os.Args[1:]
-	for i := range args{
-		fmt.Printf( "\nNext File: %s\n\n",args[i] )
-		var stream   cuei.Stream
-		stream.Decode(args[i])
-	}
-} 
-
-
-```
-## Parse base64 encoded SCTE-35
+# `Parse base64 encoded SCTE-35`
 ```go
 package main
 
@@ -131,7 +147,7 @@ func main(){
         cue.Show()
 }
 ```
-## Use cuei with another MPEGTS stream parser / demuxer
+## `Use cuei with another MPEGTS stream parser / demuxer`
 * Scte35Parser is for incorporating with another MPEGTS parser.
 * Example
 ```go
@@ -162,7 +178,7 @@ func main(){
 	 * Completed cue messages are decoded into a Cue and returned.
 
 ---
-## Shadow a Cue struct method
+# `Shadow a Cue struct method`
 ```go
 package main
 
@@ -189,7 +205,7 @@ func main(){
 
 ```
 
-## Call a shadowed method
+# `Call a shadowed method`
 ```go
 package main
 
@@ -222,7 +238,7 @@ func main(){
 
 
 ```
-## Use Dot notation to access SCTE-35 Cue values
+# Use Dot notation to access SCTE-35 Cue values
 ```go
 
 /**
