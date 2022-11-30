@@ -238,7 +238,7 @@ func main(){
 
 
 ```
-# Use Dot notation to access SCTE-35 Cue values
+# `Use Dot notation to access SCTE-35 Cue values`
 ```go
 
 /**
