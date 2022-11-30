@@ -138,7 +138,7 @@ func main(){
 	       import(
 	           "github.com/futzu/cuei"
 	           )
-	       scte35parser := cuei.Scte35Parser{}
+	       scte35parser := cuei.NewScte35Parser()
 
 	       // Each time your parser/demuxer finds a SCTE-35 packet (stream type 0x86)
 
