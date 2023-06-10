@@ -11,7 +11,7 @@ var tbl = []int{0, 79764919, 159529838, 222504665, 319059676, 398814059, 4450093
 func CRC32(data []byte) int {
 	crc := INIT_VALUE
 	for _, bite := range data {
-		crc = tbl[int(bite)^((crc>>TWENTY_FOUR)&TWO_FIFTY_FIVE)] ^ ((crc << EIGHT) & (INIT_VALUE - TWO_FIFTY_FIVE))
+		crc = tbl[int(bite) ^ ((crc >> TWENTY_FOUR) & TWO_FIFTY_FIVE)] ^ ((crc << EIGHT) & (INIT_VALUE - TWO_FIFTY_FIVE))
 	}
 	return crc
 }
