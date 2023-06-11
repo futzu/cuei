@@ -43,8 +43,8 @@ func (nb *Nbin) Add8(val uint8, nbits uint) {
 	nb.Add64(u, nbits)
 }
 
-// AddBool left shift NBin.Bites by 1 and add bool val
-func (nb *Nbin) AddBool(val bool) {
+// AddFlag left shift NBin.Bites by 1 and add bool val
+func (nb *Nbin) AddFlag(val bool) {
 	if val == true {
 		nb.Add64(1, 1)
 	} else {
@@ -69,3 +69,12 @@ func (nb *Nbin) AddHex64(val string, nbits uint) {
 		nb.Add64(u.Uint64(), nbits)
 	}
 }
+
+// Reserve num bits by setting them to 1
+func (nb *Nbin) Reserve(num int) {
+
+    for _,_ := range num {
+		nb.Add64(1, 1)
+    }
+}
+        
