@@ -44,3 +44,20 @@ func (infosec *InfoSection) Decode(gob *gobs.Gob) bool {
 	infosec.SpliceCommandType = gob.UInt8(8)
 	return true
 }
+
+// Encode Splice Info Section values.
+func (infosec *InfoSection) Encode(nb *NBin) {
+	nb.AddHex64(infosec.TableID, 8)
+	nb.AddFlag(infosec.SectionSyntaxIndicator)
+	nb.AddFlag(infosec.Private)
+	nb.AddReserve(2)
+	nb.Add16(infosec.SectionLength, 12)
+	nb.Add8(infosec.ProtocolVersion, 8)
+	nb.AddFlag(infosec.EncryptedPacket)
+	nb.Add8(infosec.EncryptionAlgorithm, 6)
+	nb.Add90k(infosec.PtsAdjustment, 33)
+	nb.AddHex64(infosec.CwIndex, 8)
+	nb.AddHex64(infosec.Tier, 12)
+	nb.Add16(infosec.SpliceCommandLength, 12)
+	nb.Add8(infosec.SpliceCommandType, 8)
+}
