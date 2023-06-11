@@ -1,3 +1,12 @@
+
+# cuei is a SCTE35 parser library in Go.
+
+- [x] Parses SCTE-35 Cues from MPEGTS or Bytes or Base64
+- [x] Parses SCTE-35 Cues spread over multiple MPEGTS packets
+- [x] Supports multi-packet PAT and PMT tables
+- [x] Supports multiple MPEGTS Programs and multiple SCTE-35 streams
+
+
 ### `Heads Up!` I am about to break stuff. 
 <details> <summary>Mea Culpa, Mea Culpa</summary>
 
@@ -17,13 +26,6 @@
 	
 </details>
 	
-# cuei is a SCTE35 parser library in Go.
-
-
-- [x] Parses SCTE-35 Cues from MPEGTS or Bytes or Base64
-- [x] Parses SCTE-35 Cues spread over multiple MPEGTS packets
-- [x] Supports multi-packet PAT and PMT tables
-- [x] Supports multiple MPEGTS Programs and multiple SCTE-35 streams
 
 * [Install](#install-cuei)
 
