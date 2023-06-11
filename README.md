@@ -1,12 +1,15 @@
-# `Heads Up!` I am about to break stuff.
+### `Heads Up!` I am about to break stuff. 
 <details> <summary>Mea Culpa, Mea Culpa</summary>
 
-	  A surprsingly large number of are people using cuei, this repo is cloned about 700 times a week. 
-	Usually I go to great lengths to maintain backward compatibily, but a company is paying me to add
-	encoding to cuei, so I need to make that happen. I am going to do what I think is the best way to 
-	include encoding, even if that means breakward compatibilty. 
+	  A surprsingly large number of are people using cuei, 
+	this repo is cloned about 700 times a week. 
+	Usually, I go to great lengths to maintain backward compatibily, 
+	however, a company is paying me to add encoding to cuei, 
+	so I need to make that happen. 
+	I could make another branch and all that,
+	but I don't want to do that, merging branches sucks.
 		
-* I expect to have it up and running in the next few days, but expect changes for the next week.
+* I expect to have it up and running in the next few days, but expect dramatic changes for the next week.
 	* My plan is to have encode mirror the decode functionality and break very little.
 	* I will be renaming gob back to bitn. 
 	* NBin, which is what packs the bits, is verfied working.
