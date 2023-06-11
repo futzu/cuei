@@ -11,7 +11,7 @@
 <details> <summary>Heads Up!</summary>
 
 	
-### <b>[TuneIn](https://tunein.com)</b> has contracted me to add encoding to cuei. 
+### The fine folks at <b>[TuneIn](https://tunein.com)</b> have contracted me to add encoding to cuei. 
 ### Over the next few days, expect the code to be in flux.
 	
 ### `punch list`
