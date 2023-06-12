@@ -6,14 +6,16 @@ import (
 
 /*
 *
-SpliceCommand 
-   These Splice Command types are consolidated into SpliceCommand.
+SpliceCommand
 
-        0x0: Splice Null,
-        0x5: Splice Insert,
-        0x6: Time Signal,
-        0x7: Bandwidth Reservation,
-        0xff: Private,
+	These Splice Command types are consolidated into SpliceCommand.
+
+	     0x0: Splice Null,
+	     0x5: Splice Insert,
+	     0x6: Time Signal,
+	     0x7: Bandwidth Reservation,
+	     0xff: Private,
+
 *
 */
 type SpliceCommand struct {
@@ -38,46 +40,45 @@ type SpliceCommand struct {
 	PTS                        float64 `json:",omitempty"`
 }
 
-
-//Decode returns a Command by type
+// Decode returns a Command by type
 func (cmd *SpliceCommand) Decode(cmdtype uint8, gob *gobs.Gob) {
 	cmd.CommandType = cmdtype
 	switch cmdtype {
 	case 0x0:
-		cmd.spliceNull(gob)
+		cmd.decodeSpliceNull(gob)
 	case 0x5:
-		cmd.spliceInsert(gob)
+		cmd.decodeSpliceInsert(gob)
 	case 0x6:
-		cmd.timeSignal(gob)
+		cmd.decodeTimeSignal(gob)
 	case 0x7:
-		cmd.bandwidthReservation(gob)
+		cmd.decodeBandwidthReservation(gob)
 	case 0xff:
-		cmd.private(gob)
+		cmd.decodePrivate(gob)
 	}
 
 }
 
 // bandwidth Reservation
-func (cmd *SpliceCommand) bandwidthReservation(gob *gobs.Gob) {
+func (cmd *SpliceCommand) decodeBandwidthReservation(gob *gobs.Gob) {
 	cmd.Name = "Bandwidth Reservation"
 	gob.Forward(0)
 }
 
 // private Command
-func (cmd *SpliceCommand) private(gob *gobs.Gob) {
+func (cmd *SpliceCommand) decodePrivate(gob *gobs.Gob) {
 	cmd.Name = "Private Command"
 	cmd.Identifier = gob.UInt32(32)
 	cmd.Bites = gob.Bytes(24)
 }
 
 // splice Null
-func (cmd *SpliceCommand) spliceNull(gob *gobs.Gob) {
+func (cmd *SpliceCommand) decodeSpliceNull(gob *gobs.Gob) {
 	cmd.Name = "Splice Null"
 	gob.Forward(0)
 }
 
 // splice Insert
-func (cmd *SpliceCommand) spliceInsert(gob *gobs.Gob) {
+func (cmd *SpliceCommand) decodeSpliceInsert(gob *gobs.Gob) {
 	cmd.Name = "Splice Insert"
 	cmd.SpliceEventID = gob.Hex(32)
 	cmd.SpliceEventCancelIndicator = gob.Flag()
@@ -129,7 +130,7 @@ func (cmd *SpliceCommand) spliceTime(gob *gobs.Gob) {
 }
 
 // time Signal
-func (cmd *SpliceCommand) timeSignal(gob *gobs.Gob) {
+func (cmd *SpliceCommand) decodeTimeSignal(gob *gobs.Gob) {
 	cmd.Name = "Time Signal"
 	cmd.spliceTime(gob)
 }
