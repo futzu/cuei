@@ -2,6 +2,7 @@ package cuei
 
 import (
 	gobs "github.com/futzu/gob"
+	//   bitn "github.com/futzu/bitn"
 )
 
 // InfoSection is the splice info section of the SCTE 35 cue.
@@ -45,12 +46,13 @@ func (infosec *InfoSection) Decode(gob *gobs.Gob) bool {
 	return true
 }
 
-// Encode Splice Info Section values.
-func (infosec *InfoSection) Encode(nb *Nbin) {
+// Encode Splice Info Section
+func (infosec *InfoSection) Encode() []byte {
+	nb := &Nbin{}
 	nb.AddHex64(infosec.TableID, 8)
 	nb.AddFlag(infosec.SectionSyntaxIndicator)
 	nb.AddFlag(infosec.Private)
-	nb.AddReserve(2)
+	nb.Reserve(2)
 	nb.Add16(infosec.SectionLength, 12)
 	nb.Add8(infosec.ProtocolVersion, 8)
 	nb.AddFlag(infosec.EncryptedPacket)
@@ -60,4 +62,5 @@ func (infosec *InfoSection) Encode(nb *Nbin) {
 	nb.AddHex64(infosec.Tier, 12)
 	nb.Add16(infosec.SpliceCommandLength, 12)
 	nb.Add8(infosec.SpliceCommandType, 8)
+	return nb.Bites.Bytes()
 }
