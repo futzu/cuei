@@ -46,7 +46,7 @@ func (infosec *InfoSection) Decode(gob *gobs.Gob) bool {
 }
 
 // Encode Splice Info Section values.
-func (infosec *InfoSection) Encode(nb *NBin) {
+func (infosec *InfoSection) Encode(nb *Nbin) {
 	nb.AddHex64(infosec.TableID, 8)
 	nb.AddFlag(infosec.SectionSyntaxIndicator)
 	nb.AddFlag(infosec.Private)
