@@ -58,6 +58,17 @@ func (cmd *SpliceCommand) Decode(cmdtype uint8, gob *gobs.Gob) {
 
 }
 
+// Encode returns a SpliceCommand values as bytes
+func (cmd *SpliceCommand) Encode() []byte {
+	var fu []byte
+
+	switch cmd.CommandType {
+	case 0x5:
+		fu = cmd.encodeSpliceInsert()
+	}
+	return fu
+}
+
 // bandwidth Reservation
 func (cmd *SpliceCommand) decodeBandwidthReservation(gob *gobs.Gob) {
 	cmd.Name = "Bandwidth Reservation"
@@ -126,6 +137,58 @@ func (cmd *SpliceCommand) spliceTime(gob *gobs.Gob) {
 		cmd.PTS = gob.As90k(33)
 	} else {
 		gob.Forward(7)
+	}
+}
+
+// encode splice Insert
+func (cmd *SpliceCommand) encodeSpliceInsert() []byte {
+	nb := &Nbin{}
+	nb.AddHex64(cmd.SpliceEventID, 32)
+	nb.AddFlag(cmd.SpliceEventCancelIndicator)
+	nb.Reserve(7)
+	if !cmd.SpliceEventCancelIndicator {
+		nb.AddFlag(cmd.OutOfNetworkIndicator)
+		nb.AddFlag(cmd.ProgramSpliceFlag)
+		nb.AddFlag(cmd.DurationFlag)
+		nb.AddFlag(cmd.SpliceImmediateFlag)
+		nb.Reserve(4)
+	}
+	if cmd.ProgramSpliceFlag == true {
+		if !cmd.SpliceImmediateFlag {
+			cmd.encodeSpliceTime(nb)
+		}
+	} else {
+		nb.Add8(cmd.ComponentCount, 8)
+		for i := range cmd.Components {
+			nb.Add8(cmd.Components[i], 8)
+		}
+		if !cmd.SpliceImmediateFlag {
+			cmd.encodeSpliceTime(nb)
+		}
+	}
+	if cmd.DurationFlag == true {
+		cmd.encodeBreak(nb)
+	}
+	nb.Add16(cmd.UniqueProgramID, 16)
+	nb.Add8(cmd.AvailNum, 8)
+	nb.Add8(cmd.AvailExpected, 8)
+
+	return nb.Bites.Bytes()
+}
+
+func (cmd *SpliceCommand) encodeBreak(nb *Nbin) {
+	nb.AddFlag(cmd.BreakAutoReturn)
+	nb.Reserve(6)
+	nb.Add90k(cmd.BreakDuration, 33)
+}
+
+func (cmd *SpliceCommand) encodeSpliceTime(nb *Nbin) {
+	nb.AddFlag(cmd.TimeSpecifiedFlag)
+	if cmd.TimeSpecifiedFlag {
+		nb.Reserve(6)
+		nb.Add90k(cmd.PTS, 33)
+	} else {
+		nb.Reserve(7)
 	}
 }
 
