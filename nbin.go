@@ -73,8 +73,7 @@ func (nb *Nbin) AddHex64(val string, nbits uint) {
 // Reserve num bits by setting them to 1
 func (nb *Nbin) Reserve(num int) {
 
-    for _,_ := range num {
+	for i := 0; i < num; i++ {
 		nb.Add64(1, 1)
-    }
+	}
 }
-        
