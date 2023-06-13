@@ -2,7 +2,6 @@ package cuei
 
 import (
 	gobs "github.com/futzu/gob"
-	//   bitn "github.com/futzu/bitn"
 )
 
 // InfoSection is the splice info section of the SCTE 35 cue.
