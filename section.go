@@ -22,6 +22,7 @@ type InfoSection struct {
 	SpliceCommandLength    uint16
 	SpliceCommandType      uint8
 	DescriptorLoopLength   uint16
+	CRC                    uint32
 }
 
 // Decode Splice Info Section values.
@@ -46,8 +47,28 @@ func (infosec *InfoSection) Decode(gob *gobs.Gob) bool {
 	return true
 }
 
+// Defaults sets default InfoSection values for encoding
+func (infosec *InfoSection) Defaults() {
+	infosec.Name = "Splice Info Section"
+	infosec.TableID = "0xfc"
+	infosec.SectionSyntaxIndicator = false
+	infosec.Private = false
+	infosec.Reserved = "0x3"
+	infosec.SectionLength = 11
+	infosec.ProtocolVersion = 0
+	infosec.EncryptedPacket = false
+	infosec.EncryptionAlgorithm = 0
+	infosec.PtsAdjustment = 0.0
+	infosec.CwIndex = "0x0"
+	infosec.Tier = "0xfff"
+	infosec.SpliceCommandLength = 0
+	infosec.SpliceCommandType = 0
+	infosec.DescriptorLoopLength = 0
+}
+
 // Encode Splice Info Section
 func (infosec *InfoSection) Encode() []byte {
+	infosec.Defaults()
 	nb := &Nbin{}
 	nb.AddHex64(infosec.TableID, 8)
 	nb.AddFlag(infosec.SectionSyntaxIndicator)
