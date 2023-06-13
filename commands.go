@@ -196,14 +196,12 @@ func (cmd *SpliceCommand) encodeSpliceTime(nb *Nbin) {
 // decode time Signal
 func (cmd *SpliceCommand) decodeTimeSignal(gob *gobs.Gob) {
 	cmd.Name = "Time Signal"
-	cmd.spliceTime(gob) 
-}
- 
- //  encode time Signal
-func (cmd *SpliceCommand) encodeTimeSignal() []byte {
-    nb := &Nbin{}
-    cmd.encodeSpliceTime(nb)
-    return nb.Bites.Bytes()
+	cmd.spliceTime(gob)
 }
 
- 
+//  encode time Signal
+func (cmd *SpliceCommand) encodeTimeSignal() []byte {
+	nb := &Nbin{}
+	cmd.encodeSpliceTime(nb)
+	return nb.Bites.Bytes()
+}
