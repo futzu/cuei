@@ -199,7 +199,7 @@ func (cmd *SpliceCommand) decodeTimeSignal(gob *gobs.Gob) {
 	cmd.spliceTime(gob)
 }
 
-//  encode time Signal
+// encode time Signal
 func (cmd *SpliceCommand) encodeTimeSignal() []byte {
 	nb := &Nbin{}
 	cmd.encodeSpliceTime(nb)
