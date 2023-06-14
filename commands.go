@@ -1,4 +1,4 @@
-package cuei
+ package cuei
 
 import (
 	gobs "github.com/futzu/gob"
@@ -138,6 +138,67 @@ func (cmd *SpliceCommand) spliceTime(gob *gobs.Gob) {
 	} else {
 		gob.Forward(7)
 	}
+}
+
+// MkSpliceInsert easy Splice Insert Splice Command creation
+/**
+
+
+    The args set the SpliceInsert vars.
+
+    SpliceEventID = eventid
+
+    if pts is 0 (default):
+        SpliceImmediateFlag      True
+        timeSpecifiedFlag      False
+
+    if pts > 0:
+        spliceImmediateFlag      False
+        timeSpecifiedFlag       True
+        PTS                  pts
+
+    If duration is 0(default)
+        DurationFlag              False
+
+    if duration IS set:
+        OutOfNetworkIndicator   True
+        durationFlag           True
+        BreakAutoReturn         True
+        BreakDuration             duration
+        PTS                  pts
+
+    if out :
+        OutOfNetworkIndicator  True
+
+    if out is False (default):
+        OutOfNetworkIndicator   False
+
+**/
+func (cmd *SpliceCommand) MkSpliceInsert(eventid string, pts float64, duration float64, out bool) {
+	cmd.SpliceEventID = eventid
+	cmd.CommandType = 5
+	cmd.SpliceEventCancelIndicator = false
+	cmd.ProgramSpliceFlag = false
+	cmd.SpliceImmediateFlag = true
+	cmd.DurationFlag = false
+	cmd.AvailNum = 0
+	cmd.AvailExpected = 0
+	cmd.TimeSpecifiedFlag = false
+	if pts > 0 {
+		cmd.ProgramSpliceFlag = true
+		cmd.SpliceImmediateFlag = false
+		cmd.TimeSpecifiedFlag = true
+		cmd.PTS = pts
+	} else {
+		cmd.ComponentCount = 0
+	}
+	if duration > 0 {
+		cmd.DurationFlag = true
+		cmd.BreakDuration = duration
+		cmd.BreakAutoReturn = true
+		cmd.OutOfNetworkIndicator = true
+	}
+
 }
 
 // encode splice Insert
