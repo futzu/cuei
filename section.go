@@ -1,6 +1,7 @@
 package cuei
 
 import (
+	"fmt"
 	gobs "github.com/futzu/gob"
 )
 
@@ -53,7 +54,7 @@ func (infosec *InfoSection) Defaults() {
 	infosec.SectionSyntaxIndicator = false
 	infosec.Private = false
 	infosec.Reserved = "0x3"
-	infosec.SectionLength = 11
+	infosec.SectionLength = 17
 	infosec.ProtocolVersion = 0
 	infosec.EncryptedPacket = false
 	infosec.EncryptionAlgorithm = 0
@@ -82,5 +83,8 @@ func (infosec *InfoSection) Encode() []byte {
 	nb.AddHex64(infosec.Tier, 12)
 	nb.Add16(infosec.SpliceCommandLength, 12)
 	nb.Add8(infosec.SpliceCommandType, 8)
+	nb.Add16(infosec.DescriptorLoopLength, 16)
+	crc32 := CRC32(nb.Bites.Bytes())
+	nb.Add32(crc32, 32)
 	return nb.Bites.Bytes()
 }
