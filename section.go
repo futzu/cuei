@@ -1,7 +1,6 @@
 package cuei
 
 import (
-	"fmt"
 	gobs "github.com/futzu/gob"
 )
 
@@ -66,7 +65,31 @@ func (infosec *InfoSection) Defaults() {
 	infosec.DescriptorLoopLength = 0
 }
 
-// Encode Splice Info Section
+/**
+
+Encode Splice Info Section
+Encodes the InfoSection variables to bytes.
+
+Easy splice null example:
+
+package main
+
+import (
+"fmt"
+"github.com/futzu/cuei"
+
+)
+
+
+func main() {
+isec  := cuei.InfoSection{}
+isec.Defaults()
+fmt.Println(cuei.EncB64(isec.Encode()))
+
+}
+
+**/
+
 func (infosec *InfoSection) Encode() []byte {
 	infosec.Defaults()
 	nb := &Nbin{}
@@ -87,4 +110,5 @@ func (infosec *InfoSection) Encode() []byte {
 	crc32 := CRC32(nb.Bites.Bytes())
 	nb.Add32(crc32, 32)
 	return nb.Bites.Bytes()
+
 }
