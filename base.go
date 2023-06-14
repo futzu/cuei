@@ -15,11 +15,24 @@ func chk(e error) {
 	}
 }
 
-// DeB64 decodes base64 strings.
+// DeB64 decodes base64 strings
+// This is deprecated please use DecB64
 func DeB64(b64 string) []byte {
+	return DecB64(b64)
+
+}
+
+// DecB64 decodes base64 strings.
+func DecB64(b64 string) []byte {
 	deb64, err := base64.StdEncoding.DecodeString(b64)
 	chk(err)
 	return deb64
+}
+
+// EncB64 encodes  bytes to a Base64 string
+func EncB64(data []byte) string {
+	return base64.StdEncoding.EncodeToString(data)
+
 }
 
 // IsIn is a test for slice membership
