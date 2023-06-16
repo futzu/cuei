@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"math/big"
 )
 
 // chk generic catchall error checking
@@ -31,8 +32,17 @@ func DecB64(b64 string) []byte {
 
 // EncB64 encodes  bytes to a Base64 string
 func EncB64(data []byte) string {
-	return base64.StdEncoding.EncodeToString(data)
+	b64 := base64.StdEncoding.EncodeToString(data)
 
+	return b64
+}
+
+// Hex2Int Hexidecimal string to uint64
+func Hex2Int(str string) uint64 {
+	i := new(big.Int)
+	_, err := fmt.Sscan(str, i)
+	chk(err)
+	return i.Uint64()
 }
 
 // IsIn is a test for slice membership
