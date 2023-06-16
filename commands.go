@@ -1,7 +1,6 @@
 package cuei
 
 import (
-	"fmt"
 	gobs "github.com/futzu/gob"
 )
 
