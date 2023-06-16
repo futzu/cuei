@@ -1,6 +1,7 @@
- package cuei
+package cuei
 
 import (
+	"fmt"
 	gobs "github.com/futzu/gob"
 )
 
@@ -175,8 +176,9 @@ func (cmd *SpliceCommand) spliceTime(gob *gobs.Gob) {
 
 **/
 func (cmd *SpliceCommand) MkSpliceInsert(eventid string, pts float64, duration float64, out bool) {
-	cmd.SpliceEventID = eventid
+	cmd.Name = "Splice Insert"
 	cmd.CommandType = 5
+	cmd.SpliceEventID = eventid
 	cmd.SpliceEventCancelIndicator = false
 	cmd.ProgramSpliceFlag = false
 	cmd.SpliceImmediateFlag = true
@@ -201,7 +203,7 @@ func (cmd *SpliceCommand) MkSpliceInsert(eventid string, pts float64, duration f
 
 }
 
-// encode splice Insert
+// encode Splice Insert Splice Command
 func (cmd *SpliceCommand) encodeSpliceInsert() []byte {
 	nb := &Nbin{}
 	nb.AddHex64(cmd.SpliceEventID, 32)
@@ -237,6 +239,8 @@ func (cmd *SpliceCommand) encodeSpliceInsert() []byte {
 	return nb.Bites.Bytes()
 }
 
+
+
 func (cmd *SpliceCommand) encodeBreak(nb *Nbin) {
 	nb.AddFlag(cmd.BreakAutoReturn)
 	nb.Reserve(6)
@@ -254,15 +258,17 @@ func (cmd *SpliceCommand) encodeSpliceTime(nb *Nbin) {
 	}
 }
 
-// decode time Signal
+// decode Time Signal Splice Commands
 func (cmd *SpliceCommand) decodeTimeSignal(gob *gobs.Gob) {
 	cmd.Name = "Time Signal"
 	cmd.spliceTime(gob)
 }
 
-// encode time Signal
+// encode Time Signal Splice Commands
 func (cmd *SpliceCommand) encodeTimeSignal() []byte {
 	nb := &Nbin{}
 	cmd.encodeSpliceTime(nb)
+	cmd.Bites = nb.Bites.Bytes()
 	return nb.Bites.Bytes()
 }
+
