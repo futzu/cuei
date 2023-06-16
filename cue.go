@@ -9,11 +9,12 @@ import (
 *
 Cue is a SCTE35 cue.
 
-    A Cue contains: 
-        1 InfoSection
-        1 SpliceCommand
-        0 or more Splice Descriptors
-        1 packetData (if parsed from MPEGTS)
+	A Cue contains:
+	    1 InfoSection
+	    1 SpliceCommand
+	    0 or more Splice Descriptors
+	    1 packetData (if parsed from MPEGTS)
+
 *
 */
 type Cue struct {
@@ -58,4 +59,60 @@ func (cue *Cue) dscptrLoop(gob *gobs.Gob) {
 // Show display SCTE-35 data as JSON.
 func (cue *Cue) Show() {
 	fmt.Println(MkJson(&cue))
+}
+
+/**
+func (cue *Cue) Encode() {
+
+       cmdl = self.command.command_length = len(cmd_bites)
+        self.info_section.splice_command_length = cmdl
+        self.info_section.splice_command_type = self.command.command_type
+        # 11 bytes for info section + command + 2 descriptor loop length
+        # + descriptor loop + 4 for crc
+        self.info_section.section_length = 11 + cmdl + 2 + dll + 4
+        self.bites = self.info_section.encode()
+        self.bites += cmd_bites
+        self.bites += int.to_bytes(
+            self.info_section.descriptor_loop_length, 2, byteorder="big"
+        )
+        self.bites += dscptr_bites
+        self._encode_crc()
+        return b64encode(self.bites).decode()
+**/
+
+/*
+  - Six2Five converts a Cue with a Time Sgnal Command
+    and a Segmentation Descriptor with a
+    type id of 0x34,0x35,0x36,0x37,0x38. or 0x39
+    into a Cue with a Splice Insert Command.
+
+*
+*/
+func (cue *Cue) Six2Five() {
+	upidStarts := []uint16{0x34, 0x36, 0x38}
+	upidStops := []uint16{0x35, 0x37, 0x39}
+	eventid := "0x0"
+	pts := 0.0
+	duration := float64(0.0)
+	out := false
+	if cue.Command.CommandType == 6 {
+		if cue.Command.PTS > 0.0 {
+			pts = cue.Command.PTS
+		}
+		for _, dscptr := range cue.Descriptors {
+			if dscptr.Tag == 2 {
+				eventid = fmt.Sprintf("%v", Hex2Int(dscptr.SegmentationEventID)&uint64(2^31))
+				if IsIn(upidStarts, uint16(dscptr.SegmentationTypeID)) {
+					if dscptr.SegmentationDurationFlag {
+						duration = dscptr.SegmentationDuration
+						out = true
+					}
+				}
+				if IsIn(upidStops, uint16(dscptr.SegmentationTypeID)) {
+					out = false
+				}
+			}
+			cue.Command.MkSpliceInsert(eventid, pts, duration, out)
+		}
+	}
 }
