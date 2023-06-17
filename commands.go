@@ -238,15 +238,13 @@ func (cmd *SpliceCommand) encodeSpliceInsert() []byte {
 	return nb.Bites.Bytes()
 }
 
-
-
 func (cmd *SpliceCommand) encodeBreak(nb *Nbin) {
 	nb.AddFlag(cmd.BreakAutoReturn)
 	nb.Reserve(6)
 	nb.Add90k(cmd.BreakDuration, 33)
 }
 
-// encode PTS splice times
+// Encode PTS splice times
 func (cmd *SpliceCommand) encodeSpliceTime(nb *Nbin) {
 	nb.AddFlag(cmd.TimeSpecifiedFlag)
 	if cmd.TimeSpecifiedFlag {
@@ -257,17 +255,16 @@ func (cmd *SpliceCommand) encodeSpliceTime(nb *Nbin) {
 	}
 }
 
-// decode Time Signal Splice Commands
+// Decode Time Signal Splice Commands
 func (cmd *SpliceCommand) decodeTimeSignal(gob *gobs.Gob) {
 	cmd.Name = "Time Signal"
 	cmd.spliceTime(gob)
 }
 
-// encode Time Signal Splice Commands
+// Encode Time Signal Splice Commands
 func (cmd *SpliceCommand) encodeTimeSignal() []byte {
 	nb := &Nbin{}
 	cmd.encodeSpliceTime(nb)
 	cmd.Bites = nb.Bites.Bytes()
 	return nb.Bites.Bytes()
 }
-
