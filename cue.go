@@ -105,6 +105,9 @@ func (cue *Cue) Six2Five() {
 	duration := float64(0.0)
 	out := false
 	if cue.Command.CommandType == 6 {
+			cue.Command.CommandType = 5
+
+		cue.Command.Name = "Six2Five'd Splice Insert"
 		if cue.Command.PTS > 0.0 {
 			pts = cue.Command.PTS
 		}
@@ -125,8 +128,7 @@ func (cue *Cue) Six2Five() {
 			cue.Command.CommandType = 5
 
 			cue.Command.MkSpliceInsert(eventid, pts, duration, out)
-			cue.Command.Name = "Six2Five'd Splice Insert"
-			cue.Show()
+			//cue.Show()
 			fmt.Println("Six 2 Five")
 		}
 	}
