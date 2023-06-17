@@ -1,6 +1,6 @@
 
 # cuei is a SCTE35 parser library in Go.
-
+![Resized_20210916_135344](https://github.com/futzu/cuei/assets/52701496/f4596860-7087-437e-828f-f5bfec339ee6)
 - [x] Parses SCTE-35 Cues from MPEGTS or Bytes or Base64
 - [x] Parses SCTE-35 Cues spread over multiple MPEGTS packets
 - [x] Supports multi-packet PAT and PMT tables
