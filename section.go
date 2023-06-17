@@ -6,6 +6,7 @@ import (
 
 // InfoSection is the splice info section of the SCTE 35 cue.
 type InfoSection struct {
+	Bites                  []byte
 	Name                   string
 	TableID                string
 	SectionSyntaxIndicator bool
@@ -65,30 +66,7 @@ func (infosec *InfoSection) Defaults() {
 	infosec.DescriptorLoopLength = 0
 }
 
-/**
 
-Encode Splice Info Section
-Encodes the InfoSection variables to bytes.
-
-Easy splice null example:
-
-package main
-
-import (
-"fmt"
-"github.com/futzu/cuei"
-
-)
-
-
-func main() {
-isec  := cuei.InfoSection{}
-isec.Defaults()
-fmt.Println(cuei.EncB64(isec.Encode()))
-
-}
-
-**/
 
 func (infosec *InfoSection) Encode() []byte {
 	infosec.Defaults()
@@ -106,9 +84,7 @@ func (infosec *InfoSection) Encode() []byte {
 	nb.AddHex64(infosec.Tier, 12)
 	nb.Add16(infosec.SpliceCommandLength, 12)
 	nb.Add8(infosec.SpliceCommandType, 8)
-	nb.Add16(infosec.DescriptorLoopLength, 16)
-	crc32 := CRC32(nb.Bites.Bytes())
-	nb.Add32(crc32, 32)
-	return nb.Bites.Bytes()
+	infosec.Bites = nb.Bites.Bytes()
+	return infosec.Bites
 
 }
