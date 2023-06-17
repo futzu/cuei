@@ -18,6 +18,7 @@ Cue is a SCTE35 cue.
 *
 */
 type Cue struct {
+	Bites       []byte
 	InfoSection *InfoSection
 	Command     *SpliceCommand
 	Descriptors []SpliceDescriptor `json:",omitempty"`
@@ -61,24 +62,32 @@ func (cue *Cue) Show() {
 	fmt.Println(MkJson(&cue))
 }
 
-/**
-func (cue *Cue) Encode() {
+func (cue *Cue) Encode() string {
+	cue.Command.Encode()
+	cmdl := len(cue.Command.Bites)
+	cue.InfoSection.SpliceCommandLength = uint16(cmdl)
+	cue.InfoSection.SpliceCommandType = cue.Command.CommandType
+	// 11 bytes for info section + command + 2 descriptor loop length
+	// + descriptor loop + 4 for crc
+	cue.InfoSection.SectionLength = uint16(11 + cmdl + 2 + 4)
+	cue.InfoSection.Encode()
+	nb := &Nbin{}
+	isbits := uint(len(cue.InfoSection.Bites) << 3)
+	nb.AddBytes(string(cue.InfoSection.Bites), isbits)
+	ccbits := uint(len(cue.Command.Bites) << 3)
+	nb.AddBytes(string(cue.Command.Bites), ccbits)
+	dll := uint8(0)
+	nb.Add8(dll, 2)
+	/**     cue.Bites += int.to_bytes(
+	            self.info_section.descriptor_loop_length, 2, byteorder="big"
+	        )
+	        self.bites += dscptr_bites
 
-       cmdl = self.command.command_length = len(cmd_bites)
-        self.info_section.splice_command_length = cmdl
-        self.info_section.splice_command_type = self.command.command_type
-        # 11 bytes for info section + command + 2 descriptor loop length
-        # + descriptor loop + 4 for crc
-        self.info_section.section_length = 11 + cmdl + 2 + dll + 4
-        self.bites = self.info_section.encode()
-        self.bites += cmd_bites
-        self.bites += int.to_bytes(
-            self.info_section.descriptor_loop_length, 2, byteorder="big"
-        )
-        self.bites += dscptr_bites
-        self._encode_crc()
-        return b64encode(self.bites).decode()
-**/
+	**/
+	nb.Add32(CRC32(cue.Bites), 32)
+	cue.Bites = nb.Bites.Bytes()
+	return EncB64(cue.Bites)
+}
 
 /*
   - Six2Five converts a Cue with a Time Sgnal Command
@@ -101,6 +110,7 @@ func (cue *Cue) Six2Five() {
 		}
 		for _, dscptr := range cue.Descriptors {
 			if dscptr.Tag == 2 {
+				//value, _ := strconv.ParseInt(hex, 16, 64)
 				eventid = fmt.Sprintf("%v", Hex2Int(dscptr.SegmentationEventID)&uint64(2^31))
 				if IsIn(upidStarts, uint16(dscptr.SegmentationTypeID)) {
 					if dscptr.SegmentationDurationFlag {
