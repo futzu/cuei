@@ -62,9 +62,14 @@ func (cue *Cue) Show() {
 	fmt.Println(MkJson(&cue))
 }
 
-func (cue *Cue) Encode() string {
-	cue.Command.Encode()
-	cmdl := len(cue.Command.Bites)
+func (cue *Cue) Encode() []byte {
+	//cmdl := len(cue.Command.Bites)
+	//cue.Command.MkSpliceInsert("77",11.012344,30.1,true)
+	cmdb := cue.Command.Encode()
+	cmdl := len(cmdb)
+	//fmt.Println(cmdb)
+
+	cue.InfoSection.Defaults()
 	cue.InfoSection.SpliceCommandLength = uint16(cmdl)
 	cue.InfoSection.SpliceCommandType = cue.Command.CommandType
 	// 11 bytes for info section + command + 2 descriptor loop length
@@ -73,20 +78,21 @@ func (cue *Cue) Encode() string {
 	cue.InfoSection.Encode()
 	nb := &Nbin{}
 	isbits := uint(len(cue.InfoSection.Bites) << 3)
-	nb.AddBytes(string(cue.InfoSection.Bites), isbits)
-	ccbits := uint(len(cue.Command.Bites) << 3)
-	nb.AddBytes(string(cue.Command.Bites), ccbits)
-	dll := uint8(0)
-	nb.Add8(dll, 2)
+	nb.AddBytes(cue.InfoSection.Bites, isbits)
+	ccbits := uint(len(cmdb) << 3)
+	nb.AddBytes(cmdb, ccbits)
+	dll := uint16(0)
+	nb.Add16(dll, 16)
 	/**     cue.Bites += int.to_bytes(
 	            self.info_section.descriptor_loop_length, 2, byteorder="big"
 	        )
 	        self.bites += dscptr_bites
 
 	**/
-	nb.Add32(CRC32(cue.Bites), 32)
+	crc32 := CRC32(nb.Bites.Bytes())
+	nb.Add32(crc32, 32)
 	cue.Bites = nb.Bites.Bytes()
-	return EncB64(cue.Bites)
+	return nb.Bites.Bytes()
 }
 
 /*
@@ -105,7 +111,7 @@ func (cue *Cue) Six2Five() {
 	duration := float64(0.0)
 	out := false
 	if cue.Command.CommandType == 6 {
-			cue.Command.CommandType = 5
+		cue.Command.CommandType = 5
 
 		cue.Command.Name = "Six2Five'd Splice Insert"
 		if cue.Command.PTS > 0.0 {
@@ -125,10 +131,12 @@ func (cue *Cue) Six2Five() {
 					out = false
 				}
 			}
-			cue.Command.CommandType = 5
-
 			cue.Command.MkSpliceInsert(eventid, pts, duration, out)
-			//cue.Show()
+			cue.Command.Name = "Six2Five'd Splice Insert"
+
+			cue.Encode()
+			//cue.Decode(cue.Encode())
+			cue.Show()
 			fmt.Println("Six 2 Five")
 		}
 	}
