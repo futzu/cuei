@@ -12,7 +12,6 @@ import (
 func chk(e error) {
 	if e != nil {
 		fmt.Println(e)
-
 	}
 }
 
@@ -33,7 +32,6 @@ func DecB64(b64 string) []byte {
 // EncB64 encodes  bytes to a Base64 string
 func EncB64(data []byte) string {
 	b64 := base64.StdEncoding.EncodeToString(data)
-
 	return b64
 }
 
