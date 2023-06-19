@@ -5,15 +5,15 @@ import (
 	"math/big"
 )
 
-// Nbin packs SCTE-35 data as bits for encoding and stores them in a big.Int called Bites
+// Nbin packs  SCTE-35 data as bits for encoding and stores them in a big.Int called Bites
 type Nbin struct {
 	Bites big.Int
 }
 
 // Append a string  as bits to NBin.Bites for encoding
-func (nb *Nbin) AddBytes(str string, nbits uint) {
+func (nb *Nbin) AddBytes(bites []byte, nbits uint) {
 	t := new(big.Int)
-	t.SetBytes([]byte(str))
+	t.SetBytes(bites)
 	o := nb.Bites.Lsh(&nb.Bites, nbits)
 	nb.Bites = *nb.Bites.Add(o, t)
 }
@@ -38,7 +38,7 @@ func (nb *Nbin) Add16(val uint16, nbits uint) {
 	nb.Add64(u, nbits)
 }
 
-//  Add8  append a  unit8 as bits to NBin.Bites
+// Add8  append a  unit8 as bits to NBin.Bites
 func (nb *Nbin) Add8(val uint8, nbits uint) {
 	u := uint64(val)
 	nb.Add64(u, nbits)
@@ -59,7 +59,7 @@ func (nb *Nbin) Add90k(val float64, nbits uint) {
 	nb.Add64(u, nbits)
 }
 
-// AddHex64 append a hex string, as uint64, in bits, to NBin.Bites 
+// AddHex64 append a hex string as uint64 in bits to NBin.Bites
 func (nb *Nbin) AddHex64(val string, nbits uint) {
 	u := new(big.Int)
 	_, err := fmt.Sscan(val, u)
