@@ -19,10 +19,10 @@ SpliceCommand
 *
 */
 type SpliceCommand struct {
-	Name                       string
-	CommandType                uint8
-	Identifier                 uint32  `json:",omitempty"`
-	Bites                      []byte  `json:",omitempty"`
+	Name        string
+	CommandType uint8
+	Identifier  uint32 `json:",omitempty"`
+	Bites       []byte `json:",omitempty"`
 	//*NBin
 	SpliceEventID              string  `json:",omitempty"`
 	SpliceEventCancelIndicator bool    `json:",omitempty"`
@@ -61,7 +61,7 @@ func (cmd *SpliceCommand) Decode(cmdtype uint8, gob *gobs.Gob) {
 
 // Encode returns a SpliceCommand values as bytes
 func (cmd *SpliceCommand) Encode() []byte {
-	blank :=[]byte{}
+	blank := []byte{}
 	switch cmd.CommandType {
 	case 0x5:
 		return cmd.encodeSpliceInsert()
@@ -174,7 +174,7 @@ func (cmd *SpliceCommand) spliceTime(gob *gobs.Gob) {
         OutOfNetworkIndicator   False
 
 **/
-func (cmd *SpliceCommand) MkSpliceInsert(eventid string, pts float64, duration float64, out bool) []byte{
+func (cmd *SpliceCommand) MkSpliceInsert(eventid string, pts float64, duration float64, out bool) []byte {
 	cmd.Name = "Splice Insert"
 	cmd.CommandType = 5
 	cmd.SpliceEventID = eventid
@@ -203,7 +203,7 @@ func (cmd *SpliceCommand) MkSpliceInsert(eventid string, pts float64, duration f
 }
 
 // encode Splice Insert Splice Command
-func (cmd *SpliceCommand) encodeSpliceInsert() []byte{
+func (cmd *SpliceCommand) encodeSpliceInsert() []byte {
 	nb := &Nbin{}
 	nb.AddHex64(cmd.SpliceEventID, 32)
 	nb.AddFlag(cmd.SpliceEventCancelIndicator)
