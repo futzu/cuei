@@ -53,20 +53,31 @@ func (stream *Stream) Decode(fname string) []*Cue {
 	defer file.Close()
 	buffer := make([]byte, BufSz)
 	for {
-		bytesread, err := file.Read(buffer)
+		_, err := file.Read(buffer)
 		if err != nil {
 			break
 		}
-		for i := 1; i <= (bytesread / PktSz); i++ {
-			end := i * PktSz
-			start := end - PktSz
-			p := buffer[start:end]
-			pkt := &p
-			stream.pktNum++
-			stream.parse(*pkt)
-		}
+		stream.DecodeBytes(buffer)
 	}
 	return stream.Cues
+}
+
+// DecodeBytes Parses a chunk of mpegts bytes for SCTE-35
+func (stream *Stream) DecodeBytes(bites []byte) []*Cue {
+	stream.mkMaps()
+	stream.Pids = &Pids{}
+	stream.pktNum = 0
+	for i := 1; i <= (len(bites) / PktSz); i++ {
+		end := i * PktSz
+		start := end - PktSz
+		p := bites[start:end]
+		pkt := &p
+		stream.pktNum++
+		stream.parse(*pkt)
+	}
+	cues := stream.Cues
+	stream.Cues = stream.Cues[:0]
+	return cues
 }
 
 // afcFlag returns true if AFC flag is set
