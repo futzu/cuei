@@ -6,7 +6,6 @@ import (
 )
 
 type packetData struct {
-	PacketNumber int     `json:",omitempty"`
 	Pid          uint16  `json:",omitempty"`
 	Program      uint16  `json:",omitempty"`
 	Pcr          float64 `json:",omitempty"`
@@ -30,7 +29,6 @@ type Stream struct {
 	Prgm2Pts map[uint16]uint64 // program to pts map
 	last     map[uint16][]byte // last compares current packet payload to last packet payload by pid
 	partial  map[uint16][]byte // partial manages tables spread across multiple packets by pid
-	pktNum   int               // packet count.
 
 }
 
@@ -47,7 +45,6 @@ func (stream *Stream) mkMaps() {
 func (stream *Stream) Decode(fname string) []*Cue {
 	stream.mkMaps()
 	stream.Pids = &Pids{}
-	stream.pktNum = 0
 	file, err := os.Open(fname)
 	chk(err)
 	defer file.Close()
@@ -66,13 +63,11 @@ func (stream *Stream) Decode(fname string) []*Cue {
 func (stream *Stream) DecodeBytes(bites []byte) []*Cue {
 	stream.mkMaps()
 	stream.Pids = &Pids{}
-	stream.pktNum = 0
 	for i := 1; i <= (len(bites) / PktSz); i++ {
 		end := i * PktSz
 		start := end - PktSz
 		p := bites[start:end]
 		pkt := &p
-		stream.pktNum++
 		stream.parse(*pkt)
 	}
 	cues := stream.Cues
@@ -293,7 +288,7 @@ func (stream *Stream) parseScte35(pay []byte, pid uint16) {
 	}
 }
 
-// mkCue adds PID,PCR, PTS and PacketNumber to a Cue
+// mkCue adds PID,PCR, PTS to a Cue
 func (stream *Stream) mkCue(pid uint16) *Cue {
 	cue := &Cue{}
 	cue.PacketData = &packetData{}
@@ -303,6 +298,5 @@ func (stream *Stream) mkCue(pid uint16) *Cue {
 	cue.PacketData.Program = *prgm
 	cue.PacketData.Pcr = mk90k(stream.Prgm2Pcr[*prgm])
 	cue.PacketData.Pts = mk90k(stream.Prgm2Pts[*prgm])
-	cue.PacketData.PacketNumber = stream.pktNum
 	return cue
 }
