@@ -10,7 +10,7 @@ type Nbin struct {
 	Bites big.Int
 }
 
-// Append a string  as bits to NBin.Bites for encoding
+// Append a []byte as bits to NBin.Bites for encoding
 func (nb *Nbin) AddBytes(bites []byte, nbits uint) {
 	t := new(big.Int)
 	t.SetBytes(bites)
