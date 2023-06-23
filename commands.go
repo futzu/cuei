@@ -21,8 +21,8 @@ SpliceCommand
 type SpliceCommand struct {
 	Name                       string
 	CommandType                uint8
+	PrivateBytes               []byte  `json:",omitempty"`
 	Identifier                 uint32  `json:",omitempty"`
-	Bites                      []byte  `json:",omit"`
 	SpliceEventID              uint32  `json:",omitempty"`
 	SpliceEventCancelIndicator bool    `json:",omitempty"`
 	OutOfNetworkIndicator      bool    `json:",omitempty"`
@@ -81,7 +81,7 @@ func (cmd *SpliceCommand) decodeBandwidthReservation(gob *gobs.Gob) {
 func (cmd *SpliceCommand) decodePrivate(gob *gobs.Gob) {
 	cmd.Name = "Private Command"
 	cmd.Identifier = gob.UInt32(32)
-	cmd.Bites = gob.Bytes(24)
+	cmd.PrivateBytes = gob.Bytes(24)
 }
 
 // splice Null
@@ -133,8 +133,8 @@ func (cmd *SpliceCommand) encodeSpliceInsert() []byte {
 	nb.Add16(cmd.UniqueProgramID, 16)
 	nb.Add8(cmd.AvailNum, 8)
 	nb.Add8(cmd.AvailExpected, 8)
-	cmd.Bites = nb.Bites.Bytes()[1:]
-	return cmd.Bites
+	return nb.Bites.Bytes()[1:] // drop Bytes[0] it's just a bumper to allow leading zero values
+
 }
 
 func (cmd *SpliceCommand) encodeBreak(nb *Nbin) {
@@ -180,6 +180,5 @@ func (cmd *SpliceCommand) decodeTimeSignal(gob *gobs.Gob) {
 func (cmd *SpliceCommand) encodeTimeSignal() []byte {
 	nb := &Nbin{}
 	cmd.encodeSpliceTime(nb)
-	cmd.Bites = nb.Bites.Bytes()
 	return nb.Bites.Bytes()
 }
