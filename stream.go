@@ -6,10 +6,10 @@ import (
 )
 
 type packetData struct {
-	Pid          uint16  `json:",omitempty"`
-	Program      uint16  `json:",omitempty"`
-	Pcr          float64 `json:",omitempty"`
-	Pts          float64 `json:",omitempty"`
+	Pid     uint16  `json:",omitempty"`
+	Program uint16  `json:",omitempty"`
+	Pcr     float64 `json:",omitempty"`
+	Pts     float64 `json:",omitempty"`
 }
 
 // pktSz is the size of an MPEG-TS packet in bytes.
@@ -54,7 +54,7 @@ func (stream *Stream) Decode(fname string) []*Cue {
 		if err != nil {
 			break
 		}
-		cues= append(cues, streamp.Parse(buffer)...)
+		cues = append(cues, streamp.Parse(buffer)...)
 	}
 	return cues
 }
