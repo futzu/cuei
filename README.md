@@ -19,10 +19,10 @@
 - [x] `Add` nbin, (which is what packs the bits)
 - [x] `Add` mpegts CRC32 generation 
 - [x] `Add` InfoSection encoding
-- [ ] `Add` SpliceCommand encoding
+- [x] `Add` SpliceCommand encoding
 - [ ] `Add` SpliceDescriptor encoding
 - [ ] `Add` Upid encoding
-- [ ] `Add` Cue encoding
+- [x] `Add` Cue encoding
 - [ ] `Rename` gob renamed back to bitn. 
 
 	
@@ -59,9 +59,10 @@ go install github.com/futzu/cuei@latest
 # `Nutshell`
 | Use this        |   To do this                                                  |
 |-----------------|---------------------------------------------------------------|
-|[cuei.Cue](https://github.com/futzu/cuei/blob/eac3a19eeb26/cue.go#L19)         | Parse SCTE-35 from a Base64 or Byte string.                   |
-|[cuei.Stream](https://pkg.go.dev/github.com/futzu/cuei#Stream)      |                     Parse SCTE35 Cues from MPEGTS packets.    |
-|[cuei.Scte35Parser](https://pkg.go.dev/github.com/futzu/cuei#Scte35Parser)|     Parse SCTE-35 from MPEGTS packets from a external demuxer.|
+|[cuei.Cue.Decode()](https://github.com/futzu/cuei/blob/eac3a19eeb26/cue.go#L19)         | Parse SCTE-35 from a Base64 or Byte string.                   |
+|[cuei.Stream.Decode()](https://pkg.go.dev/github.com/futzu/cuei#Stream)      |        Parse SCTE35 Cues from a MPEGTS file.    |
+|[cuei.StreamParser.Parse()](https://pkg.go.dev/github.com/futzu/cuei#StreamParser) | Parse MPEGTS packets as an array of bytes, like from a network stream. | 
+|[cuei.Scte35Parser.Parse()](https://pkg.go.dev/github.com/futzu/cuei#Scte35Parser)|     Parse just SCTE-35 MPEGTS packets from a external demuxer.|
 
 
 # `Quick Demo`
