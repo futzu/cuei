@@ -12,15 +12,15 @@ Cue is a SCTE35 cue.
 	A Cue contains:
 	    1 InfoSection
 	    1 SpliceCommand
-	    1 Dll  (Descriptor loop length)
+		1 Dll  Descriptor loop length
 	    0 or more Splice Descriptors
-	    1 Crc32
+		1 Crc32
 	    1 packetData (if parsed from MPEGTS)
 
 *
 */
 type Cue struct {
-	Bites       []byte
+	//	Bites       []byte
 	InfoSection *InfoSection
 	Command     *SpliceCommand
 	Dll         uint16
@@ -76,15 +76,15 @@ func (cue *Cue) Encode() []byte {
 	// 11 bytes for info section + command + 2 descriptor loop length
 	// + descriptor loop + 4 for crc
 	cue.InfoSection.SectionLength = uint16(11 + cmdl + 2 + 4)
-	cue.InfoSection.Encode()
+	isecb := cue.InfoSection.Encode()
 	nb := &Nbin{}
-	isbits := uint(len(cue.InfoSection.Bites) << 3)
-	nb.AddBytes(cue.InfoSection.Bites, isbits)
-	ccbits := uint(len(cmdb) << 3)
-	nb.AddBytes(cmdb, ccbits)
-	nb.Add16(0, 16)
+	isecbits := uint(len(isecb) << 3)
+	nb.AddBytes(isecb, isecbits)
+	cmdbits := uint(cmdl << 3)
+	nb.AddBytes(cmdb, cmdbits)
+	nb.Add16(0, 16) // descriptor loop currently disabled for encoding
 	cue.Crc32 = CRC32(nb.Bites.Bytes())
 	nb.Add32(cue.Crc32, 32)
-	cue.Bites = nb.Bites.Bytes()
+	//cue.Bites = nb.Bites.Bytes()
 	return nb.Bites.Bytes()
 }
