@@ -1,7 +1,6 @@
 package cuei
 
 import (
-	"fmt"
 	gobs "github.com/futzu/gob"
 )
 
@@ -22,8 +21,6 @@ type InfoSection struct {
 	Tier                   string
 	SpliceCommandLength    uint16
 	SpliceCommandType      uint8
-	DescriptorLoopLength   uint16
-	CRC                    uint32
 }
 
 // Decode Splice Info Section values.
@@ -45,6 +42,7 @@ func (infosec *InfoSection) Decode(gob *gobs.Gob) bool {
 	infosec.Tier = gob.Hex(12)
 	infosec.SpliceCommandLength = gob.UInt16(12)
 	infosec.SpliceCommandType = gob.UInt8(8)
+	
 	return true
 }
 
@@ -55,53 +53,28 @@ func (infosec *InfoSection) Defaults() {
 	infosec.SectionSyntaxIndicator = false
 	infosec.Private = false
 	infosec.Reserved = "0x3"
-	infosec.SectionLength = 17
+	//infosec.SectionLength = 17
 	infosec.ProtocolVersion = 0
 	infosec.EncryptedPacket = false
 	infosec.EncryptionAlgorithm = 0
 	infosec.PtsAdjustment = 0.0
 	infosec.CwIndex = "0x0"
 	infosec.Tier = "0xfff"
-	// infosec.SpliceCommandLength = 0
-	//
-	//	infosec.SpliceCommandType = 0
-	//
-	// infosec.DescriptorLoopLength = 0
+	 infosec.SpliceCommandLength = 0
+
+	infosec.SpliceCommandType = 0
 }
 
 /**
 
 Encode Splice Info Section
 Encodes the InfoSection variables to bytes.
-
-Easy splice null example:
-
-package main
-
-import (
-"fmt"
-"github.com/futzu/cuei"
-
-)
-
-
-func main() {
-isec  := cuei.InfoSection{}
-isec.Defaults()
-fmt.Println(cuei.EncB64(isec.Encode()))
-
-}
-
 **/
-
-func (infosec *InfoSection) Encode() []byte {
-	//	infosec.Defaults()
+func (infosec *InfoSection) Encode()  {
 	nb := &Nbin{}
-	nb.AddHex64(infosec.TableID, 8)
-	nb.AddFlag(infosec.SectionSyntaxIndicator)
-	nb.AddFlag(infosec.Private)
-	nb.Reserve(2)
-	nb.Add16(infosec.SectionLength, 12)
+	nb.Add16(uint16(0xfc), 16)
+	nb.Add8(48,8)
+	nb.Add8(uint8(infosec.SectionLength), 8)
 	nb.Add8(infosec.ProtocolVersion, 8)
 	nb.AddFlag(infosec.EncryptedPacket)
 	nb.Add8(infosec.EncryptionAlgorithm, 6)
@@ -111,10 +84,5 @@ func (infosec *InfoSection) Encode() []byte {
 	nb.Add16(infosec.SpliceCommandLength, 12)
 	nb.Add8(infosec.SpliceCommandType, 8)
 	infosec.Bites = nb.Bites.Bytes()
-	fmt.Println(nb.Bites.Bytes())
-	//nb.Add16(infosec.DescriptorLoopLength, 16)
-	//crc32 := CRC32(nb.Bites.Bytes())
-	//nb.Add32(crc32, 32)
-	return nb.Bites.Bytes()
-
+	
 }
