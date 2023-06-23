@@ -6,7 +6,6 @@ import (
 
 // InfoSection is the splice info section of the SCTE 35 cue.
 type InfoSection struct {
-	Bites                  []byte
 	Name                   string
 	TableID                string
 	SectionSyntaxIndicator bool
@@ -42,7 +41,7 @@ func (infosec *InfoSection) Decode(gob *gobs.Gob) bool {
 	infosec.Tier = gob.Hex(12)
 	infosec.SpliceCommandLength = gob.UInt16(12)
 	infosec.SpliceCommandType = gob.UInt8(8)
-	
+
 	return true
 }
 
@@ -60,20 +59,21 @@ func (infosec *InfoSection) Defaults() {
 	infosec.PtsAdjustment = 0.0
 	infosec.CwIndex = "0x0"
 	infosec.Tier = "0xfff"
-	 infosec.SpliceCommandLength = 0
-
+	infosec.SpliceCommandLength = 0
 	infosec.SpliceCommandType = 0
 }
 
-/**
+/*
+*
 
 Encode Splice Info Section
 Encodes the InfoSection variables to bytes.
-**/
-func (infosec *InfoSection) Encode()  {
+*
+*/
+func (infosec *InfoSection) Encode() []byte {
 	nb := &Nbin{}
 	nb.Add16(uint16(0xfc), 16)
-	nb.Add8(48,8)
+	nb.Add8(48, 8)
 	nb.Add8(uint8(infosec.SectionLength), 8)
 	nb.Add8(infosec.ProtocolVersion, 8)
 	nb.AddFlag(infosec.EncryptedPacket)
@@ -83,6 +83,6 @@ func (infosec *InfoSection) Encode()  {
 	nb.AddHex64(infosec.Tier, 12)
 	nb.Add16(infosec.SpliceCommandLength, 12)
 	nb.Add8(infosec.SpliceCommandType, 8)
-	infosec.Bites = nb.Bites.Bytes()
-	
+	return nb.Bites.Bytes()
+
 }
