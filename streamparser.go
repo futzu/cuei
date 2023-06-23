@@ -1,6 +1,5 @@
 package cuei
 
-
 // StreamParser parses a []byte of mpegts for SCTE-35
 type StreamParser struct {
 	Stream
@@ -8,7 +7,7 @@ type StreamParser struct {
 
 // Parse parses  mpegts bytes and returns any SCTE-35 Cues found
 func (streamp *StreamParser) Parse(bites []byte) []*Cue {
-	cues:= streamp.DecodeBytes(bites)
+	cues := streamp.DecodeBytes(bites)
 	return cues
 }
 
