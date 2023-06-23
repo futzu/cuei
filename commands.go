@@ -19,12 +19,11 @@ SpliceCommand
 *
 */
 type SpliceCommand struct {
-	Name        string
-	CommandType uint8
-	Identifier  uint32 `json:",omitempty"`
-	Bites       []byte `json:",omitempty"`
-	//*NBin
-	SpliceEventID              string  `json:",omitempty"`
+	Name                       string
+	CommandType                uint8
+	Identifier                 uint32  `json:",omitempty"`
+	Bites                      []byte  `json:",omit"`
+	SpliceEventID              uint32  `json:",omitempty"`
 	SpliceEventCancelIndicator bool    `json:",omitempty"`
 	OutOfNetworkIndicator      bool    `json:",omitempty"`
 	ProgramSpliceFlag          bool    `json:",omitempty"`
@@ -32,8 +31,6 @@ type SpliceCommand struct {
 	BreakAutoReturn            bool    `json:",omitempty"`
 	BreakDuration              float64 `json:",omitempty"`
 	SpliceImmediateFlag        bool    `json:",omitempty"`
-	ComponentCount             uint8   `json:",omitempty"`
-	Components                 []uint8 `json:",omitempty"`
 	UniqueProgramID            uint16  `json:",omitempty"`
 	AvailNum                   uint8   `json:",omitempty"`
 	AvailExpected              uint8   `json:",omitempty"`
@@ -41,7 +38,7 @@ type SpliceCommand struct {
 	PTS                        float64 `json:",omitempty"`
 }
 
-// Decode returns a Command by type
+// Decode a Splice Command
 func (cmd *SpliceCommand) Decode(cmdtype uint8, gob *gobs.Gob) {
 	cmd.CommandType = cmdtype
 	switch cmdtype {
@@ -59,14 +56,19 @@ func (cmd *SpliceCommand) Decode(cmdtype uint8, gob *gobs.Gob) {
 
 }
 
-// Encode returns a SpliceCommand values as bytes
+// Encode a Splice Command and return the bytes
+// mostly used by cuei.Cue
 func (cmd *SpliceCommand) Encode() []byte {
 	blank := []byte{}
 	switch cmd.CommandType {
 	case 0x5:
 		return cmd.encodeSpliceInsert()
+
+	case 0x6:
+		return cmd.encodeTimeSignal()
 	}
 	return blank
+
 }
 
 // bandwidth Reservation
@@ -91,30 +93,16 @@ func (cmd *SpliceCommand) decodeSpliceNull(gob *gobs.Gob) {
 // splice Insert
 func (cmd *SpliceCommand) decodeSpliceInsert(gob *gobs.Gob) {
 	cmd.Name = "Splice Insert"
-	cmd.SpliceEventID = gob.Hex(32)
+	cmd.SpliceEventID = gob.UInt32(32)
 	cmd.SpliceEventCancelIndicator = gob.Flag()
 	gob.Forward(7)
-	if !cmd.SpliceEventCancelIndicator {
-		cmd.OutOfNetworkIndicator = gob.Flag()
-		cmd.ProgramSpliceFlag = gob.Flag()
-		cmd.DurationFlag = gob.Flag()
-		cmd.SpliceImmediateFlag = gob.Flag()
-		gob.Forward(4)
-	}
-	if cmd.ProgramSpliceFlag == true {
-		if !cmd.SpliceImmediateFlag {
-			cmd.spliceTime(gob)
-		}
-	} else {
-		cmd.ComponentCount = gob.UInt8(8)
-		var Components [256]uint8
-		cmd.Components = Components[0:cmd.ComponentCount]
-		for i := range cmd.Components {
-			cmd.Components[i] = gob.UInt8(8)
-		}
-		if !cmd.SpliceImmediateFlag {
-			cmd.spliceTime(gob)
-		}
+	cmd.OutOfNetworkIndicator = gob.Flag()
+	cmd.ProgramSpliceFlag = gob.Flag()
+	cmd.DurationFlag = gob.Flag()
+	cmd.SpliceImmediateFlag = gob.Flag()
+	gob.Forward(4)
+	if cmd.SpliceImmediateFlag == false {
+		cmd.spliceTime(gob)
 	}
 	if cmd.DurationFlag == true {
 		cmd.parseBreak(gob)
@@ -122,6 +110,48 @@ func (cmd *SpliceCommand) decodeSpliceInsert(gob *gobs.Gob) {
 	cmd.UniqueProgramID = gob.UInt16(16)
 	cmd.AvailNum = gob.UInt8(8)
 	cmd.AvailExpected = gob.UInt8(8)
+}
+
+// encode Splice Insert Splice Command
+func (cmd *SpliceCommand) encodeSpliceInsert() []byte {
+	nb := &Nbin{}
+	nb.Add8(1, 8) //bumper
+	nb.Add32(cmd.SpliceEventID, 32)
+	nb.AddFlag(cmd.SpliceEventCancelIndicator)
+	nb.Reserve(7)
+	nb.AddFlag(cmd.OutOfNetworkIndicator)
+	nb.AddFlag(cmd.ProgramSpliceFlag)
+	nb.AddFlag(cmd.DurationFlag)
+	nb.AddFlag(cmd.SpliceImmediateFlag)
+	nb.Reserve(4)
+	if cmd.SpliceImmediateFlag == false {
+		cmd.encodeSpliceTime(nb)
+	}
+	if cmd.DurationFlag == true {
+		cmd.encodeBreak(nb)
+	}
+	nb.Add16(cmd.UniqueProgramID, 16)
+	nb.Add8(cmd.AvailNum, 8)
+	nb.Add8(cmd.AvailExpected, 8)
+	cmd.Bites = nb.Bites.Bytes()[1:]
+	return cmd.Bites
+}
+
+func (cmd *SpliceCommand) encodeBreak(nb *Nbin) {
+	nb.AddFlag(cmd.BreakAutoReturn)
+	nb.Reserve(6)
+	nb.Add90k(cmd.BreakDuration, 33)
+}
+
+// encode PTS splice times
+func (cmd *SpliceCommand) encodeSpliceTime(nb *Nbin) {
+	nb.AddFlag(cmd.TimeSpecifiedFlag)
+	if cmd.TimeSpecifiedFlag == true {
+		nb.Reserve(6)
+		nb.Add90k(cmd.PTS, 33)
+		return
+	}
+	nb.Reserve(7)
 }
 
 func (cmd *SpliceCommand) parseBreak(gob *gobs.Gob) {
@@ -137,121 +167,6 @@ func (cmd *SpliceCommand) spliceTime(gob *gobs.Gob) {
 		cmd.PTS = gob.As90k(33)
 	} else {
 		gob.Forward(7)
-	}
-}
-
-// MkSpliceInsert easy Splice Insert Splice Command creation
-/**
-
-
-    The args set the SpliceInsert vars.
-
-    SpliceEventID = eventid
-
-    if pts is 0 (default):
-        SpliceImmediateFlag      True
-        timeSpecifiedFlag      False
-
-    if pts > 0:
-        spliceImmediateFlag      False
-        timeSpecifiedFlag       True
-        PTS                  pts
-
-    If duration is 0(default)
-        DurationFlag              False
-
-    if duration IS set:
-        OutOfNetworkIndicator   True
-        durationFlag           True
-        BreakAutoReturn         True
-        BreakDuration             duration
-        PTS                  pts
-
-    if out :
-        OutOfNetworkIndicator  True
-
-    if out is False (default):
-        OutOfNetworkIndicator   False
-
-**/
-func (cmd *SpliceCommand) MkSpliceInsert(eventid string, pts float64, duration float64, out bool) []byte {
-	cmd.Name = "Splice Insert"
-	cmd.CommandType = 5
-	cmd.SpliceEventID = eventid
-	cmd.SpliceEventCancelIndicator = false
-	cmd.ProgramSpliceFlag = false
-	cmd.SpliceImmediateFlag = true
-	cmd.DurationFlag = false
-	cmd.AvailNum = 0
-	cmd.AvailExpected = 0
-	cmd.TimeSpecifiedFlag = false
-	if pts > 0 {
-		cmd.ProgramSpliceFlag = true
-		cmd.SpliceImmediateFlag = false
-		cmd.TimeSpecifiedFlag = true
-		cmd.PTS = pts
-	} else {
-		cmd.ComponentCount = 0
-	}
-	if duration > 0 {
-		cmd.DurationFlag = true
-		cmd.BreakDuration = duration
-		cmd.BreakAutoReturn = true
-		cmd.OutOfNetworkIndicator = true
-	}
-	return cmd.Encode()
-}
-
-// encode Splice Insert Splice Command
-func (cmd *SpliceCommand) encodeSpliceInsert() []byte {
-	nb := &Nbin{}
-	nb.AddHex64(cmd.SpliceEventID, 32)
-	nb.AddFlag(cmd.SpliceEventCancelIndicator)
-	nb.Reserve(7)
-	if !cmd.SpliceEventCancelIndicator {
-		nb.AddFlag(cmd.OutOfNetworkIndicator)
-		nb.AddFlag(cmd.ProgramSpliceFlag)
-		nb.AddFlag(cmd.DurationFlag)
-		nb.AddFlag(cmd.SpliceImmediateFlag)
-		nb.Reserve(4)
-	}
-	if cmd.ProgramSpliceFlag == true {
-		if !cmd.SpliceImmediateFlag {
-			cmd.encodeSpliceTime(nb)
-		}
-	} else {
-		nb.Add8(cmd.ComponentCount, 8)
-		for i := range cmd.Components {
-			nb.Add8(cmd.Components[i], 8)
-		}
-		if !cmd.SpliceImmediateFlag {
-			cmd.encodeSpliceTime(nb)
-		}
-	}
-	if cmd.DurationFlag == true {
-		cmd.encodeBreak(nb)
-	}
-	nb.Add16(cmd.UniqueProgramID, 16)
-	nb.Add8(cmd.AvailNum, 8)
-	nb.Add8(cmd.AvailExpected, 8)
-	cmd.Bites = nb.Bites.Bytes()
-	return nb.Bites.Bytes()
-}
-
-func (cmd *SpliceCommand) encodeBreak(nb *Nbin) {
-	nb.AddFlag(cmd.BreakAutoReturn)
-	nb.Reserve(6)
-	nb.Add90k(cmd.BreakDuration, 33)
-}
-
-// encode PTS splice times
-func (cmd *SpliceCommand) encodeSpliceTime(nb *Nbin) {
-	nb.AddFlag(cmd.TimeSpecifiedFlag)
-	if cmd.TimeSpecifiedFlag {
-		nb.Reserve(6)
-		nb.Add90k(cmd.PTS, 33)
-	} else {
-		nb.Reserve(7)
 	}
 }
 
