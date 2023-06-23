@@ -89,7 +89,35 @@ func (cue *Cue) Encode() []byte {
 	return nb.Bites.Bytes()
 }
 
-// Convert  Cue.Command  from a  Time Signal to a Splice Insert and return a base64 styring
+/**
+Convert  Cue.Command  from a  Time Signal to a Splice Insert 
+and return a base64 string.
+
+(I haven't figured out how to add examples to the Go Docs properly yet)
+
+Example Usage:
+
+package main
+
+import (
+	"os"
+        "fmt"
+	"github.com/futzu/cuei"
+)
+
+func main() {
+	args := os.Args[1:]
+	for _,arg := range args {
+		fmt.Printf("\nNext File: %s\n\n", arg)
+		var stream cuei.Stream
+		cues :=stream.Decode(arg)
+		for _,c:= range cues {
+			fmt.Println(c.Six2Five())
+		}
+	}
+}
+
+**/
 func (cue *Cue) Six2Five() string {
 	upidStarts := []uint16{0x34, 0x36, 0x38}
 	// upidStops := []uint16{0x35, 0x37, 0x39}
