@@ -88,3 +88,47 @@ func (cue *Cue) Encode() []byte {
 	//cue.Bites = nb.Bites.Bytes()
 	return nb.Bites.Bytes()
 }
+
+// Convert  Cue.Command  from a  Time Signal to a Splice Insert and return a base64 styring
+func (cue *Cue) Six2Five() string {
+	upidStarts := []uint16{0x34, 0x36, 0x38}
+	// upidStops := []uint16{0x35, 0x37, 0x39}
+	if cue.InfoSection.SpliceCommandType == 6 {
+
+		cue.Command.CommandType = 5
+		cue.Command.Name = "Six 2 Five"
+		cue.InfoSection.SpliceCommandType = 5
+		cue.Command.ProgramSpliceFlag = true
+		cue.Command.SpliceEventCancelIndicator = false
+		cue.Command.OutOfNetworkIndicator = false
+		cue.Command.TimeSpecifiedFlag = false
+		cue.Command.DurationFlag = false
+		cue.Command.BreakAutoReturn = false
+		cue.Command.SpliceImmediateFlag = false
+		cue.Command.AvailNum = 0
+		cue.Command.AvailExpected = 0
+		if cue.Command.PTS > 0.0 {
+			cue.Command.TimeSpecifiedFlag = true
+			cue.Command.PTS = cue.Command.PTS
+		}
+		for _, dscptr := range cue.Descriptors {
+			if dscptr.Tag == 2 {
+				//value, _ := strconv.ParseInt(hex, 16, 64)
+				cue.Command.SpliceEventID = uint32(5) //Hex2Int(dscptr.SegmentationEventID)&uint64(2^31)
+				if IsIn(upidStarts, uint16(dscptr.SegmentationTypeID)) {
+					if dscptr.SegmentationDurationFlag {
+						cue.Command.OutOfNetworkIndicator = true
+						cue.Command.DurationFlag = true
+						cue.Command.BreakAutoReturn = true
+						cue.Command.BreakDuration = dscptr.SegmentationDuration
+					}
+				}
+			}
+
+		}
+	}
+	fmt.Println("Six 2 Five")
+	cue.Show()
+	return EncB64(cue.Encode())
+
+}
