@@ -66,7 +66,6 @@ func (nb *Nbin) AddHex64(val string, nbits uint) {
 	if err != nil {
 		fmt.Println("error scanning value:", err)
 	} else {
-		fmt.Println(u.Uint64())
 		nb.Add64(u.Uint64(), nbits)
 	}
 }
