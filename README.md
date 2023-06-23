@@ -101,7 +101,7 @@ go build cueidemo.go
 ```
 
 #### `output`
-```rebol
+```json
 Next File: mpegts/out.ts
 
 {
