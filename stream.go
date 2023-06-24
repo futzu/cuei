@@ -46,7 +46,7 @@ func (stream *Stream) Decode(fname string) []*Cue {
 	streamp := NewStreamParser()
 	file, err := os.Open(fname)
 	var cues []*Cue
-	chk(err)
+	Chk(err)
 	defer file.Close()
 	buffer := make([]byte, BufSz)
 	for {
