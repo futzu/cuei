@@ -8,10 +8,11 @@ import (
 	"math/big"
 )
 
-// chk generic catchall error checking
-func chk(e error) {
+// Chk generic catchall error checking
+func Chk(e error) {
 	if e != nil {
 		fmt.Println(e)
+
 	}
 }
 
@@ -25,7 +26,7 @@ func DeB64(b64 string) []byte {
 // DecB64 decodes base64 strings.
 func DecB64(b64 string) []byte {
 	deb64, err := base64.StdEncoding.DecodeString(b64)
-	chk(err)
+	Chk(err)
 	return deb64
 }
 
@@ -39,7 +40,7 @@ func EncB64(data []byte) string {
 func Hex2Int(str string) uint64 {
 	i := new(big.Int)
 	_, err := fmt.Sscan(str, i)
-	chk(err)
+	Chk(err)
 	return i.Uint64()
 }
 
@@ -61,7 +62,7 @@ func mk90k(raw uint64) float64 {
 // MkJson structs to JSON
 func MkJson(i interface{}) string {
 	jason, err := json.MarshalIndent(&i, "", "    ")
-	chk(err)
+	Chk(err)
 	return string(jason)
 }
 
