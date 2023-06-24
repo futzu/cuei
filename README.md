@@ -1,6 +1,7 @@
 
 # cuei is a SCTE35 parser library in Go.
-![Resized_20210916_135344](https://github.com/futzu/cuei/assets/52701496/f4596860-7087-437e-828f-f5bfec339ee6)
+![image](https://github.com/futzu/cuei/assets/52701496/6ea92557-e2d3-4366-bf43-376bb44b562b)
+
 - [x] Parses SCTE-35 Cues from MPEGTS or Bytes or Base64
 - [x] Parses SCTE-35 Cues spread over multiple MPEGTS packets
 - [x] Supports multi-packet PAT and PMT tables
@@ -60,9 +61,9 @@ go install github.com/futzu/cuei@latest
 | Use this        |   To do this                                                  |
 |-----------------|---------------------------------------------------------------|
 |[cuei.Cue.Decode()](https://github.com/futzu/cuei/blob/eac3a19eeb26/cue.go#L19)         | Parse SCTE-35 from a Base64 or Byte string.                   |
-|[cuei.Stream.Decode()](https://pkg.go.dev/github.com/futzu/cuei#Stream)      |        Parse SCTE35 Cues from a MPEGTS file.    |
-|[cuei.StreamParser.Parse()](https://pkg.go.dev/github.com/futzu/cuei#StreamParser) | Parse MPEGTS packets as an array of bytes, like from a network stream. | 
-|[cuei.Scte35Parser.Parse()](https://pkg.go.dev/github.com/futzu/cuei#Scte35Parser)|     Parse just SCTE-35 MPEGTS packets from a external demuxer.|
+|[cuei.Stream.Decode()](https://github.com/futzu/cuei/blob/main/stream.go#L22)      |        Parse SCTE35 Cues from a MPEGTS file.    |
+|[cuei.StreamParser.Parse()](https://github.com/futzu/cuei/blob/main/streamparser.go#L4) | Parse MPEGTS packets as an array of bytes, like from a network stream. | 
+|[cuei.Scte35Parser.Parse()](https://github.com/futzu/cuei/blob/main/scte35parser.go#L24)|     Parse just SCTE-35 MPEGTS packets from a external demuxer.|
 
 
 # `Quick Demo`
