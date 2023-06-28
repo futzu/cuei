@@ -29,7 +29,7 @@ type Stream struct {
 	Prgm2Pts map[uint16]uint64 // program to pts map
 	last     map[uint16][]byte // last compares current packet payload to last packet payload by pid
 	partial  map[uint16][]byte // partial manages tables spread across multiple packets by pid
-
+	Quiet    bool              // Don't call Cue.Show() when a Cue is found.
 }
 
 func (stream *Stream) mkMaps() {
@@ -279,7 +279,9 @@ func (stream *Stream) parseScte35(pay []byte, pid uint16) {
 		cue := stream.mkCue(pid)
 		if cue.Decode(pay) {
 			stream.Cues = append(stream.Cues, cue)
-			cue.Show()
+			if stream.Quiet==false{
+				cue.Show()
+			}
 		} else {
 			stream.Pids.delScte35Pid(pid)
 		}
