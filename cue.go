@@ -1,4 +1,4 @@
-ppackage cuei
+package cuei
 
 import (
 	"fmt"
@@ -89,11 +89,12 @@ func (cue *Cue) Encode() []byte {
 	return nb.Bites.Bytes()
 }
 
-/**
+/*
+*
 
 	Convert  Cue.Command  from a  Time Signal
 	to a Splice Insert and return a base64 string
-	
+
 	Example Usage:
 
 		package main
@@ -115,9 +116,9 @@ func (cue *Cue) Encode() []byte {
 			}
 		}
 	}
-  
-  
-**/
+
+*
+*/
 func (cue *Cue) Six2Five() string {
 	upidStarts := []uint16{0x34, 0x36, 0x38}
 	// upidStops := []uint16{0x35, 0x37, 0x39}
@@ -155,8 +156,8 @@ func (cue *Cue) Six2Five() string {
 
 		}
 	}
-	fmt.Println("Six 2 Five")
-	cue.Show()
+	//fmt.Println("Six 2 Five")
+	//cue.Show()
 	return EncB64(cue.Encode())
 
 }
