@@ -155,6 +155,52 @@ Next File: mpegts/out.ts
 
 ```
 
+## Use cuei.StreamParser for more fine-grained control of MPEGTS stream parsing. 
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/futzu/cuei"
+	"os"
+)
+
+func main() {
+
+	args := os.Args[1:] // Take multiple command line args
+	for _, arg := range args {
+		var cues []*cuei.Cue
+		streamp := cuei.NewStreamParser() // New StreamParser for each file
+		streamp.Quiet = true // suppress printing SCTE-35 messages 
+		
+		// you don't have to use a file
+		// StreamParser.Parse takes a []byte as input
+		
+		file, err := os.Open(arg)
+		if err != nil {
+			break
+		}
+		defer file.Close()
+
+		buffer := make([]byte, cuei.BufSz) // Parse in chunks
+		for {
+			_, err := file.Read(buffer)
+			if err != nil {
+				break
+			}
+			cues = streamp.Parse(buffer)   // StreamParser.Parse returns a [] *cuei.Cue 
+			for _,cue := range cues {
+			// do stuff with the cues like:
+				cue.Show()
+			// or
+			fmt.Printf("Command is a %v\n", cue.Command.Name)
+			}
+			
+		}
+	}
+}
+```
+
 # `Parse base64 encoded SCTE-35`
 ```go
 package main
@@ -172,6 +218,9 @@ func main(){
         fmt.Println("Cue as Json")
         cue.Show()
 }
+```
+
+
 ```
 ## `Use cuei with another MPEGTS stream parser / demuxer`
 * Scte35Parser is for incorporating with another MPEGTS parser.
