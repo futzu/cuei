@@ -153,8 +153,7 @@ Next File: mpegts/out.ts
 
 
 ```
-
-### Use cuei.StreamParser for more fine-grained control of MPEGTS stream parsing. 
+*  Use cuei.StreamParser for more fine-grained control of MPEGTS stream parsing. 
 ```go
 package main
 
