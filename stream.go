@@ -5,6 +5,7 @@ import (
 	"os"
 )
 
+// packetData holds information about the packet carrying a SCTE-35
 type packetData struct {
 	Pid     uint16  `json:",omitempty"`
 	Program uint16  `json:",omitempty"`
@@ -174,7 +175,6 @@ func (stream *Stream) parse(pkt []byte) {
 	pid := &p
 	pl := stream.parsePayload(pkt)
 	pay := &pl
-
 	if *pid == 0 {
 		stream.parsePat(*pay, *pid)
 	}
@@ -279,7 +279,7 @@ func (stream *Stream) parseScte35(pay []byte, pid uint16) {
 		cue := stream.mkCue(pid)
 		if cue.Decode(pay) {
 			stream.Cues = append(stream.Cues, cue)
-			if stream.Quiet==false{
+			if stream.Quiet == false {
 				cue.Show()
 			}
 		} else {
