@@ -1,6 +1,9 @@
 package cuei
 
+// Polynomial value for CRC32 table
 const POLY = 0x104C11DB7
+
+// initial crc32 value
 const INIT_VALUE = 0xFFFFFFFF
 const ZERO = 0x0
 const ONE = 0x1
