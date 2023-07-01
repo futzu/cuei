@@ -20,10 +20,9 @@ Cue is a SCTE35 cue.
 *
 */
 type Cue struct {
-	//	Bites       []byte
 	InfoSection *InfoSection
 	Command     *SpliceCommand
-	Dll         uint16
+	Dll         uint16             // Descriptor Loop Length
 	Descriptors []SpliceDescriptor `json:",omitempty"`
 	PacketData  *packetData        `json:",omitempty"`
 	Crc32       uint32
@@ -90,32 +89,32 @@ func (cue *Cue) Encode() []byte {
 }
 
 /*
-*
+	 *
 
-	Convert  Cue.Command  from a  Time Signal
-	to a Splice Insert and return a base64 string
+		Convert  Cue.Command  from a  Time Signal
+		to a Splice Insert and return a base64 string
 
-	Example Usage:
+		Example Usage:
 
-		package main
+			package main
 
-	import (
-		"os"
-			"fmt"
-		"github.com/futzu/cuei"
-	)
+		import (
+			"os"
+				"fmt"
+			"github.com/futzu/cuei"
+		)
 
-	func main() {
-		args := os.Args[1:]
-		for _,arg := range args {
-			fmt.Printf("\nNext File: %s\n\n", arg)
-			var stream cuei.Stream
-			cues :=stream.Decode(arg)
-			for _,c:= range cues {
-				fmt.Println(c.Six2Five())
+		func main() {
+			args := os.Args[1:]
+			for _,arg := range args {
+				fmt.Printf("\nNext File: %s\n\n", arg)
+				var stream cuei.Stream
+				cues :=stream.Decode(arg)
+				for _,c:= range cues {
+					fmt.Println(c.Six2Five())
+				}
 			}
 		}
-	}
 
 *
 */
@@ -125,7 +124,7 @@ func (cue *Cue) Six2Five() string {
 	if cue.InfoSection.SpliceCommandType == 6 {
 
 		cue.Command.CommandType = 5
-		cue.Command.Name = "Six 2 Five"
+		cue.Command.Name = "Splice Insert"
 		cue.InfoSection.SpliceCommandType = 5
 		cue.Command.ProgramSpliceFlag = true
 		cue.Command.SpliceEventCancelIndicator = false
@@ -143,7 +142,7 @@ func (cue *Cue) Six2Five() string {
 		for _, dscptr := range cue.Descriptors {
 			if dscptr.Tag == 2 {
 				//value, _ := strconv.ParseInt(hex, 16, 64)
-				cue.Command.SpliceEventID = uint32(5) //Hex2Int(dscptr.SegmentationEventID)&uint64(2^31)
+				cue.Command.SpliceEventID = uint32(Hex2Int(dscptr.SegmentationEventID))
 				if IsIn(upidStarts, uint16(dscptr.SegmentationTypeID)) {
 					if dscptr.SegmentationDurationFlag {
 						cue.Command.OutOfNetworkIndicator = true
@@ -156,8 +155,6 @@ func (cue *Cue) Six2Five() string {
 
 		}
 	}
-	//fmt.Println("Six 2 Five")
-	//cue.Show()
 	return EncB64(cue.Encode())
 
 }
