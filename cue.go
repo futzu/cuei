@@ -88,6 +88,26 @@ func (cue *Cue) Encode() []byte {
 	return nb.Bites.Bytes()
 }
 
+// used by Six2Five to convert a time signal to a splice insert
+func (cue *Cue) mkSpliceInsert() {
+	cue.Command.CommandType = 5
+	cue.Command.Name = "Splice Insert"
+	cue.InfoSection.SpliceCommandType = 5
+	cue.Command.ProgramSpliceFlag = true
+	cue.Command.SpliceEventCancelIndicator = false
+	cue.Command.OutOfNetworkIndicator = false
+	cue.Command.TimeSpecifiedFlag = false
+	cue.Command.DurationFlag = false
+	cue.Command.BreakAutoReturn = false
+	cue.Command.SpliceImmediateFlag = false
+	cue.Command.AvailNum = 0
+	cue.Command.AvailExpected = 0
+	if cue.Command.PTS > 0.0 {
+		cue.Command.TimeSpecifiedFlag = true
+		cue.Command.PTS = cue.Command.PTS
+	}
+}
+
 /*
 	 *
 
@@ -119,40 +139,27 @@ func (cue *Cue) Encode() []byte {
 *
 */
 func (cue *Cue) Six2Five() string {
-	upidStarts := []uint16{0x34, 0x36, 0x38}
-	// upidStops := []uint16{0x35, 0x37, 0x39}
+	segStarts := []uint16{0x34, 0x36, 0x38}
+	segStops := []uint16{0x35, 0x37, 0x39}
 	if cue.InfoSection.SpliceCommandType == 6 {
-
-		cue.Command.CommandType = 5
-		cue.Command.Name = "Splice Insert"
-		cue.InfoSection.SpliceCommandType = 5
-		cue.Command.ProgramSpliceFlag = true
-		cue.Command.SpliceEventCancelIndicator = false
-		cue.Command.OutOfNetworkIndicator = false
-		cue.Command.TimeSpecifiedFlag = false
-		cue.Command.DurationFlag = false
-		cue.Command.BreakAutoReturn = false
-		cue.Command.SpliceImmediateFlag = false
-		cue.Command.AvailNum = 0
-		cue.Command.AvailExpected = 0
-		if cue.Command.PTS > 0.0 {
-			cue.Command.TimeSpecifiedFlag = true
-			cue.Command.PTS = cue.Command.PTS
-		}
 		for _, dscptr := range cue.Descriptors {
 			if dscptr.Tag == 2 {
 				//value, _ := strconv.ParseInt(hex, 16, 64)
 				cue.Command.SpliceEventID = uint32(Hex2Int(dscptr.SegmentationEventID))
-				if IsIn(upidStarts, uint16(dscptr.SegmentationTypeID)) {
+				if IsIn(segStarts, uint16(dscptr.SegmentationTypeID)) {
 					if dscptr.SegmentationDurationFlag {
+						cue.mkSpliceInsert()
 						cue.Command.OutOfNetworkIndicator = true
 						cue.Command.DurationFlag = true
 						cue.Command.BreakAutoReturn = true
 						cue.Command.BreakDuration = dscptr.SegmentationDuration
 					}
 				}
-			}
+				if IsIn(segStops, uint16(dscptr.SegmentationTypeID)) {
+					cue.mkSpliceInsert()
+				}
 
+			}
 		}
 	}
 	return EncB64(cue.Encode())
