@@ -18,8 +18,8 @@ type InfoSection struct {
 	PtsAdjustment          float64
 	CwIndex                string
 	Tier                   string
-	SpliceCommandLength    uint16
-	SpliceCommandType      uint8
+	CommandLength          uint16
+	CommandType            uint8
 }
 
 // Decode Splice Info Section values.
@@ -39,8 +39,8 @@ func (infosec *InfoSection) Decode(gob *gobs.Gob) bool {
 	infosec.PtsAdjustment = gob.As90k(33)
 	infosec.CwIndex = gob.Hex(8)
 	infosec.Tier = gob.Hex(12)
-	infosec.SpliceCommandLength = gob.UInt16(12)
-	infosec.SpliceCommandType = gob.UInt8(8)
+	infosec.CommandLength = gob.UInt16(12)
+	infosec.CommandType = gob.UInt8(8)
 
 	return true
 }
@@ -59,8 +59,9 @@ func (infosec *InfoSection) Defaults() {
 	infosec.PtsAdjustment = 0.0
 	infosec.CwIndex = "0x0"
 	infosec.Tier = "0xfff"
-	infosec.SpliceCommandLength = 0
-	infosec.SpliceCommandType = 0
+	infosec.CommandLength = 0
+
+	infosec.CommandType = 0
 }
 
 /*
@@ -71,6 +72,7 @@ Encodes the InfoSection variables to bytes.
 *
 */
 func (infosec *InfoSection) Encode() []byte {
+	//	infosec.Defaults()
 	nb := &Nbin{}
 	nb.Add16(uint16(0xfc), 16)
 	nb.Add8(48, 8)
@@ -81,8 +83,8 @@ func (infosec *InfoSection) Encode() []byte {
 	nb.Add90k(infosec.PtsAdjustment, 33)
 	nb.AddHex64(infosec.CwIndex, 8)
 	nb.AddHex64(infosec.Tier, 12)
-	nb.Add16(infosec.SpliceCommandLength, 12)
-	nb.Add8(infosec.SpliceCommandType, 8)
+	nb.Add16(infosec.CommandLength, 12)
+	nb.Add8(infosec.CommandType, 8)
 	return nb.Bites.Bytes()
 
 }
