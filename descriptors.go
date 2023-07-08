@@ -19,7 +19,7 @@ type segCmpt struct {
 	PtsOffset    float64
 }
 
-type SpliceDescriptor struct {
+type Descriptor struct {
 	Tag                              uint8       `json:",omitempty"`
 	Length                           uint8       `json:",omitempty"`
 	Identifier                       string      `json:",omitempty"`
@@ -54,19 +54,21 @@ type SpliceDescriptor struct {
 	SubSegmentsExpected              uint8       `json:",omitempty"`
 }
 
-/** 
+/*
+*
 Decode returns a Splice Descriptor by tag.
 
-    The following Splice Descriptors are recognized.
-    
-        0x0: Avail Descriptor,
-        0x1: DTMF Descriptor,
-        0x2: Segmentation Descriptor,
-        0x3: Time Descriptor,
-        0x4: Audio Descrioptor,
-    
-**/
-func (dscptr *SpliceDescriptor) Decode(gob *gobs.Gob, tag uint8, length uint8) {
+	The following Splice Descriptors are recognized.
+
+	    0x0: Avail Descriptor,
+	    0x1: DTMF Descriptor,
+	    0x2: Segmentation Descriptor,
+	    0x3: Time Descriptor,
+	    0x4: Audio Descrioptor,
+
+*
+*/
+func (dscptr *Descriptor) Decode(gob *gobs.Gob, tag uint8, length uint8) {
 	switch tag {
 	case 0x0:
 		dscptr.Tag = 0x0
@@ -86,7 +88,7 @@ func (dscptr *SpliceDescriptor) Decode(gob *gobs.Gob, tag uint8, length uint8) {
 	}
 }
 
-func (dscptr *SpliceDescriptor) audioDescriptor(gob *gobs.Gob, tag uint8, length uint8) {
+func (dscptr *Descriptor) audioDescriptor(gob *gobs.Gob, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
 	dscptr.Identifier = gob.Ascii(32)
@@ -104,7 +106,7 @@ func (dscptr *SpliceDescriptor) audioDescriptor(gob *gobs.Gob, tag uint8, length
 }
 
 // Decode for the avail Splice Descriptors
-func (dscptr *SpliceDescriptor) availDescriptor(gob *gobs.Gob, tag uint8, length uint8) {
+func (dscptr *Descriptor) availDescriptor(gob *gobs.Gob, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
 	dscptr.Identifier = gob.Ascii(32)
@@ -113,7 +115,7 @@ func (dscptr *SpliceDescriptor) availDescriptor(gob *gobs.Gob, tag uint8, length
 }
 
 // DTMF Splice Descriptor
-func (dscptr *SpliceDescriptor) dtmfDescriptor(gob *gobs.Gob, tag uint8, length uint8) {
+func (dscptr *Descriptor) dtmfDescriptor(gob *gobs.Gob, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
 	dscptr.Identifier = gob.Ascii(32)
@@ -126,7 +128,7 @@ func (dscptr *SpliceDescriptor) dtmfDescriptor(gob *gobs.Gob, tag uint8, length 
 }
 
 // Decode for the Time Descriptor
-func (dscptr *SpliceDescriptor) timeDescriptor(gob *gobs.Gob, tag uint8, length uint8) {
+func (dscptr *Descriptor) timeDescriptor(gob *gobs.Gob, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
 	dscptr.Identifier = gob.Ascii(32)
@@ -137,7 +139,7 @@ func (dscptr *SpliceDescriptor) timeDescriptor(gob *gobs.Gob, tag uint8, length 
 }
 
 // Decode for the Segmentation Descriptor
-func (dscptr *SpliceDescriptor) segmentationDescriptor(gob *gobs.Gob, tag uint8, length uint8) {
+func (dscptr *Descriptor) segmentationDescriptor(gob *gobs.Gob, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
 	dscptr.Identifier = gob.Ascii(32)
@@ -154,7 +156,7 @@ func (dscptr *SpliceDescriptor) segmentationDescriptor(gob *gobs.Gob, tag uint8,
 	}
 }
 
-func (dscptr *SpliceDescriptor) decodeSegFlags(gob *gobs.Gob) {
+func (dscptr *Descriptor) decodeSegFlags(gob *gobs.Gob) {
 	dscptr.ProgramSegmentationFlag = gob.Flag()
 	dscptr.SegmentationDurationFlag = gob.Flag()
 	dscptr.DeliveryNotRestrictedFlag = gob.Flag()
@@ -168,7 +170,7 @@ func (dscptr *SpliceDescriptor) decodeSegFlags(gob *gobs.Gob) {
 	gob.Forward(5)
 }
 
-func (dscptr *SpliceDescriptor) decodeSegCmpnts(gob *gobs.Gob) {
+func (dscptr *Descriptor) decodeSegCmpnts(gob *gobs.Gob) {
 	ccount := gob.UInt8(8)
 	for ccount > 0 { // 6 bytes each
 		ccount--
@@ -179,7 +181,7 @@ func (dscptr *SpliceDescriptor) decodeSegCmpnts(gob *gobs.Gob) {
 	}
 }
 
-func (dscptr *SpliceDescriptor) decodeSegmentation(gob *gobs.Gob) {
+func (dscptr *Descriptor) decodeSegmentation(gob *gobs.Gob) {
 	if dscptr.SegmentationDurationFlag {
 		dscptr.SegmentationDuration = gob.As90k(40)
 	}
@@ -196,11 +198,10 @@ func (dscptr *SpliceDescriptor) decodeSegmentation(gob *gobs.Gob) {
 	dscptr.SegmentNum = gob.UInt8(8)
 	dscptr.SegmentsExpected = gob.UInt8(8)
 	subSegIDs := []uint8{0x34, 0x36, 0x38, 0x3a}
-    	for _, ssid := range subSegIDs{
-		if   dscptr.SegmentationTypeID == ssid{
+	for _, ssid := range subSegIDs {
+		if dscptr.SegmentationTypeID == ssid {
 			dscptr.SubSegmentNum = gob.UInt8(8)
-            		dscptr.SubSegmentsExpected = gob.UInt8(8)
+			dscptr.SubSegmentsExpected = gob.UInt8(8)
 		}
 	}
 }
-
