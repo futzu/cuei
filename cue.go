@@ -11,7 +11,7 @@ Cue is a SCTE35 cue.
 
 	A Cue contains:
 	    1 InfoSection
-	    1 SpliceCommand
+	    1 Command
 		1 Dll  Descriptor loop length
 	    0 or more Splice Descriptors
 		1 Crc32
@@ -21,10 +21,10 @@ Cue is a SCTE35 cue.
 */
 type Cue struct {
 	InfoSection *InfoSection
-	Command     *SpliceCommand
-	Dll         uint16             // Descriptor Loop Length
-	Descriptors []SpliceDescriptor `json:",omitempty"`
-	PacketData  *packetData        `json:",omitempty"`
+	Command     *Command
+	Dll         uint16       // Descriptor Loop Length
+	Descriptors []Descriptor `json:",omitempty"`
+	PacketData  *packetData  `json:",omitempty"`
 	Crc32       uint32
 }
 
@@ -34,8 +34,8 @@ func (cue *Cue) Decode(bites []byte) bool {
 	gob.Load(bites)
 	cue.InfoSection = &InfoSection{}
 	if cue.InfoSection.Decode(&gob) {
-		cue.Command = &SpliceCommand{}
-		cue.Command.Decode(cue.InfoSection.SpliceCommandType, &gob)
+		cue.Command = &Command{}
+		cue.Command.Decode(cue.InfoSection.CommandType, &gob)
 		cue.Dll = gob.UInt16(16)
 		cue.dscptrLoop(cue.Dll, &gob)
 		cue.Crc32 = gob.UInt32(32)
@@ -55,7 +55,7 @@ func (cue *Cue) dscptrLoop(dll uint16, gob *gobs.Gob) {
 		length := gob.UInt16(8)
 		i++
 		i += length
-		var sdr SpliceDescriptor
+		var sdr Descriptor
 		sdr.Decode(gob, tag, uint8(length))
 		cue.Descriptors = append(cue.Descriptors, sdr)
 	}
@@ -70,8 +70,8 @@ func (cue *Cue) Show() {
 func (cue *Cue) Encode() []byte {
 	cmdb := cue.Command.Encode()
 	cmdl := len(cmdb)
-	cue.InfoSection.SpliceCommandLength = uint16(cmdl)
-	cue.InfoSection.SpliceCommandType = cue.Command.CommandType
+	cue.InfoSection.CommandLength = uint16(cmdl)
+	cue.InfoSection.CommandType = cue.Command.CommandType
 	// 11 bytes for info section + command + 2 descriptor loop length
 	// + descriptor loop + 4 for crc
 	cue.InfoSection.SectionLength = uint16(11 + cmdl + 2 + 4)
@@ -92,7 +92,7 @@ func (cue *Cue) Encode() []byte {
 func (cue *Cue) mkSpliceInsert() {
 	cue.Command.CommandType = 5
 	cue.Command.Name = "Splice Insert"
-	cue.InfoSection.SpliceCommandType = 5
+	cue.InfoSection.CommandType = 5
 	cue.Command.ProgramSpliceFlag = true
 	cue.Command.SpliceEventCancelIndicator = false
 	cue.Command.OutOfNetworkIndicator = false
@@ -141,7 +141,7 @@ func (cue *Cue) mkSpliceInsert() {
 func (cue *Cue) Six2Five() string {
 	segStarts := []uint16{0x34, 0x36, 0x38}
 	segStops := []uint16{0x35, 0x37, 0x39}
-	if cue.InfoSection.SpliceCommandType == 6 {
+	if cue.InfoSection.CommandType == 6 {
 		for _, dscptr := range cue.Descriptors {
 			if dscptr.Tag == 2 {
 				//value, _ := strconv.ParseInt(hex, 16, 64)
@@ -153,10 +153,13 @@ func (cue *Cue) Six2Five() string {
 						cue.Command.DurationFlag = true
 						cue.Command.BreakAutoReturn = true
 						cue.Command.BreakDuration = dscptr.SegmentationDuration
+						return EncB64(cue.Encode())
 					}
 				}
 				if IsIn(segStops, uint16(dscptr.SegmentationTypeID)) {
 					cue.mkSpliceInsert()
+					return EncB64(cue.Encode())
+
 				}
 
 			}
