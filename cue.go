@@ -9,13 +9,13 @@ import (
 *
 Cue is a SCTE35 cue.
 
-	A Cue contains:
-	    1 InfoSection
-	    1 Command
-		1 Dll  Descriptor loop length
-	    0 or more Splice Descriptors
-		1 Crc32
-	    1 packetData (if parsed from MPEGTS)
+A Cue contains:
+ 	1 InfoSection
+    	1 Command
+    	1 Dll  Descriptor loop length
+    	0 or more Splice Descriptors
+    	1 Crc32
+    	1 packetData (if parsed from MPEGTS)
 
 *
 */
