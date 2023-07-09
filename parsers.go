@@ -21,6 +21,7 @@ func NewCueParser() *CueParser {
 	return cuep
 }
 
+
 // StreamParser parses a []byte of mpegts for SCTE-35
 type StreamParser struct {
 	Stream
@@ -28,9 +29,17 @@ type StreamParser struct {
 
 // Parse parses  mpegts bytes and returns any SCTE-35 Cues found
 func (streamp *StreamParser) Parse(bites []byte) []*Cue {
-	cues := streamp.DecodeBytes(bites)
+	cues := streamp.decodeBytes(bites)
 	return cues
 }
+
+
+// ParseFile parses a mpegts file and returns any SCTE-35 Cues found
+func (streamp *StreamParser) ParseFile(filename string) []*Cue {
+	cues := streamp.decode(filename)
+	return cues
+}
+
 
 // initialize and return a *StreamParser
 func NewStreamParser() *StreamParser {
