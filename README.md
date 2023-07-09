@@ -58,10 +58,10 @@ go install github.com/futzu/cuei@latest
 # `Nutshell`
 | Use this        |   To do this                                                  |
 |-----------------|---------------------------------------------------------------|
-|[cuei.Cue.Decode()](https://github.com/futzu/cuei/blob/eac3a19eeb26/cue.go#L19)         | Parse SCTE-35 from a Base64 or Byte string.                   |
+|[cuei.CueParser](https://github.com/futzu/cuei/blob/eac3a19eeb26/cueparser.go#L1)         | Parse SCTE-35 from a Base64 or Byte string.                   |
 |[cuei.Stream.Decode()](https://github.com/futzu/cuei/blob/main/stream.go#L22)      |        Parse SCTE35 Cues from a MPEGTS file.    |
-|[cuei.StreamParser.Parse()](https://github.com/futzu/cuei/blob/main/streamparser.go#L4) | Parse MPEGTS packets as an array of bytes, like from a network stream. | 
-|[cuei.Scte35Parser.Parse()](https://github.com/futzu/cuei/blob/main/scte35parser.go#L24)|     Parse just SCTE-35 MPEGTS packets from a external demuxer.|
+|[cuei.StreamParser](https://github.com/futzu/cuei/blob/main/streamparser.go#L4) | Parse MPEGTS packets as an array of bytes, like from a network stream. | 
+|[cuei.Scte35Parser](https://github.com/futzu/cuei/blob/main/scte35parser.go#L24)|     Parse just SCTE-35 MPEGTS packets from a external demuxer.|
 
 
 # `Quick Demo`
