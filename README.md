@@ -9,21 +9,18 @@
 
 ###  
 <details> <summary>Heads Up!</summary>
+## I am about to make some signifigant backend changes, I need to reorganize things. 
+### I am sorry, but it has to be done. Most of you won't even notice.
 
-	
-### The fine folks at <b>[TuneIn](https://tunein.com)</b> have contracted me to add encoding to cuei. 
-### Over the next few days, expect the code to be in flux.
-	
-### `punch list`
-	
-- [x] `Add` nbin, (which is what packs the bits)
-- [x] `Add` mpegts CRC32 generation 
-- [x] `Add` InfoSection encoding
-- [x] `Add` SpliceCommand encoding
-- [ ] `Add` SpliceDescriptor encoding
-- [ ] `Add` Upid encoding
-- [x] `Add` Cue encoding
-- [ ] `Rename` gob renamed back to bitn. 
+#### Changes:
+- [ ] Combine Gob and NBin into an external module
+- [x]  Remove SCTE35Parser in favor of StreamParser
+- [x]  Add CueParser for consistency
+- [x]  Rename SpliceCommand to Command
+- [x]  Rename SpliceDescriptor to Descriptor
+- [ ]  .....
+
+> A lot of this is to make the godocs easier to follow. It has to be done. 
 
 	
 </details>
