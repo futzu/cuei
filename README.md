@@ -41,9 +41,7 @@
 	* [Parse Base64 encoded SCTE-35](#parse-base64-encoded-scte-35)
 	      
 	* [Use Dot Notation to access SCTE-35 Cue values](#use-dot-notation-to-access-scte-35-cue-values)
-	
-	* [Use cuei with another MPEGTS stream parser / demuxer](#use-cuei-with-another-mpegts-stream-parser--demuxer)
-	
+		
 	* [Shadow a Cue Struct Method ( override ) ](#shadow-a-cue-struct-method)
 	
 	* [Shadow a Cue Method and call the Shadowed Method ( like super in python )](#call-a-shadowed-method)
@@ -61,7 +59,6 @@ go install github.com/futzu/cuei@latest
 |[cuei.CueParser](https://github.com/futzu/cuei/blob/eac3a19eeb26/cueparser.go#L1)         | Parse SCTE-35 from a Base64 or Byte string.                   |
 |[cuei.Stream.Decode()](https://github.com/futzu/cuei/blob/main/stream.go#L22)      |        Parse SCTE35 Cues from a MPEGTS file.    |
 |[cuei.StreamParser](https://github.com/futzu/cuei/blob/main/streamparser.go#L4) | Parse MPEGTS packets as an array of bytes, like from a network stream. | 
-|[cuei.Scte35Parser](https://github.com/futzu/cuei/blob/main/scte35parser.go#L24)|     Parse just SCTE-35 MPEGTS packets from a external demuxer.|
 
 
 # `Quick Demo`
@@ -216,37 +213,6 @@ func main(){
         cue.Show()
 }
 ```
-
-## `Use cuei with another MPEGTS stream parser / demuxer`
-* Scte35Parser is for incorporating with another MPEGTS parser.
-* Example
-```go
-	       import(
-	           "github.com/futzu/cuei"
-	           )
-	       scte35parser := cuei.NewScte35Parser()
-
-	       // Each time your parser/demuxer finds a SCTE-35 packet (stream type 0x86)
-
-	       // do something like
-
-	       cue := scte35parser.Parse(aScte35Packet)
-	       if cue != nil {
-	           // do something with the cue
-	       }
-
-```
-
-* If the MPEGTS SCTE-35 packet contains a complete cue message
-	* The cue message is decoded into a Cue and returned.
-
-
-* If the MPEGTS SCTE-35 packet is a partial cue message
-
-	 * It will be stored and aggregated with the next MPEGTS SCTE-35 packet until complete.
-
-	 * Completed cue messages are decoded into a Cue and returned.
-
 ---
 # `Shadow a Cue struct method`
 ```go
