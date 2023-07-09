@@ -9,8 +9,10 @@
 
 ###  
 <details> <summary>Heads Up!</summary>
-## I am about to make some signifigant backend changes, I need to reorganize things. 
-### I am sorry, but it has to be done. Most of you won't even notice.
+
+ 
+### I am about to make some backend changes, I need to reorganize things. 
+### Most of you won't even notice.
 
 #### Changes:
 - [ ] Combine Gob and NBin into an external module
