@@ -56,9 +56,9 @@ go install github.com/futzu/cuei@latest
 # `Nutshell`
 | Use this        |   To do this                                                  |
 |-----------------|---------------------------------------------------------------|
-|[cuei.CueParser](https://github.com/futzu/cuei/blob/eac3a19eeb26/cueparser.go#L1)         | Parse SCTE-35 from a Base64 or Byte string.                   |
-|[cuei.Stream.Decode()](https://github.com/futzu/cuei/blob/main/stream.go#L22)      |        Parse SCTE35 Cues from a MPEGTS file.    |
-|[cuei.StreamParser](https://github.com/futzu/cuei/blob/main/streamparser.go#L4) | Parse MPEGTS packets as an array of bytes, like from a network stream. | 
+|[cuei.CueParser](https://github.com/futzu/cuei/blob/eac3a19eeb26/parsers.go)         | Parse SCTE-35 from a Base64 or Byte string.                   |
+|[cuei.StreamParser](https://github.com/futzu/cuei/blob/main/parsers.go)      |        Parse SCTE35 Cues from a MPEGTS file.    |
+|[cuei.StreamParser](https://github.com/futzu/cuei/blob/main/parsers.go) | Parse MPEGTS packets as an array of bytes, like from a network stream. | 
 
 
 # `Quick Demo`
@@ -69,20 +69,23 @@ go install github.com/futzu/cuei@latest
 package main
 
 import (
-	"os"
-	"fmt"
-	"github.com/futzu/cuei"
+        "os"
+        "fmt"
+        "github.com/futzu/cuei"
 )
 
 func main(){
 
-	args := os.Args[1:]
-	for i := range args{
-		fmt.Printf( "\nNext File: %s\n\n",args[i] )
-		var stream   cuei.Stream
-		stream.Decode(args[i])
-	}
-} 
+        arg := os.Args[1]
+
+        streamp := cuei.NewStreamParser()
+        cues := streamp.ParseFile(arg)
+        for _,cue := range cues {
+        fmt.Printf("Command is a %v\n", cue.Command.Name)
+        }
+
+}
+
 
 
 ```
