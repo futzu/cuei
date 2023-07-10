@@ -15,14 +15,11 @@
 ### Most of you won't even notice.
 
 #### Changes:
-- [ ] Combine Gob and NBin into an external module
-- [x]  Remove SCTE35Parser in favor of StreamParser
-- [x]  Add CueParser for consistency
-- [x]  Rename SpliceCommand to Command
-- [x]  Rename SpliceDescriptor to Descriptor
-- [ ]  .....
-
-> A lot of this is to make the godocs easier to follow. It has to be done. 
+- [x]  Combine `Gob` and `NBin` into an external `bitter` module
+- [x]  Remove `SCTE35Parser` in favor of `StreamParser`
+- [x]  Add `CueParser` for consistency
+- [x]  Rename `SpliceCommand` to `Command`
+- [x]  Rename `SpliceDescriptor` to `Descriptor`
 
 	
 </details>
@@ -209,11 +206,11 @@ import (
 
 func main(){
 
-	var cue cuei.Cue
+	cuep := cuei.CueParser
 	data := cuei.DeB64("/DA7AAAAAAAAAP/wFAUAAAABf+/+AItfZn4AKTLgAAEAAAAWAhRDVUVJAAAAAX//AAApMuABACIBAIoXZrM=")
-        cue.Decode(data) 
+        cuep.Parse(data) 
         fmt.Println("Cue as Json")
-        cue.Show()
+        cuep.Show()
 }
 ```
 ---
@@ -284,8 +281,6 @@ func main(){
 Show  the packet PTS time and Splice Command Name of SCTE-35 Cues
 in a MPEGTS stream.
 **/
-
-
 package main
 
 import (
@@ -296,14 +291,12 @@ import (
 
 func main() {
 
-	args := os.Args[1:]
-	for _,arg := range args {
-		fmt.Printf("\nNext File: %s\n\n", arg)
-		var stream cuei.Stream
-		stream.Decode(arg)
-		for _,c:= range stream.Cues {
-			fmt.Printf("PTS: %v, Splice Command: %v\n",c.PacketData.Pts, c.Command.Name )
-		}
+	arg := os.Args[1]
+	streamp := cuei.NewStreamParser()
+	cues :=	streamp.ParseFile(arg)
+	for _,c := range cues {
+		fmt.Printf("PTS: %v, Splice Command: %v\n",c.PacketData.Pts, c.Command.Name )
 	}
 }
+
 ```
