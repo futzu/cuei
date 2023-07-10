@@ -1,7 +1,7 @@
 package cuei
 
 import (
-	gobs "github.com/futzu/gob"
+	bitter "github.com/futzu/bitter"
 )
 
 // audioCmpt is a struct for audioDscptr Components
@@ -68,140 +68,140 @@ Decode returns a Splice Descriptor by tag.
 
 *
 */
-func (dscptr *Descriptor) Decode(gob *gobs.Gob, tag uint8, length uint8) {
+func (dscptr *Descriptor) Decode(bd *bitter.Decoder, tag uint8, length uint8) {
 	switch tag {
 	case 0x0:
 		dscptr.Tag = 0x0
-		dscptr.availDescriptor(gob, tag, length)
+		dscptr.availDescriptor(bd, tag, length)
 	case 0x1:
 		dscptr.Tag = 0x1
-		dscptr.dtmfDescriptor(gob, tag, length)
+		dscptr.dtmfDescriptor(bd, tag, length)
 	case 0x2:
 		dscptr.Tag = 0x2
-		dscptr.segmentationDescriptor(gob, tag, length)
+		dscptr.segmentationDescriptor(bd, tag, length)
 	case 0x3:
 		dscptr.Tag = 0x3
-		dscptr.timeDescriptor(gob, tag, length)
+		dscptr.timeDescriptor(bd, tag, length)
 	case 0x4:
 		dscptr.Tag = 0x4
-		dscptr.audioDescriptor(gob, tag, length)
+		dscptr.audioDescriptor(bd, tag, length)
 	}
 }
 
-func (dscptr *Descriptor) audioDescriptor(gob *gobs.Gob, tag uint8, length uint8) {
+func (dscptr *Descriptor) audioDescriptor(bd *bitter.Decoder, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
-	dscptr.Identifier = gob.Ascii(32)
-	ccount := gob.UInt8(4)
-	gob.Forward(4)
+	dscptr.Identifier = bd.Ascii(32)
+	ccount := bd.UInt8(4)
+	bd.Forward(4)
 	for ccount > 0 {
 		ccount--
-		ct := gob.UInt8(8)
-		iso := gob.UInt32(24)
-		bsm := gob.UInt8(3)
-		nc := gob.UInt8(4)
-		fsa := gob.Flag()
+		ct := bd.UInt8(8)
+		iso := bd.UInt32(24)
+		bsm := bd.UInt8(3)
+		nc := bd.UInt8(4)
+		fsa := bd.Flag()
 		dscptr.AudioComponents = append(dscptr.AudioComponents, audioCmpt{ct, iso, bsm, nc, fsa})
 	}
 }
 
 // Decode for the avail Splice Descriptors
-func (dscptr *Descriptor) availDescriptor(gob *gobs.Gob, tag uint8, length uint8) {
+func (dscptr *Descriptor) availDescriptor(bd *bitter.Decoder, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
-	dscptr.Identifier = gob.Ascii(32)
+	dscptr.Identifier = bd.Ascii(32)
 	dscptr.Name = "Avail Descriptor"
-	dscptr.ProviderAvailID = gob.UInt32(32)
+	dscptr.ProviderAvailID = bd.UInt32(32)
 }
 
 // DTMF Splice Descriptor
-func (dscptr *Descriptor) dtmfDescriptor(gob *gobs.Gob, tag uint8, length uint8) {
+func (dscptr *Descriptor) dtmfDescriptor(bd *bitter.Decoder, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
-	dscptr.Identifier = gob.Ascii(32)
+	dscptr.Identifier = bd.Ascii(32)
 	dscptr.Name = "DTMF Descriptor"
-	dscptr.PreRoll = gob.UInt8(8)
-	dscptr.DTMFCount = gob.UInt8(3)
-	//gob.Forward(5)
-	dscptr.DTMFChars = gob.UInt64(uint(8 * dscptr.DTMFCount))
+	dscptr.PreRoll = bd.UInt8(8)
+	dscptr.DTMFCount = bd.UInt8(3)
+	//bd.Forward(5)
+	dscptr.DTMFChars = bd.UInt64(uint(8 * dscptr.DTMFCount))
 
 }
 
 // Decode for the Time Descriptor
-func (dscptr *Descriptor) timeDescriptor(gob *gobs.Gob, tag uint8, length uint8) {
+func (dscptr *Descriptor) timeDescriptor(bd *bitter.Decoder, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
-	dscptr.Identifier = gob.Ascii(32)
+	dscptr.Identifier = bd.Ascii(32)
 	dscptr.Name = "Time Descriptor"
-	dscptr.TAISeconds = gob.UInt64(48)
-	dscptr.TAINano = gob.UInt32(32)
-	dscptr.UTCOffset = gob.UInt16(16)
+	dscptr.TAISeconds = bd.UInt64(48)
+	dscptr.TAINano = bd.UInt32(32)
+	dscptr.UTCOffset = bd.UInt16(16)
 }
 
 // Decode for the Segmentation Descriptor
-func (dscptr *Descriptor) segmentationDescriptor(gob *gobs.Gob, tag uint8, length uint8) {
+func (dscptr *Descriptor) segmentationDescriptor(bd *bitter.Decoder, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
-	dscptr.Identifier = gob.Ascii(32)
+	dscptr.Identifier = bd.Ascii(32)
 	dscptr.Name = "Segmentation Descriptor"
-	dscptr.SegmentationEventID = gob.Hex(32)
-	dscptr.SegmentationEventCancelIndicator = gob.Flag()
-	gob.Forward(7)
+	dscptr.SegmentationEventID = bd.Hex(32)
+	dscptr.SegmentationEventCancelIndicator = bd.Flag()
+	bd.Forward(7)
 	if !dscptr.SegmentationEventCancelIndicator {
-		dscptr.decodeSegFlags(gob)
+		dscptr.decodeSegFlags(bd)
 		if !dscptr.ProgramSegmentationFlag {
-			dscptr.decodeSegCmpnts(gob)
+			dscptr.decodeSegCmpnts(bd)
 		}
-		dscptr.decodeSegmentation(gob)
+		dscptr.decodeSegmentation(bd)
 	}
 }
 
-func (dscptr *Descriptor) decodeSegFlags(gob *gobs.Gob) {
-	dscptr.ProgramSegmentationFlag = gob.Flag()
-	dscptr.SegmentationDurationFlag = gob.Flag()
-	dscptr.DeliveryNotRestrictedFlag = gob.Flag()
+func (dscptr *Descriptor) decodeSegFlags(bd *bitter.Decoder) {
+	dscptr.ProgramSegmentationFlag = bd.Flag()
+	dscptr.SegmentationDurationFlag = bd.Flag()
+	dscptr.DeliveryNotRestrictedFlag = bd.Flag()
 	if !dscptr.DeliveryNotRestrictedFlag {
-		dscptr.WebDeliveryAllowedFlag = gob.Flag()
-		dscptr.NoRegionalBlackoutFlag = gob.Flag()
-		dscptr.ArchiveAllowedFlag = gob.Flag()
-		dscptr.DeviceRestrictions = table20[gob.UInt8(2)]
+		dscptr.WebDeliveryAllowedFlag = bd.Flag()
+		dscptr.NoRegionalBlackoutFlag = bd.Flag()
+		dscptr.ArchiveAllowedFlag = bd.Flag()
+		dscptr.DeviceRestrictions = table20[bd.UInt8(2)]
 		return
 	}
-	gob.Forward(5)
+	bd.Forward(5)
 }
 
-func (dscptr *Descriptor) decodeSegCmpnts(gob *gobs.Gob) {
-	ccount := gob.UInt8(8)
+func (dscptr *Descriptor) decodeSegCmpnts(bd *bitter.Decoder) {
+	ccount := bd.UInt8(8)
 	for ccount > 0 { // 6 bytes each
 		ccount--
-		ct := gob.UInt8(8)
-		gob.Forward(7)
-		po := gob.As90k(33)
+		ct := bd.UInt8(8)
+		bd.Forward(7)
+		po := bd.As90k(33)
 		dscptr.Components = append(dscptr.Components, segCmpt{ct, po})
 	}
 }
 
-func (dscptr *Descriptor) decodeSegmentation(gob *gobs.Gob) {
+func (dscptr *Descriptor) decodeSegmentation(bd *bitter.Decoder) {
 	if dscptr.SegmentationDurationFlag {
-		dscptr.SegmentationDuration = gob.As90k(40)
+		dscptr.SegmentationDuration = bd.As90k(40)
 	}
-	dscptr.SegmentationUpidType = gob.UInt8(8)
-	dscptr.SegmentationUpidLength = gob.UInt8(8)
+	dscptr.SegmentationUpidType = bd.UInt8(8)
+	dscptr.SegmentationUpidLength = bd.UInt8(8)
 	dscptr.SegmentationUpid = &Upid{}
-	dscptr.SegmentationUpid.Decode(gob, dscptr.SegmentationUpidType, dscptr.SegmentationUpidLength)
-	dscptr.SegmentationTypeID = gob.UInt8(8)
+	dscptr.SegmentationUpid.Decode(bd, dscptr.SegmentationUpidType, dscptr.SegmentationUpidLength)
+	dscptr.SegmentationTypeID = bd.UInt8(8)
 
 	mesg, ok := table22[dscptr.SegmentationTypeID]
 	if ok {
 		dscptr.SegmentationMessage = mesg
 	}
-	dscptr.SegmentNum = gob.UInt8(8)
-	dscptr.SegmentsExpected = gob.UInt8(8)
+	dscptr.SegmentNum = bd.UInt8(8)
+	dscptr.SegmentsExpected = bd.UInt8(8)
 	subSegIDs := []uint8{0x34, 0x36, 0x38, 0x3a}
 	for _, ssid := range subSegIDs {
 		if dscptr.SegmentationTypeID == ssid {
-			dscptr.SubSegmentNum = gob.UInt8(8)
-			dscptr.SubSegmentsExpected = gob.UInt8(8)
+			dscptr.SubSegmentNum = bd.UInt8(8)
+			dscptr.SubSegmentsExpected = bd.UInt8(8)
 		}
 	}
 }
