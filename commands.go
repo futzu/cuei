@@ -1,7 +1,7 @@
 package cuei
 
 import (
-	gobs "github.com/futzu/gob"
+	bitter "github.com/futzu/bitter"
 )
 
 /*
@@ -39,19 +39,19 @@ type Command struct {
 }
 
 // Decode a Splice Command
-func (cmd *Command) Decode(cmdtype uint8, gob *gobs.Gob) {
+func (cmd *Command) Decode(cmdtype uint8, bd *bitter.Decoder) {
 	cmd.CommandType = cmdtype
 	switch cmdtype {
 	case 0x0:
-		cmd.decodeSpliceNull(gob)
+		cmd.decodeSpliceNull(bd)
 	case 0x5:
-		cmd.decodeSpliceInsert(gob)
+		cmd.decodeSpliceInsert(bd)
 	case 0x6:
-		cmd.decodeTimeSignal(gob)
+		cmd.decodeTimeSignal(bd)
 	case 0x7:
-		cmd.decodeBandwidthReservation(gob)
+		cmd.decodeBandwidthReservation(bd)
 	case 0xff:
-		cmd.decodePrivate(gob)
+		cmd.decodePrivate(bd)
 	}
 
 }
@@ -72,113 +72,113 @@ func (cmd *Command) Encode() []byte {
 }
 
 // bandwidth Reservation
-func (cmd *Command) decodeBandwidthReservation(gob *gobs.Gob) {
+func (cmd *Command) decodeBandwidthReservation(bd *bitter.Decoder) {
 	cmd.Name = "Bandwidth Reservation"
-	gob.Forward(0)
+	bd.Forward(0)
 }
 
 // private Command
-func (cmd *Command) decodePrivate(gob *gobs.Gob) {
+func (cmd *Command) decodePrivate(bd *bitter.Decoder) {
 	cmd.Name = "Private Command"
-	cmd.Identifier = gob.UInt32(32)
-	cmd.PrivateBytes = gob.Bytes(24)
+	cmd.Identifier = bd.UInt32(32)
+	cmd.PrivateBytes = bd.Bytes(24)
 }
 
 // splice Null
-func (cmd *Command) decodeSpliceNull(gob *gobs.Gob) {
+func (cmd *Command) decodeSpliceNull(bd *bitter.Decoder) {
 	cmd.Name = "Splice Null"
-	gob.Forward(0)
+	bd.Forward(0)
 }
 
 // splice Insert
-func (cmd *Command) decodeSpliceInsert(gob *gobs.Gob) {
+func (cmd *Command) decodeSpliceInsert(bd *bitter.Decoder) {
 	cmd.Name = "Splice Insert"
-	cmd.SpliceEventID = gob.UInt32(32)
-	cmd.SpliceEventCancelIndicator = gob.Flag()
-	gob.Forward(7)
-	cmd.OutOfNetworkIndicator = gob.Flag()
-	cmd.ProgramSpliceFlag = gob.Flag()
-	cmd.DurationFlag = gob.Flag()
-	cmd.SpliceImmediateFlag = gob.Flag()
-	gob.Forward(4)
+	cmd.SpliceEventID = bd.UInt32(32)
+	cmd.SpliceEventCancelIndicator = bd.Flag()
+	bd.Forward(7)
+	cmd.OutOfNetworkIndicator = bd.Flag()
+	cmd.ProgramSpliceFlag = bd.Flag()
+	cmd.DurationFlag = bd.Flag()
+	cmd.SpliceImmediateFlag = bd.Flag()
+	bd.Forward(4)
 	if cmd.SpliceImmediateFlag == false {
-		cmd.spliceTime(gob)
+		cmd.spliceTime(bd)
 	}
 	if cmd.DurationFlag == true {
-		cmd.parseBreak(gob)
+		cmd.parseBreak(bd)
 	}
-	cmd.UniqueProgramID = gob.UInt16(16)
-	cmd.AvailNum = gob.UInt8(8)
-	cmd.AvailExpected = gob.UInt8(8)
+	cmd.UniqueProgramID = bd.UInt16(16)
+	cmd.AvailNum = bd.UInt8(8)
+	cmd.AvailExpected = bd.UInt8(8)
 }
 
 // encode Splice Insert Splice Command
 func (cmd *Command) encodeSpliceInsert() []byte {
-	nb := &Nbin{}
-	nb.Add8(1, 8) //bumper
-	nb.Add32(cmd.SpliceEventID, 32)
-	nb.AddFlag(cmd.SpliceEventCancelIndicator)
-	nb.Reserve(7)
-	nb.AddFlag(cmd.OutOfNetworkIndicator)
-	nb.AddFlag(cmd.ProgramSpliceFlag)
-	nb.AddFlag(cmd.DurationFlag)
-	nb.AddFlag(cmd.SpliceImmediateFlag)
-	nb.Reserve(4)
+	be := &bitter.Encoder{}
+	be.Add8(1, 8) //bumper
+	be.Add32(cmd.SpliceEventID, 32)
+	be.AddFlag(cmd.SpliceEventCancelIndicator)
+	be.Reserve(7)
+	be.AddFlag(cmd.OutOfNetworkIndicator)
+	be.AddFlag(cmd.ProgramSpliceFlag)
+	be.AddFlag(cmd.DurationFlag)
+	be.AddFlag(cmd.SpliceImmediateFlag)
+	be.Reserve(4)
 	if cmd.SpliceImmediateFlag == false {
-		cmd.encodeSpliceTime(nb)
+		cmd.encodeSpliceTime(be)
 	}
 	if cmd.DurationFlag == true {
-		cmd.encodeBreak(nb)
+		cmd.encodeBreak(be)
 	}
-	nb.Add16(cmd.UniqueProgramID, 16)
-	nb.Add8(cmd.AvailNum, 8)
-	nb.Add8(cmd.AvailExpected, 8)
-	return nb.Bites.Bytes()[1:] // drop Bytes[0] it's just a bumper to allow leading zero values
+	be.Add16(cmd.UniqueProgramID, 16)
+	be.Add8(cmd.AvailNum, 8)
+	be.Add8(cmd.AvailExpected, 8)
+	return be.Bites.Bytes()[1:] // drop Bytes[0] it's just a bumper to allow leading zero values
 
 }
 
-func (cmd *Command) encodeBreak(nb *Nbin) {
-	nb.AddFlag(cmd.BreakAutoReturn)
-	nb.Reserve(6)
-	nb.Add90k(cmd.BreakDuration, 33)
+func (cmd *Command) encodeBreak(be *bitter.Encoder) {
+	be.AddFlag(cmd.BreakAutoReturn)
+	be.Reserve(6)
+	be.Add90k(cmd.BreakDuration, 33)
 }
 
 // encode PTS splice times
-func (cmd *Command) encodeSpliceTime(nb *Nbin) {
-	nb.AddFlag(cmd.TimeSpecifiedFlag)
+func (cmd *Command) encodeSpliceTime(be *bitter.Encoder) {
+	be.AddFlag(cmd.TimeSpecifiedFlag)
 	if cmd.TimeSpecifiedFlag == true {
-		nb.Reserve(6)
-		nb.Add90k(cmd.PTS, 33)
+		be.Reserve(6)
+		be.Add90k(cmd.PTS, 33)
 		return
 	}
-	nb.Reserve(7)
+	be.Reserve(7)
 }
 
-func (cmd *Command) parseBreak(gob *gobs.Gob) {
-	cmd.BreakAutoReturn = gob.Flag()
-	gob.Forward(6)
-	cmd.BreakDuration = gob.As90k(33)
+func (cmd *Command) parseBreak(bd *bitter.Decoder) {
+	cmd.BreakAutoReturn = bd.Flag()
+	bd.Forward(6)
+	cmd.BreakDuration = bd.As90k(33)
 }
 
-func (cmd *Command) spliceTime(gob *gobs.Gob) {
-	cmd.TimeSpecifiedFlag = gob.Flag()
+func (cmd *Command) spliceTime(bd *bitter.Decoder) {
+	cmd.TimeSpecifiedFlag = bd.Flag()
 	if cmd.TimeSpecifiedFlag {
-		gob.Forward(6)
-		cmd.PTS = gob.As90k(33)
+		bd.Forward(6)
+		cmd.PTS = bd.As90k(33)
 	} else {
-		gob.Forward(7)
+		bd.Forward(7)
 	}
 }
 
 // decode Time Signal Splice Commands
-func (cmd *Command) decodeTimeSignal(gob *gobs.Gob) {
+func (cmd *Command) decodeTimeSignal(bd *bitter.Decoder) {
 	cmd.Name = "Time Signal"
-	cmd.spliceTime(gob)
+	cmd.spliceTime(bd)
 }
 
 // encode Time Signal Splice Commands
 func (cmd *Command) encodeTimeSignal() []byte {
-	nb := &Nbin{}
-	cmd.encodeSpliceTime(nb)
-	return nb.Bites.Bytes()
+	be := &bitter.Encoder{}
+	cmd.encodeSpliceTime(be)
+	return be.Bites.Bytes()
 }
