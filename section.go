@@ -1,7 +1,7 @@
 package cuei
 
 import (
-	gobs "github.com/futzu/gob"
+	bitter "github.com/futzu/bitter"
 )
 
 // InfoSection is the splice info section of the SCTE 35 cue.
@@ -23,24 +23,24 @@ type InfoSection struct {
 }
 
 // Decode Splice Info Section values.
-func (infosec *InfoSection) Decode(gob *gobs.Gob) bool {
+func (infosec *InfoSection) Decode(bd *bitter.Decoder) bool {
 	infosec.Name = "Splice Info Section"
-	infosec.TableID = gob.Hex(8)
+	infosec.TableID = bd.Hex(8)
 	if infosec.TableID != "0xfc" {
 		return false
 	}
-	infosec.SectionSyntaxIndicator = gob.Flag()
-	infosec.Private = gob.Flag()
-	infosec.Reserved = gob.Hex(2)
-	infosec.SectionLength = gob.UInt16(12)
-	infosec.ProtocolVersion = gob.UInt8(8)
-	infosec.EncryptedPacket = gob.Flag()
-	infosec.EncryptionAlgorithm = gob.UInt8(6)
-	infosec.PtsAdjustment = gob.As90k(33)
-	infosec.CwIndex = gob.Hex(8)
-	infosec.Tier = gob.Hex(12)
-	infosec.CommandLength = gob.UInt16(12)
-	infosec.CommandType = gob.UInt8(8)
+	infosec.SectionSyntaxIndicator = bd.Flag()
+	infosec.Private = bd.Flag()
+	infosec.Reserved = bd.Hex(2)
+	infosec.SectionLength = bd.UInt16(12)
+	infosec.ProtocolVersion = bd.UInt8(8)
+	infosec.EncryptedPacket = bd.Flag()
+	infosec.EncryptionAlgorithm = bd.UInt8(6)
+	infosec.PtsAdjustment = bd.As90k(33)
+	infosec.CwIndex = bd.Hex(8)
+	infosec.Tier = bd.Hex(12)
+	infosec.CommandLength = bd.UInt16(12)
+	infosec.CommandType = bd.UInt8(8)
 
 	return true
 }
@@ -73,18 +73,18 @@ Encodes the InfoSection variables to bytes.
 */
 func (infosec *InfoSection) Encode() []byte {
 	//	infosec.Defaults()
-	nb := &Nbin{}
-	nb.Add16(uint16(0xfc), 16)
-	nb.Add8(48, 8)
-	nb.Add8(uint8(infosec.SectionLength), 8)
-	nb.Add8(infosec.ProtocolVersion, 8)
-	nb.AddFlag(infosec.EncryptedPacket)
-	nb.Add8(infosec.EncryptionAlgorithm, 6)
-	nb.Add90k(infosec.PtsAdjustment, 33)
-	nb.AddHex64(infosec.CwIndex, 8)
-	nb.AddHex64(infosec.Tier, 12)
-	nb.Add16(infosec.CommandLength, 12)
-	nb.Add8(infosec.CommandType, 8)
-	return nb.Bites.Bytes()
+	be := &bitter.Encoder{}
+	be.Add16(uint16(0xfc), 16)
+	be.Add8(48, 8)
+	be.Add8(uint8(infosec.SectionLength), 8)
+	be.Add8(infosec.ProtocolVersion, 8)
+	be.AddFlag(infosec.EncryptedPacket)
+	be.Add8(infosec.EncryptionAlgorithm, 6)
+	be.Add90k(infosec.PtsAdjustment, 33)
+	be.AddHex64(infosec.CwIndex, 8)
+	be.AddHex64(infosec.Tier, 12)
+	be.Add16(infosec.CommandLength, 12)
+	be.Add8(infosec.CommandType, 8)
+	return be.Bites.Bytes()
 
 }
