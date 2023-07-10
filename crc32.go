@@ -17,7 +17,7 @@ const TWO_FIFTY_SIX = 0x100
 func bytecrc(crc int, poly int) int {
 	mask := ONE << (THIRTY_TWO - ONE)
 	for i := 0; i < EIGHT; i++ {
-		if crc&mask != ZERO {
+		if crc & mask != ZERO {
 			crc = crc<<ONE ^ poly
 		} else {
 			crc = crc << ONE
@@ -30,9 +30,9 @@ func bytecrc(crc int, poly int) int {
 func mkTable() [256]int {
 	var tbl [TWO_FIFTY_SIX]int
 	mask := (ONE << THIRTY_TWO) - ONE
-	poly := POLY & mask
+	pm := POLY & mask
 	for idx, _ := range tbl {
-		tbl[idx] = (bytecrc((idx << TWENTY_FOUR), poly))
+		tbl[idx] = (bytecrc((idx << TWENTY_FOUR), pm))
 	}
 	return tbl
 }
