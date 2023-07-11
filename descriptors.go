@@ -197,11 +197,83 @@ func (dscptr *Descriptor) decodeSegmentation(bd *bitter.Decoder) {
 	}
 	dscptr.SegmentNum = bd.UInt8(8)
 	dscptr.SegmentsExpected = bd.UInt8(8)
-	subSegIDs := []uint8{0x34, 0x36, 0x38, 0x3a}
-	for _, ssid := range subSegIDs {
-		if dscptr.SegmentationTypeID == ssid {
-			dscptr.SubSegmentNum = bd.UInt8(8)
-			dscptr.SubSegmentsExpected = bd.UInt8(8)
+	subSegIDs := []uint16{0x34, 0x36, 0x38, 0x3a}
+	if IsIn(subSegIDs, uint16(dscptr.SegmentationTypeID)) {
+		dscptr.SubSegmentNum = bd.UInt8(8)
+		dscptr.SubSegmentsExpected = bd.UInt8(8)
+	}
+}
+
+//    Encode a segmentation descriptor
+
+func (dscptr *Descriptor) Encode() []byte {
+	be := &bitter.Encoder{}
+	be.AddHex64(dscptr.SegmentationEventID, 32)
+	be.AddFlag(dscptr.SegmentationEventCancelIndicator)
+	be.Reserve(7)
+	if !dscptr.SegmentationEventCancelIndicator {
+		dscptr.encodeFlags(be)
+		if !dscptr.ProgramSegmentationFlag {
+			dscptr.encodeComponents(be)
+			dscptr.encodeSegmentation(be)
 		}
+	}
+	return be.Bites.Bytes()
+}
+
+func (dscptr *Descriptor) encodeComponents(be *bitter.Encoder) {
+	count := uint8(len(dscptr.Components))
+	be.Add8(count, 8)
+	cc := uint8(0)
+	for cc < count {
+		comp := dscptr.Components[cc]
+		be.Add8(comp.ComponentTag, 8)
+		be.Reserve(7)
+		be.Add90k(comp.PtsOffset, 33)
+		cc++
+	}
+}
+
+func (dscptr *Descriptor) encodeFlags(be *bitter.Encoder) {
+	be.AddFlag(dscptr.ProgramSegmentationFlag)
+	be.AddFlag(dscptr.SegmentationDurationFlag)
+	be.AddFlag(dscptr.DeliveryNotRestrictedFlag)
+	if !dscptr.DeliveryNotRestrictedFlag {
+		be.AddFlag(dscptr.WebDeliveryAllowedFlag)
+		be.AddFlag(dscptr.NoRegionalBlackoutFlag)
+		be.AddFlag(dscptr.ArchiveAllowedFlag)
+		//   a_key = k_by_v(table20, dscptr.device_restrictions)
+		//     nbin.add_int(a_key, 2)
+		be.Add8(3, 2) //  dscptr.device_restrictions
+	} else {
+		be.Reserve(5)
+	}
+}
+
+func (dscptr *Descriptor) encodeSegmentation(be *bitter.Encoder) {
+	if dscptr.SegmentationDurationFlag {
+		be.Add90k(dscptr.SegmentationDuration, 40)
+	}
+	be.Add8(dscptr.SegmentationUpidType, 8)
+	be.Add8(dscptr.SegmentationUpidLength, 8)
+	be.Reserve(int(dscptr.SegmentationUpidLength << 3)) // Cover Upid
+	/*   upidencoder(
+	         nbin,
+	         dscptr.segmentationupidtype,
+	         dscptr.segmentationupidlength,
+	         dscptr.segmentationupid,
+	     )
+	*/
+	be.Add8(dscptr.SegmentationTypeID, 8)
+	dscptr.encodeSegments(be)
+}
+
+func (dscptr *Descriptor) encodeSegments(be *bitter.Encoder) {
+	be.Add8(dscptr.SegmentNum, 8)
+	be.Add8(dscptr.SegmentsExpected, 8)
+	subSegIDs := []uint16{0x34, 0x36, 0x38, 0x3a}
+	if IsIn(subSegIDs, uint16(dscptr.SegmentationTypeID)) {
+		be.Add8(dscptr.SubSegmentNum, 8)
+		be.Add8(dscptr.SubSegmentsExpected, 8)
 	}
 }
