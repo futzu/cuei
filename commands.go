@@ -115,14 +115,14 @@ func (cmd *Command) decodeSpliceInsert(bd *bitter.Decoder) {
 // encode Splice Insert Splice Command
 func (cmd *Command) encodeSpliceInsert() []byte {
 	be := &bitter.Encoder{}
-	be.Add8(1, 8) //bumper
-	be.Add32(cmd.SpliceEventID, 32)
-	be.AddFlag(cmd.SpliceEventCancelIndicator)
+	be.Add(1, 8) //bumper
+	be.Add(cmd.SpliceEventID, 32)
+	be.Add(cmd.SpliceEventCancelIndicator, 1)
 	be.Reserve(7)
-	be.AddFlag(cmd.OutOfNetworkIndicator)
-	be.AddFlag(cmd.ProgramSpliceFlag)
-	be.AddFlag(cmd.DurationFlag)
-	be.AddFlag(cmd.SpliceImmediateFlag)
+	be.Add(cmd.OutOfNetworkIndicator, 1)
+	be.Add(cmd.ProgramSpliceFlag, 1)
+	be.Add(cmd.DurationFlag, 1)
+	be.Add(cmd.SpliceImmediateFlag, 1)
 	be.Reserve(4)
 	if cmd.SpliceImmediateFlag == false {
 		cmd.encodeSpliceTime(be)
@@ -130,25 +130,25 @@ func (cmd *Command) encodeSpliceInsert() []byte {
 	if cmd.DurationFlag == true {
 		cmd.encodeBreak(be)
 	}
-	be.Add16(cmd.UniqueProgramID, 16)
-	be.Add8(cmd.AvailNum, 8)
-	be.Add8(cmd.AvailExpected, 8)
+	be.Add(cmd.UniqueProgramID, 16)
+	be.Add(cmd.AvailNum, 8)
+	be.Add(cmd.AvailExpected, 8)
 	return be.Bites.Bytes()[1:] // drop Bytes[0] it's just a bumper to allow leading zero values
 
 }
 
 func (cmd *Command) encodeBreak(be *bitter.Encoder) {
-	be.AddFlag(cmd.BreakAutoReturn)
+	be.Add(cmd.BreakAutoReturn, 1)
 	be.Reserve(6)
-	be.Add90k(cmd.BreakDuration, 33)
+	be.Add(cmd.BreakDuration, 33)
 }
 
 // encode PTS splice times
 func (cmd *Command) encodeSpliceTime(be *bitter.Encoder) {
-	be.AddFlag(cmd.TimeSpecifiedFlag)
+	be.Add(cmd.TimeSpecifiedFlag, 1)
 	if cmd.TimeSpecifiedFlag == true {
 		be.Reserve(6)
-		be.Add90k(cmd.PTS, 33)
+		be.Add(cmd.PTS, 33)
 		return
 	}
 	be.Reserve(7)
