@@ -74,17 +74,17 @@ Encodes the InfoSection variables to bytes.
 func (infosec *InfoSection) Encode() []byte {
 	//	infosec.Defaults()
 	be := &bitter.Encoder{}
-	be.Add16(uint16(0xfc), 16)
-	be.Add8(48, 8)
-	be.Add8(uint8(infosec.SectionLength), 8)
-	be.Add8(infosec.ProtocolVersion, 8)
-	be.AddFlag(infosec.EncryptedPacket)
-	be.Add8(infosec.EncryptionAlgorithm, 6)
-	be.Add90k(infosec.PtsAdjustment, 33)
+	be.Add(uint16(0xfc), 16)
+	be.Add(48, 8)
+	be.Add(uint8(infosec.SectionLength), 8)
+	be.Add(infosec.ProtocolVersion, 8)
+	be.Add(infosec.EncryptedPacket, 1)
+	be.Add(infosec.EncryptionAlgorithm, 6)
+	be.Add(infosec.PtsAdjustment, 33)
 	be.AddHex64(infosec.CwIndex, 8)
 	be.AddHex64(infosec.Tier, 12)
-	be.Add16(infosec.CommandLength, 12)
-	be.Add8(infosec.CommandType, 8)
+	be.Add(infosec.CommandLength, 12)
+	be.Add(infosec.CommandType, 8)
 	return be.Bites.Bytes()
 
 }
