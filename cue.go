@@ -120,7 +120,7 @@ func (cue *Cue) mkSpliceInsert() {
 
 		import (
 			"os"
-				"fmt"
+			"fmt"
 			"github.com/futzu/cuei"
 		)
 
@@ -128,7 +128,7 @@ func (cue *Cue) mkSpliceInsert() {
 			args := os.Args[1:]
 			for _,arg := range args {
 				fmt.Printf("\nNext File: %s\n\n", arg)
-				var stream cuei.Stream
+				stream := cuei.NewStream()
 				cues :=stream.Decode(arg)
 				for _,c:= range cues {
 					fmt.Println(c.Six2Five())
@@ -167,4 +167,11 @@ func (cue *Cue) Six2Five() string {
 	}
 	return EncB64(cue.Encode())
 
+}
+
+
+// initialize and return a *Cue
+func NewCue() *Cue {
+	cue := &Cue{}
+	return cue
 }
