@@ -8,22 +8,6 @@
 
 
 ###  
-<details> <summary>Heads Up!</summary>
-
- 
-### I am about to make some backend changes, I need to reorganize things. 
-### Most of you won't even notice.
-
-#### Changes:
-- [x]  Combine `Gob` and `NBin` into an external `bitter` module
-- [x]  Remove `SCTE35Parser` in favor of `StreamParser`
-- [x]  Add `CueParser` for consistency
-- [x]  Rename `SpliceCommand` to `Command`
-- [x]  Rename `SpliceDescriptor` to `Descriptor`
-
-	
-</details>
-	
 
 * [Install](#install-cuei)
 
@@ -53,9 +37,9 @@ go install github.com/futzu/cuei@latest
 # `Nutshell`
 | Use this        |   To do this                                                  |
 |-----------------|---------------------------------------------------------------|
-|[cuei.CueParser](https://github.com/futzu/cuei/blob/eac3a19eeb26/parsers.go)         | Parse SCTE-35 from a Base64 or Byte string.                   |
-|[cuei.StreamParser](https://github.com/futzu/cuei/blob/main/parsers.go)      |        Parse SCTE35 Cues from a MPEGTS file.    |
-|[cuei.StreamParser](https://github.com/futzu/cuei/blob/main/parsers.go) | Parse MPEGTS packets as an array of bytes, like from a network stream. | 
+|[cuei.Cue.Decode([]byte)](https://github.com/futzu/cuei/blob/main/cue.go)         | Parse SCTE-35 from a Base64 or Byte string.                   |
+|[cuei.Stream.Decode(filename)](https://github.com/futzu/cuei/blob/main/stream.go)      |        Parse SCTE35 Cues from a MPEGTS file.    |
+|[cuei.Stream.DecodeBytes([]byte)](https://github.com/futzu/cuei/blob/main/stream.go) | Parse MPEGTS packets as an array of bytes, like from a network stream. | 
 
 
 # `Quick Demo`
@@ -75,8 +59,8 @@ func main(){
 
         arg := os.Args[1]
 
-        streamp := cuei.NewStreamParser()
-        cues := streamp.ParseFile(arg)
+        stream := cuei.NewStream()
+        cues := stream.Decode(arg)
         for _,cue := range cues {
         fmt.Printf("Command is a %v\n", cue.Command.Name)
         }
@@ -149,7 +133,7 @@ Next File: mpegts/out.ts
 
 
 ```
-*  Use cuei.StreamParser for more fine-grained control of MPEGTS stream parsing. 
+*  Use cuei.Stream.DecodeBytes for more fine-grained control of MPEGTS stream parsing. 
 ```go
 package main
 
@@ -164,11 +148,11 @@ func main() {
 	args := os.Args[1:] // Take multiple command line args
 	for _, arg := range args {
 		var cues []*cuei.Cue
-		streamp := cuei.NewStreamParser() // New StreamParser for each file
-		streamp.Quiet = true // suppress printing SCTE-35 messages 
+		stream := cuei.NewStream() // New StreamParser for each file
+		stream.Quiet = true // suppress printing SCTE-35 messages 
 		
 		// you don't have to use a file
-		// StreamParser.Parse takes a []byte as input
+		// Stream.DecodeBytes takes a []byte as input
 		
 		file, err := os.Open(arg)
 		if err != nil {
@@ -182,7 +166,7 @@ func main() {
 			if err != nil {
 				break
 			}
-			cues = streamp.Parse(buffer)   // StreamParser.Parse returns a [] *cuei.Cue 
+			cues = stream.DecodeBytes(buffer)   // StreamParser.Parse returns a [] *cuei.Cue 
 			for _,cue := range cues {
 			// do stuff with the cues like:
 				cue.Show()
@@ -206,11 +190,11 @@ import (
 
 func main(){
 
-	cuep := cuei.CueParser
+	cue := cuei.NewCue()
 	data := cuei.DeB64("/DA7AAAAAAAAAP/wFAUAAAABf+/+AItfZn4AKTLgAAEAAAAWAhRDVUVJAAAAAX//AAApMuABACIBAIoXZrM=")
-        cuep.Parse(data) 
+        cue.Decode(data) 
         fmt.Println("Cue as Json")
-        cuep.Show()
+        cue.Show()
 }
 ```
 ---
@@ -292,8 +276,8 @@ import (
 func main() {
 
 	arg := os.Args[1]
-	streamp := cuei.NewStreamParser()
-	cues :=	streamp.ParseFile(arg)
+	stream := cuei.NewStream()
+	cues :=	stream.Decode(arg)
 	for _,c := range cues {
 		fmt.Printf("PTS: %v, Splice Command: %v\n",c.PacketData.Pts, c.Command.Name )
 	}
