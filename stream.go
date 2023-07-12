@@ -42,8 +42,8 @@ func (stream *Stream) mkMaps() {
 	stream.partial = make(map[uint16][]byte)
 }
 
-// decode fname (a file name) for SCTE-35
-func (stream *Stream) decode(fname string) []*Cue {
+// Decode fname (a file name) for SCTE-35
+func (stream *Stream) Decode(fname string) []*Cue {
 	stream.Pids = &Pids{}
 	stream.mkMaps()
 	file, err := os.Open(fname)
@@ -56,13 +56,13 @@ func (stream *Stream) decode(fname string) []*Cue {
 		if err != nil {
 			break
 		}
-		cues = append(cues, stream.decodeBytes(buffer)...)
+		cues = append(cues, stream.DecodeBytes(buffer)...)
 	}
 	return cues
 }
 
-// decodeBytes Parses a chunk of mpegts bytes for SCTE-35
-func (stream *Stream) decodeBytes(bites []byte) []*Cue {
+// DecodeBytes Parses a chunk of mpegts bytes for SCTE-35
+func (stream *Stream) DecodeBytes(bites []byte) []*Cue {
 	for i := 1; i <= (len(bites) / PktSz); i++ {
 		end := i * PktSz
 		start := end - PktSz
@@ -300,4 +300,13 @@ func (stream *Stream) mkCue(pid uint16) *Cue {
 	cue.PacketData.Pcr = mk90k(stream.Prgm2Pcr[*prgm])
 	cue.PacketData.Pts = mk90k(stream.Prgm2Pts[*prgm])
 	return cue
+}
+
+
+// initialize and return a *Stream
+func NewStream() *Stream {
+	stream := &Stream{}
+	stream.Pids = &Pids{}
+	stream.mkMaps()
+	return stream
 }
