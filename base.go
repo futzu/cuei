@@ -66,6 +66,14 @@ func MkJson(i interface{}) string {
 	return string(jason)
 }
 
+// Take a JSON string and return a *Cue
+func Json2Cue(s string) *Cue {
+	b := []byte(s)
+	cue := &Cue{}
+	json.Unmarshal(b, cue)
+	return cue
+}
+
 func parseLen(byte1, byte2 byte) uint16 {
 	return uint16(byte1&0xf)<<8 | uint16(byte2)
 }
