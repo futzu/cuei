@@ -1,4 +1,4 @@
-module github.com/futzu/cuei/v1.1.45
+module github.com/futzu/cuei/v1
 
 go 1.19
 
