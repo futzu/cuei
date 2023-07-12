@@ -44,7 +44,8 @@ func (stream *Stream) mkMaps() {
 
 // decode fname (a file name) for SCTE-35
 func (stream *Stream) decode(fname string) []*Cue {
-	streamp := NewStreamParser()
+	stream.Pids = &Pids{}
+	stream.mkMaps()
 	file, err := os.Open(fname)
 	var cues []*Cue
 	Chk(err)
@@ -55,7 +56,7 @@ func (stream *Stream) decode(fname string) []*Cue {
 		if err != nil {
 			break
 		}
-		cues = append(cues, streamp.Parse(buffer)...)
+		cues = append(cues, stream.decodeBytes(buffer)...)
 	}
 	return cues
 }
