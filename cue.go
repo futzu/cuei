@@ -23,7 +23,7 @@ A Cue contains:
 type Cue struct {
 	InfoSection *InfoSection
 	Command     *Command
-	Dll         uint16       // Descriptor Loop Length
+	Dll         uint16       `json:"DescriptorLoopLength"`
 	Descriptors []Descriptor `json:",omitempty"`
 	PacketData  *packetData  `json:",omitempty"`
 	Crc32       uint32
@@ -82,9 +82,9 @@ func (cue *Cue) Encode() []byte {
 	be.AddBytes(isecb, isecbits)
 	cmdbits := uint(cmdl << 3)
 	be.AddBytes(cmdb, cmdbits)
-	be.Add16(0, 16) // descriptor loop currently disabled for encoding
+	be.Add(0, 16) // descriptor loop currently disabled for encoding
 	cue.Crc32 = CRC32(be.Bites.Bytes())
-	be.Add32(cue.Crc32, 32)
+	be.Add(cue.Crc32, 32)
 	return be.Bites.Bytes()
 }
 
