@@ -2,7 +2,6 @@ package cuei
 
 import (
 	"fmt"
-	bitter "github.com/futzu/bitter"
 )
 
 /*
@@ -31,7 +30,7 @@ type Cue struct {
 
 // Decode extracts bits for the Cue values.
 func (cue *Cue) Decode(bites []byte) bool {
-	var bd bitter.Decoder
+	var bd BitDecoder
 	bd.Load(bites)
 	cue.InfoSection = &InfoSection{}
 	if cue.InfoSection.Decode(&bd) {
@@ -46,7 +45,7 @@ func (cue *Cue) Decode(bites []byte) bool {
 }
 
 // DscptrLoop loops over any splice descriptors
-func (cue *Cue) dscptrLoop(dll uint16, bd *bitter.Decoder) {
+func (cue *Cue) dscptrLoop(dll uint16, bd *BitDecoder) {
 	var i uint16
 	i = 0
 	l := dll
@@ -77,7 +76,7 @@ func (cue *Cue) Encode() []byte {
 	// + descriptor loop + 4 for crc
 	cue.InfoSection.SectionLength = uint16(11 + cmdl + 2 + 4)
 	isecb := cue.InfoSection.Encode()
-	be := &bitter.Encoder{}
+	be := &BitEncoder{}
 	isecbits := uint(len(isecb) << 3)
 	be.AddBytes(isecb, isecbits)
 	cmdbits := uint(cmdl << 3)
@@ -158,7 +157,7 @@ func (cue *Cue) Six2Five() string {
 				}
 				if IsIn(segStops, uint16(dscptr.SegmentationTypeID)) {
 					cue.mkSpliceInsert()
-					cue2 :=NewCue() 
+					cue2 := NewCue()
 					cue2.Decode(cue.Encode())
 					return EncB64(cue2.Encode())
 				}
@@ -168,7 +167,6 @@ func (cue *Cue) Six2Five() string {
 	return EncB64(cue.Encode())
 
 }
-
 
 // initialize and return a *Cue
 func NewCue() *Cue {
