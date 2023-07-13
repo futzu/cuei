@@ -5,32 +5,27 @@ import (
 	bitter "github.com/futzu/bitter"
 )
 
+var uriUpids = map[uint8]string{
+	0x01: "Deprecated",
+	0x02: "Deprecated",
+	0x03: "AdID",
+	0x07: "TID",
+	0x08: "AiringID",
+	0x09: "ADI",
+	0x10: "UUID",
+	0x11: "ACR",
+	0x0a: "EIDR",
+	0x0b: "ATSC",
+	0x0c: "MPU",
+	0x0d: "MID",
+	0x0e: "ADS Info",
+	0x0f: "URI",
+}
+
 /*
-*
 Upid is the Struct for Segmentation Upids
 
-		    These UPID types are recognized.
-
-	            0x01: "Deprecated",
-	            0x02: "Deprecated",
-	            0x03: "AdID",
-	            0x05: "ISAN"
-	            0x06: "ISAN"
-	            0x07: "TID",
-	            0x08: "AiringID",
-	            0x09: "ADI",
-	            0x10: "UUID",
-	            0x11: "ACR",
-	            0x0a: "EIDR",
-	            0x0b: "ATSC",
-	            0x0c: "MPU",
-	            0x0d: "MID",
-	            0x0e: "ADS Info",
-	            0x0f: "URI",
-
-		    Non-standard UPID types are returned as bytes.
-
-*
+Non-standard UPID types are returned as bytes.
 */
 type Upid struct {
 	Name             string `json:",omitempty"`
@@ -46,36 +41,18 @@ type Upid struct {
 	PrivateData      []byte `json:",omitempty"`
 }
 
-// Decode Decodes Segmentation UPIDs
+// Decode Upids
 func (upid *Upid) Decode(bd *bitter.Decoder, upidType uint8, upidlen uint8) {
 
 	upid.UpidType = upidType
 
-	var uri_upids = map[uint8]string{
-		0x01: "Deprecated",
-		0x02: "Deprecated",
-		0x03: "AdID",
-		0x07: "TID",
-		0x08: "AiringID",
-		0x09: "ADI",
-		0x10: "UUID",
-		0x11: "ACR",
-		0x0a: "EIDR",
-		0x0b: "ATSC",
-		0x0c: "MPU",
-		0x0d: "MID",
-		0x0e: "ADS Info",
-		0x0f: "URI",
-	}
-
-	name, ok := uri_upids[upidType]
+	name, ok := uriUpids[upidType]
 	if ok {
 		upid.Name = name
 		upid.uri(bd, upidlen)
 	} else {
 
 		switch upidType {
-
 		case 0x05, 0x06:
 			upid.Name = "ISAN"
 			upid.isan(bd, upidlen)
@@ -155,4 +132,21 @@ func (upid *Upid) mid(bd *bitter.Decoder, upidlen uint8) {
 		upid.Decode(bd, utype, ulen)
 		upid.Upids = append(upid.Upids, mupid)
 	}
+}
+
+// Encode Upids
+func (upid *Upid) Encode(be *bitter.Encoder) {
+
+	name, ok := uriUpids[upid.UpidType]
+	if ok {
+		upid.Name = name
+		upid.encodeUri(be)
+	}
+
+}
+
+func (upid *Upid) encodeUri(be *bitter.Encoder) {
+	bites := []byte(upid.Value)
+	bitlen := uint(len(bites) << 3)
+	be.AddBytes(bites, bitlen)
 }
