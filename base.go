@@ -16,13 +16,6 @@ func Chk(e error) {
 	}
 }
 
-// DeB64 decodes base64 strings
-// This is deprecated please use DecB64
-func DeB64(b64 string) []byte {
-	return DecB64(b64)
-
-}
-
 // DecB64 decodes base64 strings.
 func DecB64(b64 string) []byte {
 	deb64, err := base64.StdEncoding.DecodeString(b64)
