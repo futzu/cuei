@@ -302,7 +302,6 @@ func (stream *Stream) mkCue(pid uint16) *Cue {
 	return cue
 }
 
-
 // initialize and return a *Stream
 func NewStream() *Stream {
 	stream := &Stream{}
