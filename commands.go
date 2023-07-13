@@ -1,9 +1,5 @@
 package cuei
 
-import (
-	bitter "github.com/futzu/bitter"
-)
-
 /*
 Command
 
@@ -14,30 +10,29 @@ Command
 	     0x6: Time Signal,
 	     0x7: Bandwidth Reservation,
 	     0xff: Private,
-
 */
 type Command struct {
 	Name                       string
 	CommandType                uint8
 	PrivateBytes               []byte  `json:",omitempty"`
-	Identifier                uint32   `json:",omitempty"`
-	SpliceEventID              uint32   `json:",omitempty"`
-	SpliceEventCancelIndicator bool       `json:",omitempty"`
-	OutOfNetworkIndicator      bool     `json:",omitempty"`
+	Identifier                 uint32  `json:",omitempty"`
+	SpliceEventID              uint32  `json:",omitempty"`
+	SpliceEventCancelIndicator bool    `json:",omitempty"`
+	OutOfNetworkIndicator      bool    `json:",omitempty"`
 	ProgramSpliceFlag          bool    `json:",omitempty"`
-	DurationFlag               bool     `json:",omitempty"`
-	BreakAutoReturn            bool      `json:",omitempty"`
-	BreakDuration              float64  `json:",omitempty"`
-	SpliceImmediateFlag        bool     `json:",omitempty"`
-	UniqueProgramID            uint16   `json:",omitempty"`
+	DurationFlag               bool    `json:",omitempty"`
+	BreakAutoReturn            bool    `json:",omitempty"`
+	BreakDuration              float64 `json:",omitempty"`
+	SpliceImmediateFlag        bool    `json:",omitempty"`
+	UniqueProgramID            uint16  `json:",omitempty"`
 	AvailNum                   uint8   `json:",omitempty"`
-	AvailExpected              uint8    `json:",omitempty"`
-	TimeSpecifiedFlag          bool      `json:",omitempty"`
-	PTS                        float64  `json:",omitempty"`
+	AvailExpected              uint8   `json:",omitempty"`
+	TimeSpecifiedFlag          bool    `json:",omitempty"`
+	PTS                        float64 `json:",omitempty"`
 }
 
 // Decode a Splice Command
-func (cmd *Command) Decode(cmdtype uint8, bd *bitter.Decoder) {
+func (cmd *Command) Decode(cmdtype uint8, bd *BitDecoder) {
 	cmd.CommandType = cmdtype
 	switch cmdtype {
 	case 0x0:
@@ -70,26 +65,26 @@ func (cmd *Command) Encode() []byte {
 }
 
 // bandwidth Reservation
-func (cmd *Command) decodeBandwidthReservation(bd *bitter.Decoder) {
+func (cmd *Command) decodeBandwidthReservation(bd *BitDecoder) {
 	cmd.Name = "Bandwidth Reservation"
 	bd.Forward(0)
 }
 
 // private Command
-func (cmd *Command) decodePrivate(bd *bitter.Decoder) {
+func (cmd *Command) decodePrivate(bd *BitDecoder) {
 	cmd.Name = "Private Command"
 	cmd.Identifier = bd.UInt32(32)
 	cmd.PrivateBytes = bd.Bytes(24)
 }
 
 // splice Null
-func (cmd *Command) decodeSpliceNull(bd *bitter.Decoder) {
+func (cmd *Command) decodeSpliceNull(bd *BitDecoder) {
 	cmd.Name = "Splice Null"
 	bd.Forward(0)
 }
 
 // splice Insert
-func (cmd *Command) decodeSpliceInsert(bd *bitter.Decoder) {
+func (cmd *Command) decodeSpliceInsert(bd *BitDecoder) {
 	cmd.Name = "Splice Insert"
 	cmd.SpliceEventID = bd.UInt32(32)
 	cmd.SpliceEventCancelIndicator = bd.Flag()
@@ -112,7 +107,7 @@ func (cmd *Command) decodeSpliceInsert(bd *bitter.Decoder) {
 
 // encode Splice Insert Splice Command
 func (cmd *Command) encodeSpliceInsert() []byte {
-	be := &bitter.Encoder{}
+	be := &BitEncoder{}
 	be.Add(1, 8) //bumper
 	be.Add(cmd.SpliceEventID, 32)
 	be.Add(cmd.SpliceEventCancelIndicator, 1)
@@ -135,14 +130,14 @@ func (cmd *Command) encodeSpliceInsert() []byte {
 
 }
 
-func (cmd *Command) encodeBreak(be *bitter.Encoder) {
+func (cmd *Command) encodeBreak(be *BitEncoder) {
 	be.Add(cmd.BreakAutoReturn, 1)
 	be.Reserve(6)
 	be.Add(cmd.BreakDuration, 33)
 }
 
 // encode PTS splice times
-func (cmd *Command) encodeSpliceTime(be *bitter.Encoder) {
+func (cmd *Command) encodeSpliceTime(be *BitEncoder) {
 	be.Add(cmd.TimeSpecifiedFlag, 1)
 	if cmd.TimeSpecifiedFlag == true {
 		be.Reserve(6)
@@ -152,13 +147,13 @@ func (cmd *Command) encodeSpliceTime(be *bitter.Encoder) {
 	be.Reserve(7)
 }
 
-func (cmd *Command) parseBreak(bd *bitter.Decoder) {
+func (cmd *Command) parseBreak(bd *BitDecoder) {
 	cmd.BreakAutoReturn = bd.Flag()
 	bd.Forward(6)
 	cmd.BreakDuration = bd.As90k(33)
 }
 
-func (cmd *Command) spliceTime(bd *bitter.Decoder) {
+func (cmd *Command) spliceTime(bd *BitDecoder) {
 	cmd.TimeSpecifiedFlag = bd.Flag()
 	if cmd.TimeSpecifiedFlag {
 		bd.Forward(6)
@@ -169,14 +164,14 @@ func (cmd *Command) spliceTime(bd *bitter.Decoder) {
 }
 
 // decode Time Signal Splice Commands
-func (cmd *Command) decodeTimeSignal(bd *bitter.Decoder) {
+func (cmd *Command) decodeTimeSignal(bd *BitDecoder) {
 	cmd.Name = "Time Signal"
 	cmd.spliceTime(bd)
 }
 
 // encode Time Signal Splice Commands
 func (cmd *Command) encodeTimeSignal() []byte {
-	be := &bitter.Encoder{}
+	be := &BitEncoder{}
 	cmd.encodeSpliceTime(be)
 	return be.Bites.Bytes()
 }
