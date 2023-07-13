@@ -158,10 +158,10 @@ func (cue *Cue) Six2Five() string {
 				}
 				if IsIn(segStops, uint16(dscptr.SegmentationTypeID)) {
 					cue.mkSpliceInsert()
-					return EncB64(cue.Encode())
-
+					cue2 :=NewCue() 
+					cue2.Decode(cue.Encode())
+					return EncB64(cue2.Encode())
 				}
-
 			}
 		}
 	}
