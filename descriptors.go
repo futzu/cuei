@@ -1,9 +1,5 @@
 package cuei
 
-import (
-	bitter "github.com/futzu/bitter"
-)
-
 // audioCmpt is a struct for audioDscptr Components
 type audioCmpt struct {
 	ComponentTag  uint8
@@ -68,7 +64,7 @@ Decode returns a Splice Descriptor by tag.
 
 *
 */
-func (dscptr *Descriptor) Decode(bd *bitter.Decoder, tag uint8, length uint8) {
+func (dscptr *Descriptor) Decode(bd *BitDecoder, tag uint8, length uint8) {
 	switch tag {
 	case 0x0:
 		dscptr.Tag = 0x0
@@ -88,7 +84,7 @@ func (dscptr *Descriptor) Decode(bd *bitter.Decoder, tag uint8, length uint8) {
 	}
 }
 
-func (dscptr *Descriptor) audioDescriptor(bd *bitter.Decoder, tag uint8, length uint8) {
+func (dscptr *Descriptor) audioDescriptor(bd *BitDecoder, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
 	dscptr.Identifier = bd.Ascii(32)
@@ -106,7 +102,7 @@ func (dscptr *Descriptor) audioDescriptor(bd *bitter.Decoder, tag uint8, length 
 }
 
 // Decode for the avail Splice Descriptors
-func (dscptr *Descriptor) availDescriptor(bd *bitter.Decoder, tag uint8, length uint8) {
+func (dscptr *Descriptor) availDescriptor(bd *BitDecoder, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
 	dscptr.Identifier = bd.Ascii(32)
@@ -115,7 +111,7 @@ func (dscptr *Descriptor) availDescriptor(bd *bitter.Decoder, tag uint8, length 
 }
 
 // DTMF Splice Descriptor
-func (dscptr *Descriptor) dtmfDescriptor(bd *bitter.Decoder, tag uint8, length uint8) {
+func (dscptr *Descriptor) dtmfDescriptor(bd *BitDecoder, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
 	dscptr.Identifier = bd.Ascii(32)
@@ -128,7 +124,7 @@ func (dscptr *Descriptor) dtmfDescriptor(bd *bitter.Decoder, tag uint8, length u
 }
 
 // Decode for the Time Descriptor
-func (dscptr *Descriptor) timeDescriptor(bd *bitter.Decoder, tag uint8, length uint8) {
+func (dscptr *Descriptor) timeDescriptor(bd *BitDecoder, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
 	dscptr.Identifier = bd.Ascii(32)
@@ -139,7 +135,7 @@ func (dscptr *Descriptor) timeDescriptor(bd *bitter.Decoder, tag uint8, length u
 }
 
 // Decode for the Segmentation Descriptor
-func (dscptr *Descriptor) segmentationDescriptor(bd *bitter.Decoder, tag uint8, length uint8) {
+func (dscptr *Descriptor) segmentationDescriptor(bd *BitDecoder, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
 	dscptr.Identifier = bd.Ascii(32)
@@ -156,7 +152,7 @@ func (dscptr *Descriptor) segmentationDescriptor(bd *bitter.Decoder, tag uint8, 
 	}
 }
 
-func (dscptr *Descriptor) decodeSegFlags(bd *bitter.Decoder) {
+func (dscptr *Descriptor) decodeSegFlags(bd *BitDecoder) {
 	dscptr.ProgramSegmentationFlag = bd.Flag()
 	dscptr.SegmentationDurationFlag = bd.Flag()
 	dscptr.DeliveryNotRestrictedFlag = bd.Flag()
@@ -170,7 +166,7 @@ func (dscptr *Descriptor) decodeSegFlags(bd *bitter.Decoder) {
 	bd.Forward(5)
 }
 
-func (dscptr *Descriptor) decodeSegCmpnts(bd *bitter.Decoder) {
+func (dscptr *Descriptor) decodeSegCmpnts(bd *BitDecoder) {
 	ccount := bd.UInt8(8)
 	for ccount > 0 { // 6 bytes each
 		ccount--
@@ -181,7 +177,7 @@ func (dscptr *Descriptor) decodeSegCmpnts(bd *bitter.Decoder) {
 	}
 }
 
-func (dscptr *Descriptor) decodeSegmentation(bd *bitter.Decoder) {
+func (dscptr *Descriptor) decodeSegmentation(bd *BitDecoder) {
 	if dscptr.SegmentationDurationFlag {
 		dscptr.SegmentationDuration = bd.As90k(40)
 	}
@@ -207,7 +203,7 @@ func (dscptr *Descriptor) decodeSegmentation(bd *bitter.Decoder) {
 //    Encode a segmentation descriptor
 
 func (dscptr *Descriptor) Encode() []byte {
-	be := &bitter.Encoder{}
+	be := &BitEncoder{}
 	be.AddHex64(dscptr.SegmentationEventID, 32)
 	be.Add(dscptr.SegmentationEventCancelIndicator, 1)
 	be.Reserve(7)
@@ -221,7 +217,7 @@ func (dscptr *Descriptor) Encode() []byte {
 	return be.Bites.Bytes()
 }
 
-func (dscptr *Descriptor) encodeComponents(be *bitter.Encoder) {
+func (dscptr *Descriptor) encodeComponents(be *BitEncoder) {
 	count := uint8(len(dscptr.Components))
 	be.Add(count, 8)
 	cc := uint8(0)
@@ -234,7 +230,7 @@ func (dscptr *Descriptor) encodeComponents(be *bitter.Encoder) {
 	}
 }
 
-func (dscptr *Descriptor) encodeFlags(be *bitter.Encoder) {
+func (dscptr *Descriptor) encodeFlags(be *BitEncoder) {
 	be.Add(dscptr.ProgramSegmentationFlag, 1)
 	be.Add(dscptr.SegmentationDurationFlag, 1)
 	be.Add(dscptr.DeliveryNotRestrictedFlag, 1)
@@ -250,7 +246,7 @@ func (dscptr *Descriptor) encodeFlags(be *bitter.Encoder) {
 	}
 }
 
-func (dscptr *Descriptor) encodeSegmentation(be *bitter.Encoder) {
+func (dscptr *Descriptor) encodeSegmentation(be *BitEncoder) {
 	if dscptr.SegmentationDurationFlag {
 		be.Add(dscptr.SegmentationDuration, 40)
 	}
@@ -268,7 +264,7 @@ func (dscptr *Descriptor) encodeSegmentation(be *bitter.Encoder) {
 	dscptr.encodeSegments(be)
 }
 
-func (dscptr *Descriptor) encodeSegments(be *bitter.Encoder) {
+func (dscptr *Descriptor) encodeSegments(be *BitEncoder) {
 	be.Add(dscptr.SegmentNum, 8)
 	be.Add(dscptr.SegmentsExpected, 8)
 	subSegIDs := []uint16{0x34, 0x36, 0x38, 0x3a}
