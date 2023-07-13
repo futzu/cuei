@@ -1,9 +1,5 @@
 package cuei
 
-import (
-	bitter "github.com/futzu/bitter"
-)
-
 // InfoSection is the splice info section of the SCTE 35 cue.
 type InfoSection struct {
 	Name                   string
@@ -23,7 +19,7 @@ type InfoSection struct {
 }
 
 // Decode Splice Info Section values.
-func (infosec *InfoSection) Decode(bd *bitter.Decoder) bool {
+func (infosec *InfoSection) Decode(bd *BitDecoder) bool {
 	infosec.Name = "Splice Info Section"
 	infosec.TableID = bd.Hex(8)
 	if infosec.TableID != "0xfc" {
@@ -73,7 +69,7 @@ Encodes the InfoSection variables to bytes.
 */
 func (infosec *InfoSection) Encode() []byte {
 	//	infosec.Defaults()
-	be := &bitter.Encoder{}
+	be := &BitEncoder{}
 	be.Add(uint16(0xfc), 16)
 	be.Add(48, 8)
 	be.Add(uint8(infosec.SectionLength), 8)
