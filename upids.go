@@ -2,7 +2,6 @@ package cuei
 
 import (
 	"fmt"
-	bitter "github.com/futzu/bitter"
 )
 
 var uriUpids = map[uint8]string{
@@ -42,7 +41,7 @@ type Upid struct {
 }
 
 // Decode Upids
-func (upid *Upid) Decode(bd *bitter.Decoder, upidType uint8, upidlen uint8) {
+func (upid *Upid) Decode(bd *BitDecoder, upidType uint8, upidlen uint8) {
 
 	upid.UpidType = upidType
 
@@ -79,22 +78,22 @@ func (upid *Upid) Decode(bd *bitter.Decoder, upidType uint8, upidlen uint8) {
 }
 
 // Decode for AirId
-func (upid *Upid) airid(bd *bitter.Decoder, upidlen uint8) {
+func (upid *Upid) airid(bd *BitDecoder, upidlen uint8) {
 	upid.Value = bd.Hex(uint(upidlen << 3))
 }
 
 // Decode for Isan Upid
-func (upid *Upid) isan(bd *bitter.Decoder, upidlen uint8) {
+func (upid *Upid) isan(bd *BitDecoder, upidlen uint8) {
 	upid.Value = bd.Ascii(uint(upidlen << 3))
 }
 
 // Decode for URI Upid
-func (upid *Upid) uri(bd *bitter.Decoder, upidlen uint8) {
+func (upid *Upid) uri(bd *BitDecoder, upidlen uint8) {
 	upid.Value = bd.Ascii(uint(upidlen) << 3)
 }
 
 // Decode for ATSC Upid
-func (upid *Upid) atsc(bd *bitter.Decoder, upidlen uint8) {
+func (upid *Upid) atsc(bd *BitDecoder, upidlen uint8) {
 	upid.TSID = bd.UInt16(16)
 	upid.Reserved = bd.UInt8(2)
 	upid.EndOfDay = bd.UInt8(5)
@@ -103,7 +102,7 @@ func (upid *Upid) atsc(bd *bitter.Decoder, upidlen uint8) {
 }
 
 // Decode for EIDR Upid
-func (upid *Upid) eidr(bd *bitter.Decoder, upidlen uint8) {
+func (upid *Upid) eidr(bd *BitDecoder, upidlen uint8) {
 	if upidlen == 12 {
 		head := bd.UInt64(16)
 		tail := bd.Hex(80)
@@ -112,14 +111,14 @@ func (upid *Upid) eidr(bd *bitter.Decoder, upidlen uint8) {
 }
 
 // Decode for MPU Upid
-func (upid *Upid) mpu(bd *bitter.Decoder, upidlen uint8) {
+func (upid *Upid) mpu(bd *BitDecoder, upidlen uint8) {
 	ulb := uint(upidlen) << 3
 	upid.FormatIdentifier = bd.Hex(32)
 	upid.PrivateData = bd.Bytes(ulb - 32)
 }
 
 // Decode for MID Upid
-func (upid *Upid) mid(bd *bitter.Decoder, upidlen uint8) {
+func (upid *Upid) mid(bd *BitDecoder, upidlen uint8) {
 	var i uint8
 	i = 0
 	for i < upidlen {
@@ -135,7 +134,7 @@ func (upid *Upid) mid(bd *bitter.Decoder, upidlen uint8) {
 }
 
 // Encode Upids
-func (upid *Upid) Encode(be *bitter.Encoder) {
+func (upid *Upid) Encode(be *BitEncoder) {
 
 	name, ok := uriUpids[upid.UpidType]
 	if ok {
@@ -145,7 +144,7 @@ func (upid *Upid) Encode(be *bitter.Encoder) {
 
 }
 
-func (upid *Upid) encodeUri(be *bitter.Encoder) {
+func (upid *Upid) encodeUri(be *BitEncoder) {
 	bites := []byte(upid.Value)
 	bitlen := uint(len(bites) << 3)
 	be.AddBytes(bites, bitlen)
