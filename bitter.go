@@ -2,6 +2,7 @@ package cuei
 
 import (
 	"fmt"
+	"math"
 	"math/big"
 )
 
@@ -28,28 +29,28 @@ func (bd *BitDecoder) Chunk(bitcount uint) *big.Int {
 	return j
 }
 
-// uint8 trims uint64 to 8 bits
+// UInt8 trims uint64 to 8 bits
 func (bd *BitDecoder) UInt8(bitcount uint) uint8 {
 	j := bd.UInt64(bitcount)
 	return uint8(j)
 
 }
 
-// uint16 trims uint64 to 16 bits
+// UInt16 trims uint64 to 16 bits
 func (bd *BitDecoder) UInt16(bitcount uint) uint16 {
 	j := bd.UInt64(bitcount)
 	return uint16(j)
 
 }
 
-// uint32 trims uint64 to 32 bits
+// UInt32 trims uint64 to 32 bits
 func (bd *BitDecoder) UInt32(bitcount uint) uint32 {
 	j := bd.UInt64(bitcount)
 	return uint32(j)
 
 }
 
-// uint64 is a wrapper for Chunk
+// UInt64 is a wrapper for Chunk
 func (bd *BitDecoder) UInt64(bitcount uint) uint64 {
 	j := bd.Chunk(bitcount)
 	return j.Uint64()
@@ -160,7 +161,7 @@ func u64(i interface{}) uint64 {
 	case uint32:
 		return uint64(i.(uint32))
 	case float64:
-		return uint64(i.(float64) * float64(90000.0))
+		return uint64(math.Round(i.(float64) * float64(90000.0)))
 	case bool:
 		if i == true {
 			return uint64(1)
