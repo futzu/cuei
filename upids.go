@@ -134,18 +134,19 @@ func (upid *Upid) mid(bd *BitDecoder, upidlen uint8) {
 }
 
 // Encode Upids
-func (upid *Upid) Encode(be *BitEncoder) {
-
+func (upid *Upid) Encode(upidType uint8) []byte {
+	upid.UpidType = upidType
+	bites := []byte("")
 	name, ok := uriUpids[upid.UpidType]
 	if ok {
 		upid.Name = name
-		upid.encodeUri(be)
+		return upid.encodeUri()
 	}
 
+	return bites
 }
 
-func (upid *Upid) encodeUri(be *BitEncoder) {
+func (upid *Upid) encodeUri() []byte {
 	bites := []byte(upid.Value)
-	bitlen := uint(len(bites) << 3)
-	be.AddBytes(bites, bitlen)
+	return bites
 }
