@@ -25,7 +25,7 @@ type Cue struct {
 	Dll         uint16       `json:"DescriptorLoopLength"`
 	Descriptors []Descriptor `json:",omitempty"`
 	PacketData  *packetData  `json:",omitempty"`
-	Crc32       uint32
+	Crc32       string
 }
 
 // Decode extracts bits for the Cue values.
@@ -38,7 +38,7 @@ func (cue *Cue) Decode(bites []byte) bool {
 		cue.Command.Decode(cue.InfoSection.CommandType, &bd)
 		cue.Dll = bd.UInt16(16)
 		cue.dscptrLoop(cue.Dll, &bd)
-		cue.Crc32 = bd.UInt32(32)
+		cue.Crc32 = bd.Hex(32)
 		return true
 	}
 	return false
@@ -61,6 +61,19 @@ func (cue *Cue) dscptrLoop(dll uint16, bd *BitDecoder) {
 	}
 }
 
+func (cue *Cue) rollLoop() []byte {
+	be := &BitEncoder{}
+	be.Add(1, 8) //bumper
+	for _, dscptr := range cue.Descriptors {
+		be.Add(dscptr.Tag, 8)
+		be.Add(dscptr.Length, 8)
+		be.AddBytes([]byte("CUEI"), 32)
+		dscptr.Encode(be)
+	}
+
+	return be.Bites.Bytes()[1:]
+}
+
 // Show display SCTE-35 data as JSON.
 func (cue *Cue) Show() {
 	fmt.Println(MkJson(&cue))
@@ -68,22 +81,25 @@ func (cue *Cue) Show() {
 
 // Encode Cue currently works for Splice Inserts and Time Signals
 func (cue *Cue) Encode() []byte {
+	dloop := cue.rollLoop()
+	cue.Dll = uint16(len(dloop))
 	cmdb := cue.Command.Encode()
 	cmdl := len(cmdb)
 	cue.InfoSection.CommandLength = uint16(cmdl)
 	cue.InfoSection.CommandType = cue.Command.CommandType
 	// 11 bytes for info section + command + 2 descriptor loop length
 	// + descriptor loop + 4 for crc
-	cue.InfoSection.SectionLength = uint16(11 + cmdl + 2 + 4)
+	cue.InfoSection.SectionLength = uint16(11+cmdl+2+4) + cue.Dll
 	isecb := cue.InfoSection.Encode()
 	be := &BitEncoder{}
 	isecbits := uint(len(isecb) << 3)
 	be.AddBytes(isecb, isecbits)
 	cmdbits := uint(cmdl << 3)
 	be.AddBytes(cmdb, cmdbits)
-	be.Add(0, 16) // descriptor loop currently disabled for encoding
-	cue.Crc32 = CRC32(be.Bites.Bytes())
-	be.Add(cue.Crc32, 32)
+	be.Add(cue.Dll, 16)
+	be.AddBytes(dloop, uint(cue.Dll<<3))
+	cue.Crc32 = fmt.Sprintf("%#x", CRC32(be.Bites.Bytes()))
+	be.AddHex64(cue.Crc32, 32)
 	return be.Bites.Bytes()
 }
 
@@ -152,14 +168,13 @@ func (cue *Cue) Six2Five() string {
 						cue.Command.DurationFlag = true
 						cue.Command.BreakAutoReturn = true
 						cue.Command.BreakDuration = dscptr.SegmentationDuration
-						return EncB64(cue.Encode())
+						//	return EncB64(cue.Encode())
 					}
-				}
-				if IsIn(segStops, uint16(dscptr.SegmentationTypeID)) {
-					cue.mkSpliceInsert()
-					cue2 := NewCue()
-					cue2.Decode(cue.Encode())
-					return EncB64(cue2.Encode())
+				} else {
+					if IsIn(segStops, uint16(dscptr.SegmentationTypeID)) {
+						cue.mkSpliceInsert()
+						//	return EncB64(cue.Encode())
+					}
 				}
 			}
 		}
