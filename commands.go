@@ -94,7 +94,7 @@ func (cmd *Command) decodeSpliceInsert(bd *BitDecoder) {
 	cmd.DurationFlag = bd.Flag()
 	cmd.SpliceImmediateFlag = bd.Flag()
 	bd.Forward(4)
-	if cmd.SpliceImmediateFlag == false {
+	if !cmd.SpliceImmediateFlag {
 		cmd.spliceTime(bd)
 	}
 	if cmd.DurationFlag == true {
@@ -117,10 +117,10 @@ func (cmd *Command) encodeSpliceInsert() []byte {
 	be.Add(cmd.DurationFlag, 1)
 	be.Add(cmd.SpliceImmediateFlag, 1)
 	be.Reserve(4)
-	if cmd.SpliceImmediateFlag == false {
+	if !cmd.SpliceImmediateFlag {
 		cmd.encodeSpliceTime(be)
 	}
-	if cmd.DurationFlag == true {
+	if cmd.DurationFlag {
 		cmd.encodeBreak(be)
 	}
 	be.Add(cmd.UniqueProgramID, 16)
