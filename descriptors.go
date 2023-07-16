@@ -1,5 +1,9 @@
 package cuei
 
+import (
+	"fmt"
+)
+
 // audioCmpt is a struct for audioDscptr Components
 type audioCmpt struct {
 	ComponentTag  uint8
@@ -101,7 +105,7 @@ func (dscptr *Descriptor) audioDescriptor(bd *BitDecoder, tag uint8, length uint
 	}
 }
 
-// Decode for the avail Splice Descriptors
+// Decode for  Avail Descriptors
 func (dscptr *Descriptor) availDescriptor(bd *BitDecoder, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
@@ -145,9 +149,9 @@ func (dscptr *Descriptor) segmentationDescriptor(bd *BitDecoder, tag uint8, leng
 	bd.Forward(7)
 	if !dscptr.SegmentationEventCancelIndicator {
 		dscptr.decodeSegFlags(bd)
-		if !dscptr.ProgramSegmentationFlag {
-			dscptr.decodeSegCmpnts(bd)
-		}
+		//	if !dscptr.ProgramSegmentationFlag {
+		//	dscptr.decodeSegCmpnts(bd)
+		//	}
 		dscptr.decodeSegmentation(bd)
 	}
 }
@@ -200,10 +204,23 @@ func (dscptr *Descriptor) decodeSegmentation(bd *BitDecoder) {
 	}
 }
 
-//    Encode a segmentation descriptor
+func (dscptr *Descriptor) Encode(be *BitEncoder) {
+	switch dscptr.Tag {
+	case 0x2:
+		dscptr.encodeSegmentationDescriptor(be)
+	case 0x0:
+		be.Add(uint32(dscptr.ProviderAvailID), 32)
+	}
+}
 
-func (dscptr *Descriptor) Encode() []byte {
-	be := &BitEncoder{}
+// Encode for Avail Descriptors
+func (dscptr *Descriptor) encodeAvailDescriptor(be *BitEncoder) {
+	fmt.Printf("ProAvailID %v\n", dscptr.ProviderAvailID)
+	be.Add(uint32(dscptr.ProviderAvailID), 32)
+}
+
+// Encode a segmentation descriptor
+func (dscptr *Descriptor) encodeSegmentationDescriptor(be *BitEncoder) {
 	be.AddHex64(dscptr.SegmentationEventID, 32)
 	be.Add(dscptr.SegmentationEventCancelIndicator, 1)
 	be.Reserve(7)
@@ -211,10 +228,9 @@ func (dscptr *Descriptor) Encode() []byte {
 		dscptr.encodeFlags(be)
 		if !dscptr.ProgramSegmentationFlag {
 			dscptr.encodeComponents(be)
-			dscptr.encodeSegmentation(be)
 		}
+		dscptr.encodeSegmentation(be)
 	}
-	return be.Bites.Bytes()
 }
 
 func (dscptr *Descriptor) encodeComponents(be *BitEncoder) {
@@ -248,18 +264,13 @@ func (dscptr *Descriptor) encodeFlags(be *BitEncoder) {
 
 func (dscptr *Descriptor) encodeSegmentation(be *BitEncoder) {
 	if dscptr.SegmentationDurationFlag {
-		be.Add(dscptr.SegmentationDuration, 40)
+		be.Add(float64(dscptr.SegmentationDuration), 40)
 	}
 	be.Add(dscptr.SegmentationUpidType, 8)
 	be.Add(dscptr.SegmentationUpidLength, 8)
-	be.Reserve(int(dscptr.SegmentationUpidLength << 3)) // Cover Upid
-	/*   upidencoder(
-	         nbin,
-	         dscptr.segmentationupidtype,
-	         dscptr.segmentationupidlength,
-	         dscptr.segmentationupid,
-	     )
-	*/
+	//be.Reserve(int(dscptr.SegmentationUpidLength <<3))
+	ubites := dscptr.SegmentationUpid.Encode(dscptr.SegmentationUpidType)
+	be.AddBytes(ubites, uint(len(ubites)<<3))
 	be.Add(dscptr.SegmentationTypeID, 8)
 	dscptr.encodeSegments(be)
 }
