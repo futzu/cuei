@@ -48,8 +48,8 @@ type Descriptor struct {
 	SegmentationUpidLength           uint8       `json:",omitempty"`
 	SegmentationUpid                 *Upid       `json:",omitempty"`
 	SegmentationTypeID               uint8       `json:",omitempty"`
-	SegmentNum                       uint8       `json:",omitempty"`
-	SegmentsExpected                 uint8       `json:",omitempty"`
+	SegmentNum                       uint8       // `json:",omitempty"`
+	SegmentsExpected                 uint8       //  `json:",omitempty"`
 	SubSegmentNum                    uint8       `json:",omitempty"`
 	SubSegmentsExpected              uint8       `json:",omitempty"`
 }
@@ -149,9 +149,9 @@ func (dscptr *Descriptor) segmentationDescriptor(bd *BitDecoder, tag uint8, leng
 	bd.Forward(7)
 	if !dscptr.SegmentationEventCancelIndicator {
 		dscptr.decodeSegFlags(bd)
-		//	if !dscptr.ProgramSegmentationFlag {
-		//	dscptr.decodeSegCmpnts(bd)
-		//	}
+		if !dscptr.ProgramSegmentationFlag {
+			dscptr.decodeSegCmpnts(bd)
+		}
 		dscptr.decodeSegmentation(bd)
 	}
 }
@@ -165,9 +165,9 @@ func (dscptr *Descriptor) decodeSegFlags(bd *BitDecoder) {
 		dscptr.NoRegionalBlackoutFlag = bd.Flag()
 		dscptr.ArchiveAllowedFlag = bd.Flag()
 		dscptr.DeviceRestrictions = table20[bd.UInt8(2)]
-		return
+	} else {
+		bd.Forward(5)
 	}
-	bd.Forward(5)
 }
 
 func (dscptr *Descriptor) decodeSegCmpnts(bd *BitDecoder) {
@@ -187,8 +187,10 @@ func (dscptr *Descriptor) decodeSegmentation(bd *BitDecoder) {
 	}
 	dscptr.SegmentationUpidType = bd.UInt8(8)
 	dscptr.SegmentationUpidLength = bd.UInt8(8)
-	dscptr.SegmentationUpid = &Upid{}
-	dscptr.SegmentationUpid.Decode(bd, dscptr.SegmentationUpidType, dscptr.SegmentationUpidLength)
+	if dscptr.SegmentationUpidLength > 0 {
+		dscptr.SegmentationUpid = &Upid{}
+		dscptr.SegmentationUpid.Decode(bd, dscptr.SegmentationUpidType, dscptr.SegmentationUpidLength)
+	}
 	dscptr.SegmentationTypeID = bd.UInt8(8)
 
 	mesg, ok := table22[dscptr.SegmentationTypeID]
@@ -199,8 +201,10 @@ func (dscptr *Descriptor) decodeSegmentation(bd *BitDecoder) {
 	dscptr.SegmentsExpected = bd.UInt8(8)
 	subSegIDs := []uint16{0x34, 0x36, 0x38, 0x3a}
 	if IsIn(subSegIDs, uint16(dscptr.SegmentationTypeID)) {
-		dscptr.SubSegmentNum = bd.UInt8(8)
-		dscptr.SubSegmentsExpected = bd.UInt8(8)
+		//dscptr.SubSegmentNum = bd.UInt8(8)
+		//dscptr.SubSegmentsExpected = bd.UInt8(8)
+		dscptr.SubSegmentNum = 0
+		dscptr.SubSegmentsExpected = 0
 	}
 }
 
@@ -269,8 +273,9 @@ func (dscptr *Descriptor) encodeSegmentation(be *BitEncoder) {
 	be.Add(dscptr.SegmentationUpidType, 8)
 	be.Add(dscptr.SegmentationUpidLength, 8)
 	//be.Reserve(int(dscptr.SegmentationUpidLength <<3))
-	ubites := dscptr.SegmentationUpid.Encode(dscptr.SegmentationUpidType)
-	be.AddBytes(ubites, uint(len(ubites)<<3))
+	if dscptr.SegmentationUpidLength > 0 {
+		dscptr.SegmentationUpid.Encode(be, dscptr.SegmentationUpidType)
+	}
 	be.Add(dscptr.SegmentationTypeID, 8)
 	dscptr.encodeSegments(be)
 }
@@ -283,4 +288,5 @@ func (dscptr *Descriptor) encodeSegments(be *BitEncoder) {
 		be.Add(dscptr.SubSegmentNum, 8)
 		be.Add(dscptr.SubSegmentsExpected, 8)
 	}
+
 }
