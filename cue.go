@@ -25,7 +25,7 @@ type Cue struct {
 	Dll         uint16       `json:"DescriptorLoopLength"`
 	Descriptors []Descriptor `json:",omitempty"`
 	PacketData  *packetData  `json:",omitempty"`
-	Crc32       string
+	Crc32       uint32
 }
 
 // Decode extracts bits for the Cue values.
@@ -38,7 +38,7 @@ func (cue *Cue) Decode(bites []byte) bool {
 		cue.Command.Decode(cue.InfoSection.CommandType, &bd)
 		cue.Dll = bd.UInt16(16)
 		cue.dscptrLoop(cue.Dll, &bd)
-		cue.Crc32 = bd.Hex(32)
+		cue.Crc32 = bd.UInt32(32)
 		return true
 	}
 	return false
@@ -81,8 +81,6 @@ func (cue *Cue) Show() {
 
 // Encode Cue currently works for Splice Inserts and Time Signals
 func (cue *Cue) Encode() []byte {
-	dloop := cue.rollLoop()
-	cue.Dll = uint16(len(dloop))
 	cmdb := cue.Command.Encode()
 	cmdl := len(cmdb)
 	cue.InfoSection.CommandLength = uint16(cmdl)
@@ -97,9 +95,13 @@ func (cue *Cue) Encode() []byte {
 	cmdbits := uint(cmdl << 3)
 	be.AddBytes(cmdb, cmdbits)
 	be.Add(cue.Dll, 16)
-	be.AddBytes(dloop, uint(cue.Dll<<3))
-	cue.Crc32 = fmt.Sprintf("%#x", CRC32(be.Bites.Bytes()))
-	be.AddHex64(cue.Crc32, 32)
+	if cue.Dll > 6 {
+		dloop := cue.rollLoop()
+		cue.Dll = uint16(len(dloop))
+		be.AddBytes(dloop, uint(cue.Dll<<3))
+	}
+	cue.Crc32 = CRC32(be.Bites.Bytes())
+	be.Add(cue.Crc32, 32)
 	return be.Bites.Bytes()
 }
 
