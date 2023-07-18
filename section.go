@@ -21,20 +21,20 @@ type InfoSection struct {
 // Decode Splice Info Section values.
 func (infosec *InfoSection) Decode(bd *BitDecoder) bool {
 	infosec.Name = "Splice Info Section"
-	infosec.TableID = bd.Hex(8)
+	infosec.TableID = bd.asHex(8)
 	if infosec.TableID != "0xfc" {
 		return false
 	}
-	infosec.SectionSyntaxIndicator = bd.Flag()
-	infosec.Private = bd.Flag()
-	infosec.Reserved = bd.Hex(2)
+	infosec.SectionSyntaxIndicator = bd.asFlag()
+	infosec.Private = bd.asFlag()
+	infosec.Reserved = bd.asHex(2)
 	infosec.SectionLength = bd.uInt16(12)
 	infosec.ProtocolVersion = bd.uInt8(8)
-	infosec.EncryptedPacket = bd.Flag()
+	infosec.EncryptedPacket = bd.asFlag()
 	infosec.EncryptionAlgorithm = bd.uInt8(6)
-	infosec.PtsAdjustment = bd.As90k(33)
-	infosec.CwIndex = bd.Hex(8)
-	infosec.Tier = bd.Hex(12)
+	infosec.PtsAdjustment = bd.as90k(33)
+	infosec.CwIndex = bd.asHex(8)
+	infosec.Tier = bd.asHex(12)
 	infosec.CommandLength = bd.uInt16(12)
 	infosec.CommandType = bd.uInt8(8)
 
@@ -68,6 +68,7 @@ Encodes the InfoSection variables to bytes.
 *
 */
 func (infosec *InfoSection) Encode() []byte {
+	//	infosec.Defaults()
 	be := &BitEncoder{}
 	be.Add(uint16(0xfc), 16)
 	be.Add(48, 8)
