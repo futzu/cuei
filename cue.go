@@ -30,7 +30,7 @@ type Cue struct {
 
 // Decode extracts bits for the Cue values.
 func (cue *Cue) Decode(bites []byte) bool {
-	var bd BitDecoder
+	var bd bitDecoder
 	bd.load(bites)
 	cue.InfoSection = &InfoSection{}
 	if cue.InfoSection.Decode(&bd) {
@@ -45,7 +45,7 @@ func (cue *Cue) Decode(bites []byte) bool {
 }
 
 // DscptrLoop loops over any splice descriptors
-func (cue *Cue) dscptrLoop(dll uint16, bd *BitDecoder) {
+func (cue *Cue) dscptrLoop(dll uint16, bd *bitDecoder) {
 	var i uint16
 	i = 0
 	l := dll
@@ -62,7 +62,7 @@ func (cue *Cue) dscptrLoop(dll uint16, bd *BitDecoder) {
 }
 
 func (cue *Cue) rollLoop() []byte {
-	be := &BitEncoder{}
+	be := &bitEncoder{}
 	be.Add(1, 8) //bumper
 	for _, dscptr := range cue.Descriptors {
 		be.Add(dscptr.Tag, 8)
@@ -89,7 +89,7 @@ func (cue *Cue) Encode() []byte {
 	// + descriptor loop + 4 for crc
 	cue.InfoSection.SectionLength = uint16(11+cmdl+2+4) + cue.Dll
 	isecb := cue.InfoSection.Encode()
-	be := &BitEncoder{}
+	be := &bitEncoder{}
 	isecbits := uint(len(isecb) << 3)
 	be.AddBytes(isecb, isecbits)
 	cmdbits := uint(cmdl << 3)
@@ -100,7 +100,7 @@ func (cue *Cue) Encode() []byte {
 		cue.Dll = uint16(len(dloop))
 		be.AddBytes(dloop, uint(cue.Dll<<3))
 	}
-	cue.Crc32 = CRC32(be.Bites.Bytes())
+	cue.Crc32 = cRC32(be.Bites.Bytes())
 	be.Add(cue.Crc32, 32)
 	return be.Bites.Bytes()
 }
@@ -162,8 +162,8 @@ func (cue *Cue) Six2Five() string {
 		for _, dscptr := range cue.Descriptors {
 			if dscptr.Tag == 2 {
 				//value, _ := strconv.ParseInt(hex, 16, 64)
-				cue.Command.SpliceEventID = uint32(Hex2Int(dscptr.SegmentationEventID))
-				if IsIn(segStarts, uint16(dscptr.SegmentationTypeID)) {
+				cue.Command.SpliceEventID = uint32(hex2Int(dscptr.SegmentationEventID))
+				if isIn(segStarts, uint16(dscptr.SegmentationTypeID)) {
 					if dscptr.SegmentationDurationFlag {
 						cue.mkSpliceInsert()
 						cue.Command.OutOfNetworkIndicator = true
@@ -173,7 +173,7 @@ func (cue *Cue) Six2Five() string {
 						//	return EncB64(cue.Encode())
 					}
 				} else {
-					if IsIn(segStops, uint16(dscptr.SegmentationTypeID)) {
+					if isIn(segStops, uint16(dscptr.SegmentationTypeID)) {
 						cue.mkSpliceInsert()
 						//	return EncB64(cue.Encode())
 					}
