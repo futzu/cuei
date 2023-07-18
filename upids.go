@@ -41,7 +41,7 @@ type Upid struct {
 }
 
 // Decode Upids
-func (upid *Upid) Decode(bd *BitDecoder, upidType uint8, upidlen uint8) {
+func (upid *Upid) Decode(bd *bitDecoder, upidType uint8, upidlen uint8) {
 
 	upid.UpidType = upidType
 
@@ -78,22 +78,22 @@ func (upid *Upid) Decode(bd *BitDecoder, upidType uint8, upidlen uint8) {
 }
 
 // Decode for AirId
-func (upid *Upid) airid(bd *BitDecoder, upidlen uint8) {
+func (upid *Upid) airid(bd *bitDecoder, upidlen uint8) {
 	upid.Value = bd.asHex(uint(upidlen << 3))
 }
 
 // Decode for Isan Upid
-func (upid *Upid) isan(bd *BitDecoder, upidlen uint8) {
+func (upid *Upid) isan(bd *bitDecoder, upidlen uint8) {
 	upid.Value = bd.asAscii(uint(upidlen << 3))
 }
 
 // Decode for URI Upid
-func (upid *Upid) uri(bd *BitDecoder, upidlen uint8) {
+func (upid *Upid) uri(bd *bitDecoder, upidlen uint8) {
 	upid.Value = bd.asAscii(uint(upidlen) << 3)
 }
 
 // Decode for ATSC Upid
-func (upid *Upid) atsc(bd *BitDecoder, upidlen uint8) {
+func (upid *Upid) atsc(bd *bitDecoder, upidlen uint8) {
 	upid.TSID = bd.uInt16(16)
 	upid.Reserved = bd.uInt8(2)
 	upid.EndOfDay = bd.uInt8(5)
@@ -102,7 +102,7 @@ func (upid *Upid) atsc(bd *BitDecoder, upidlen uint8) {
 }
 
 // Decode for EIDR Upid
-func (upid *Upid) eidr(bd *BitDecoder, upidlen uint8) {
+func (upid *Upid) eidr(bd *bitDecoder, upidlen uint8) {
 	if upidlen == 12 {
 		head := bd.uInt64(16)
 		tail := bd.asHex(80)
@@ -111,14 +111,14 @@ func (upid *Upid) eidr(bd *BitDecoder, upidlen uint8) {
 }
 
 // Decode for MPU Upid
-func (upid *Upid) mpu(bd *BitDecoder, upidlen uint8) {
+func (upid *Upid) mpu(bd *bitDecoder, upidlen uint8) {
 	ulb := uint(upidlen) << 3
 	upid.FormatIdentifier = bd.asHex(32)
 	upid.PrivateData = bd.asBytes(ulb - 32)
 }
 
 // Decode for MID Upid
-func (upid *Upid) mid(bd *BitDecoder, upidlen uint8) {
+func (upid *Upid) mid(bd *bitDecoder, upidlen uint8) {
 	var i uint8
 	i = 0
 	for i < upidlen {
@@ -134,7 +134,7 @@ func (upid *Upid) mid(bd *BitDecoder, upidlen uint8) {
 }
 
 // Encode Upids
-func (upid *Upid) Encode(be *BitEncoder, upidType uint8) {
+func (upid *Upid) Encode(be *bitEncoder, upidType uint8) {
 	upid.UpidType = upidType
 	name, ok := uriUpids[upid.UpidType]
 	if ok {
@@ -144,7 +144,7 @@ func (upid *Upid) Encode(be *BitEncoder, upidType uint8) {
 
 }
 
-func (upid *Upid) encodeUri(be *BitEncoder) {
+func (upid *Upid) encodeUri(be *bitEncoder) {
 	if len(upid.Value) > 0 {
 		be.AddBytes([]byte(upid.Value), uint(len(upid.Value)<<3))
 	}
