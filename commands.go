@@ -73,7 +73,7 @@ func (cmd *Command) decodeBandwidthReservation(bd *BitDecoder) {
 // private Command
 func (cmd *Command) decodePrivate(bd *BitDecoder) {
 	cmd.Name = "Private Command"
-	cmd.Identifier = bd.UInt32(32)
+	cmd.Identifier = bd.uInt32(32)
 	cmd.PrivateBytes = bd.Bytes(24)
 }
 
@@ -86,7 +86,7 @@ func (cmd *Command) decodeSpliceNull(bd *BitDecoder) {
 // splice Insert
 func (cmd *Command) decodeSpliceInsert(bd *BitDecoder) {
 	cmd.Name = "Splice Insert"
-	cmd.SpliceEventID = bd.UInt32(32)
+	cmd.SpliceEventID = bd.uInt32(32)
 	cmd.SpliceEventCancelIndicator = bd.Flag()
 	bd.Forward(7)
 	cmd.OutOfNetworkIndicator = bd.Flag()
@@ -100,9 +100,9 @@ func (cmd *Command) decodeSpliceInsert(bd *BitDecoder) {
 	if cmd.DurationFlag == true {
 		cmd.parseBreak(bd)
 	}
-	cmd.UniqueProgramID = bd.UInt16(16)
-	cmd.AvailNum = bd.UInt8(8)
-	cmd.AvailExpected = bd.UInt8(8)
+	cmd.UniqueProgramID = bd.uInt16(16)
+	cmd.AvailNum = bd.uInt8(8)
+	cmd.AvailExpected = bd.uInt8(8)
 }
 
 // encode Splice Insert Splice Command
