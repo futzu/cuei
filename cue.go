@@ -36,9 +36,9 @@ func (cue *Cue) Decode(bites []byte) bool {
 	if cue.InfoSection.Decode(&bd) {
 		cue.Command = &Command{}
 		cue.Command.Decode(cue.InfoSection.CommandType, &bd)
-		cue.Dll = bd.UInt16(16)
+		cue.Dll = bd.uInt16(16)
 		cue.dscptrLoop(cue.Dll, &bd)
-		cue.Crc32 = bd.UInt32(32)
+		cue.Crc32 = bd.uInt32(32)
 		return true
 	}
 	return false
@@ -50,9 +50,9 @@ func (cue *Cue) dscptrLoop(dll uint16, bd *BitDecoder) {
 	i = 0
 	l := dll
 	for i < l {
-		tag := bd.UInt8(8)
+		tag := bd.uInt8(8)
 		i++
-		length := bd.UInt16(8)
+		length := bd.uInt16(8)
 		i++
 		i += length
 		var sdr Descriptor
