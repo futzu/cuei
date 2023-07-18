@@ -32,7 +32,7 @@ type Command struct {
 }
 
 // Decode a Splice Command
-func (cmd *Command) Decode(cmdtype uint8, bd *BitDecoder) {
+func (cmd *Command) Decode(cmdtype uint8, bd *bitDecoder) {
 	cmd.CommandType = cmdtype
 	switch cmdtype {
 	case 0x0:
@@ -65,26 +65,26 @@ func (cmd *Command) Encode() []byte {
 }
 
 // bandwidth Reservation
-func (cmd *Command) decodeBandwidthReservation(bd *BitDecoder) {
+func (cmd *Command) decodeBandwidthReservation(bd *bitDecoder) {
 	cmd.Name = "Bandwidth Reservation"
 	bd.goForward(0)
 }
 
 // private Command
-func (cmd *Command) decodePrivate(bd *BitDecoder) {
+func (cmd *Command) decodePrivate(bd *bitDecoder) {
 	cmd.Name = "Private Command"
 	cmd.Identifier = bd.uInt32(32)
 	cmd.PrivateBytes = bd.asBytes(24)
 }
 
 // splice Null
-func (cmd *Command) decodeSpliceNull(bd *BitDecoder) {
+func (cmd *Command) decodeSpliceNull(bd *bitDecoder) {
 	cmd.Name = "Splice Null"
 	bd.goForward(0)
 }
 
 // splice Insert
-func (cmd *Command) decodeSpliceInsert(bd *BitDecoder) {
+func (cmd *Command) decodeSpliceInsert(bd *bitDecoder) {
 	cmd.Name = "Splice Insert"
 	cmd.SpliceEventID = bd.uInt32(32)
 	cmd.SpliceEventCancelIndicator = bd.asFlag()
@@ -107,7 +107,7 @@ func (cmd *Command) decodeSpliceInsert(bd *BitDecoder) {
 
 // encode Splice Insert Splice Command
 func (cmd *Command) encodeSpliceInsert() []byte {
-	be := &BitEncoder{}
+	be := &bitEncoder{}
 	be.Add(1, 8) //bumper
 	be.Add(cmd.SpliceEventID, 32)
 	be.Add(cmd.SpliceEventCancelIndicator, 1)
@@ -130,14 +130,14 @@ func (cmd *Command) encodeSpliceInsert() []byte {
 
 }
 
-func (cmd *Command) encodeBreak(be *BitEncoder) {
+func (cmd *Command) encodeBreak(be *bitEncoder) {
 	be.Add(cmd.BreakAutoReturn, 1)
 	be.Reserve(6)
 	be.Add(cmd.BreakDuration, 33)
 }
 
 // encode PTS splice times
-func (cmd *Command) encodeSpliceTime(be *BitEncoder) {
+func (cmd *Command) encodeSpliceTime(be *bitEncoder) {
 	be.Add(cmd.TimeSpecifiedFlag, 1)
 	if cmd.TimeSpecifiedFlag == true {
 		be.Reserve(6)
@@ -147,13 +147,13 @@ func (cmd *Command) encodeSpliceTime(be *BitEncoder) {
 	be.Reserve(7)
 }
 
-func (cmd *Command) parseBreak(bd *BitDecoder) {
+func (cmd *Command) parseBreak(bd *bitDecoder) {
 	cmd.BreakAutoReturn = bd.asFlag()
 	bd.goForward(6)
 	cmd.BreakDuration = bd.as90k(33)
 }
 
-func (cmd *Command) spliceTime(bd *BitDecoder) {
+func (cmd *Command) spliceTime(bd *bitDecoder) {
 	cmd.TimeSpecifiedFlag = bd.asFlag()
 	if cmd.TimeSpecifiedFlag {
 		bd.goForward(6)
@@ -164,14 +164,14 @@ func (cmd *Command) spliceTime(bd *BitDecoder) {
 }
 
 // decode Time Signal Splice Commands
-func (cmd *Command) decodeTimeSignal(bd *BitDecoder) {
+func (cmd *Command) decodeTimeSignal(bd *bitDecoder) {
 	cmd.Name = "Time Signal"
 	cmd.spliceTime(bd)
 }
 
 // encode Time Signal Splice Commands
 func (cmd *Command) encodeTimeSignal() []byte {
-	be := &BitEncoder{}
+	be := &bitEncoder{}
 	cmd.encodeSpliceTime(be)
 	return be.Bites.Bytes()
 }
