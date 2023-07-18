@@ -28,15 +28,15 @@ func (infosec *InfoSection) Decode(bd *BitDecoder) bool {
 	infosec.SectionSyntaxIndicator = bd.Flag()
 	infosec.Private = bd.Flag()
 	infosec.Reserved = bd.Hex(2)
-	infosec.SectionLength = bd.UInt16(12)
-	infosec.ProtocolVersion = bd.UInt8(8)
+	infosec.SectionLength = bd.uInt16(12)
+	infosec.ProtocolVersion = bd.uInt8(8)
 	infosec.EncryptedPacket = bd.Flag()
-	infosec.EncryptionAlgorithm = bd.UInt8(6)
+	infosec.EncryptionAlgorithm = bd.uInt8(6)
 	infosec.PtsAdjustment = bd.As90k(33)
 	infosec.CwIndex = bd.Hex(8)
 	infosec.Tier = bd.Hex(12)
-	infosec.CommandLength = bd.UInt16(12)
-	infosec.CommandType = bd.UInt8(8)
+	infosec.CommandLength = bd.uInt16(12)
+	infosec.CommandType = bd.uInt8(8)
 
 	return true
 }
@@ -68,7 +68,6 @@ Encodes the InfoSection variables to bytes.
 *
 */
 func (infosec *InfoSection) Encode() []byte {
-	//	infosec.Defaults()
 	be := &BitEncoder{}
 	be.Add(uint16(0xfc), 16)
 	be.Add(48, 8)
