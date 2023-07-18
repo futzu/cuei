@@ -67,33 +67,33 @@ func (cmd *Command) Encode() []byte {
 // bandwidth Reservation
 func (cmd *Command) decodeBandwidthReservation(bd *BitDecoder) {
 	cmd.Name = "Bandwidth Reservation"
-	bd.Forward(0)
+	bd.goForward(0)
 }
 
 // private Command
 func (cmd *Command) decodePrivate(bd *BitDecoder) {
 	cmd.Name = "Private Command"
 	cmd.Identifier = bd.uInt32(32)
-	cmd.PrivateBytes = bd.Bytes(24)
+	cmd.PrivateBytes = bd.asBytes(24)
 }
 
 // splice Null
 func (cmd *Command) decodeSpliceNull(bd *BitDecoder) {
 	cmd.Name = "Splice Null"
-	bd.Forward(0)
+	bd.goForward(0)
 }
 
 // splice Insert
 func (cmd *Command) decodeSpliceInsert(bd *BitDecoder) {
 	cmd.Name = "Splice Insert"
 	cmd.SpliceEventID = bd.uInt32(32)
-	cmd.SpliceEventCancelIndicator = bd.Flag()
-	bd.Forward(7)
-	cmd.OutOfNetworkIndicator = bd.Flag()
-	cmd.ProgramSpliceFlag = bd.Flag()
-	cmd.DurationFlag = bd.Flag()
-	cmd.SpliceImmediateFlag = bd.Flag()
-	bd.Forward(4)
+	cmd.SpliceEventCancelIndicator = bd.asFlag()
+	bd.goForward(7)
+	cmd.OutOfNetworkIndicator = bd.asFlag()
+	cmd.ProgramSpliceFlag = bd.asFlag()
+	cmd.DurationFlag = bd.asFlag()
+	cmd.SpliceImmediateFlag = bd.asFlag()
+	bd.goForward(4)
 	if !cmd.SpliceImmediateFlag {
 		cmd.spliceTime(bd)
 	}
@@ -148,18 +148,18 @@ func (cmd *Command) encodeSpliceTime(be *BitEncoder) {
 }
 
 func (cmd *Command) parseBreak(bd *BitDecoder) {
-	cmd.BreakAutoReturn = bd.Flag()
-	bd.Forward(6)
-	cmd.BreakDuration = bd.As90k(33)
+	cmd.BreakAutoReturn = bd.asFlag()
+	bd.goForward(6)
+	cmd.BreakDuration = bd.as90k(33)
 }
 
 func (cmd *Command) spliceTime(bd *BitDecoder) {
-	cmd.TimeSpecifiedFlag = bd.Flag()
+	cmd.TimeSpecifiedFlag = bd.asFlag()
 	if cmd.TimeSpecifiedFlag {
-		bd.Forward(6)
-		cmd.PTS = bd.As90k(33)
+		bd.goForward(6)
+		cmd.PTS = bd.as90k(33)
 	} else {
-		bd.Forward(7)
+		bd.goForward(7)
 	}
 }
 
