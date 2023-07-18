@@ -68,7 +68,7 @@ Decode returns a Splice Descriptor by tag.
 
 *
 */
-func (dscptr *Descriptor) Decode(bd *BitDecoder, tag uint8, length uint8) {
+func (dscptr *Descriptor) Decode(bd *bitDecoder, tag uint8, length uint8) {
 	switch tag {
 	case 0x0:
 		dscptr.Tag = 0x0
@@ -88,7 +88,7 @@ func (dscptr *Descriptor) Decode(bd *BitDecoder, tag uint8, length uint8) {
 	}
 }
 
-func (dscptr *Descriptor) audioDescriptor(bd *BitDecoder, tag uint8, length uint8) {
+func (dscptr *Descriptor) audioDescriptor(bd *bitDecoder, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
 	dscptr.Identifier = bd.asAscii(32)
@@ -106,7 +106,7 @@ func (dscptr *Descriptor) audioDescriptor(bd *BitDecoder, tag uint8, length uint
 }
 
 // Decode for  Avail Descriptors
-func (dscptr *Descriptor) availDescriptor(bd *BitDecoder, tag uint8, length uint8) {
+func (dscptr *Descriptor) availDescriptor(bd *bitDecoder, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
 	dscptr.Identifier = bd.asAscii(32)
@@ -115,7 +115,7 @@ func (dscptr *Descriptor) availDescriptor(bd *BitDecoder, tag uint8, length uint
 }
 
 // DTMF Splice Descriptor
-func (dscptr *Descriptor) dtmfDescriptor(bd *BitDecoder, tag uint8, length uint8) {
+func (dscptr *Descriptor) dtmfDescriptor(bd *bitDecoder, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
 	dscptr.Identifier = bd.asAscii(32)
@@ -128,7 +128,7 @@ func (dscptr *Descriptor) dtmfDescriptor(bd *BitDecoder, tag uint8, length uint8
 }
 
 // Decode for the Time Descriptor
-func (dscptr *Descriptor) timeDescriptor(bd *BitDecoder, tag uint8, length uint8) {
+func (dscptr *Descriptor) timeDescriptor(bd *bitDecoder, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
 	dscptr.Identifier = bd.asAscii(32)
@@ -139,7 +139,7 @@ func (dscptr *Descriptor) timeDescriptor(bd *BitDecoder, tag uint8, length uint8
 }
 
 // Decode for the Segmentation Descriptor
-func (dscptr *Descriptor) segmentationDescriptor(bd *BitDecoder, tag uint8, length uint8) {
+func (dscptr *Descriptor) segmentationDescriptor(bd *bitDecoder, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
 	dscptr.Identifier = bd.asAscii(32)
@@ -156,7 +156,7 @@ func (dscptr *Descriptor) segmentationDescriptor(bd *BitDecoder, tag uint8, leng
 	}
 }
 
-func (dscptr *Descriptor) decodeSegFlags(bd *BitDecoder) {
+func (dscptr *Descriptor) decodeSegFlags(bd *bitDecoder) {
 	dscptr.ProgramSegmentationFlag = bd.asFlag()
 	dscptr.SegmentationDurationFlag = bd.asFlag()
 	dscptr.DeliveryNotRestrictedFlag = bd.asFlag()
@@ -170,7 +170,7 @@ func (dscptr *Descriptor) decodeSegFlags(bd *BitDecoder) {
 	}
 }
 
-func (dscptr *Descriptor) decodeSegCmpnts(bd *BitDecoder) {
+func (dscptr *Descriptor) decodeSegCmpnts(bd *bitDecoder) {
 	ccount := bd.uInt8(8)
 	for ccount > 0 { // 6 bytes each
 		ccount--
@@ -181,7 +181,7 @@ func (dscptr *Descriptor) decodeSegCmpnts(bd *BitDecoder) {
 	}
 }
 
-func (dscptr *Descriptor) decodeSegmentation(bd *BitDecoder) {
+func (dscptr *Descriptor) decodeSegmentation(bd *bitDecoder) {
 	if dscptr.SegmentationDurationFlag {
 		dscptr.SegmentationDuration = bd.as90k(40)
 	}
@@ -200,7 +200,7 @@ func (dscptr *Descriptor) decodeSegmentation(bd *BitDecoder) {
 	dscptr.SegmentNum = bd.uInt8(8)
 	dscptr.SegmentsExpected = bd.uInt8(8)
 	subSegIDs := []uint16{0x34, 0x36, 0x38, 0x3a}
-	if IsIn(subSegIDs, uint16(dscptr.SegmentationTypeID)) {
+	if isIn(subSegIDs, uint16(dscptr.SegmentationTypeID)) {
 		//dscptr.SubSegmentNum = bd.uInt8(8)
 		//dscptr.SubSegmentsExpected = bd.uInt8(8)
 		dscptr.SubSegmentNum = 0
@@ -208,7 +208,7 @@ func (dscptr *Descriptor) decodeSegmentation(bd *BitDecoder) {
 	}
 }
 
-func (dscptr *Descriptor) Encode(be *BitEncoder) {
+func (dscptr *Descriptor) Encode(be *bitEncoder) {
 	switch dscptr.Tag {
 	case 0x2:
 		dscptr.encodeSegmentationDescriptor(be)
@@ -218,13 +218,13 @@ func (dscptr *Descriptor) Encode(be *BitEncoder) {
 }
 
 // Encode for Avail Descriptors
-func (dscptr *Descriptor) encodeAvailDescriptor(be *BitEncoder) {
+func (dscptr *Descriptor) encodeAvailDescriptor(be *bitEncoder) {
 	fmt.Printf("ProAvailID %v\n", dscptr.ProviderAvailID)
 	be.Add(uint32(dscptr.ProviderAvailID), 32)
 }
 
 // Encode a segmentation descriptor
-func (dscptr *Descriptor) encodeSegmentationDescriptor(be *BitEncoder) {
+func (dscptr *Descriptor) encodeSegmentationDescriptor(be *bitEncoder) {
 	be.AddHex64(dscptr.SegmentationEventID, 32)
 	be.Add(dscptr.SegmentationEventCancelIndicator, 1)
 	be.Reserve(7)
@@ -237,7 +237,7 @@ func (dscptr *Descriptor) encodeSegmentationDescriptor(be *BitEncoder) {
 	}
 }
 
-func (dscptr *Descriptor) encodeComponents(be *BitEncoder) {
+func (dscptr *Descriptor) encodeComponents(be *bitEncoder) {
 	count := uint8(len(dscptr.Components))
 	be.Add(count, 8)
 	cc := uint8(0)
@@ -250,7 +250,7 @@ func (dscptr *Descriptor) encodeComponents(be *BitEncoder) {
 	}
 }
 
-func (dscptr *Descriptor) encodeFlags(be *BitEncoder) {
+func (dscptr *Descriptor) encodeFlags(be *bitEncoder) {
 	be.Add(dscptr.ProgramSegmentationFlag, 1)
 	be.Add(dscptr.SegmentationDurationFlag, 1)
 	be.Add(dscptr.DeliveryNotRestrictedFlag, 1)
@@ -266,7 +266,7 @@ func (dscptr *Descriptor) encodeFlags(be *BitEncoder) {
 	}
 }
 
-func (dscptr *Descriptor) encodeSegmentation(be *BitEncoder) {
+func (dscptr *Descriptor) encodeSegmentation(be *bitEncoder) {
 	if dscptr.SegmentationDurationFlag {
 		be.Add(float64(dscptr.SegmentationDuration), 40)
 	}
@@ -280,11 +280,11 @@ func (dscptr *Descriptor) encodeSegmentation(be *BitEncoder) {
 	dscptr.encodeSegments(be)
 }
 
-func (dscptr *Descriptor) encodeSegments(be *BitEncoder) {
+func (dscptr *Descriptor) encodeSegments(be *bitEncoder) {
 	be.Add(dscptr.SegmentNum, 8)
 	be.Add(dscptr.SegmentsExpected, 8)
 	subSegIDs := []uint16{0x34, 0x36, 0x38, 0x3a}
-	if IsIn(subSegIDs, uint16(dscptr.SegmentationTypeID)) {
+	if isIn(subSegIDs, uint16(dscptr.SegmentationTypeID)) {
 		be.Add(dscptr.SubSegmentNum, 8)
 		be.Add(dscptr.SubSegmentsExpected, 8)
 	}
