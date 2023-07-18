@@ -8,8 +8,8 @@ import (
 	"math/big"
 )
 
-// Chk generic catchall error checking
-func Chk(e error) {
+// chk generic catchall error checking
+func chk(e error) {
 	if e != nil {
 		fmt.Println(e)
 
@@ -19,7 +19,7 @@ func Chk(e error) {
 // DecB64 decodes base64 strings.
 func DecB64(b64 string) []byte {
 	deb64, err := base64.StdEncoding.DecodeString(b64)
-	Chk(err)
+	chk(err)
 	return deb64
 }
 
@@ -29,16 +29,16 @@ func EncB64(data []byte) string {
 	return b64
 }
 
-// Hex2Int Hexidecimal string to uint64
-func Hex2Int(str string) uint64 {
+// hex2Int Hexidecimal string to uint64
+func hex2Int(str string) uint64 {
 	i := new(big.Int)
 	_, err := fmt.Sscan(str, i)
-	Chk(err)
+	chk(err)
 	return i.Uint64()
 }
 
-// IsIn is a test for slice membership
-func IsIn(slice []uint16, val uint16) bool {
+// isIn is a test for slice membership
+func isIn(slice []uint16, val uint16) bool {
 	for _, item := range slice {
 		if item == val {
 			return true
@@ -55,7 +55,7 @@ func mk90k(raw uint64) float64 {
 // MkJson structs to JSON
 func MkJson(i interface{}) string {
 	jason, err := json.MarshalIndent(&i, "", "    ")
-	Chk(err)
+	chk(err)
 	return string(jason)
 }
 
