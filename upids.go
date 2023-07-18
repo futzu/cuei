@@ -84,27 +84,27 @@ func (upid *Upid) airid(bd *BitDecoder, upidlen uint8) {
 
 // Decode for Isan Upid
 func (upid *Upid) isan(bd *BitDecoder, upidlen uint8) {
-	upid.Value = bd.Ascii(uint(upidlen << 3))
+	upid.Value = bd.ascii(uint(upidlen << 3))
 }
 
 // Decode for URI Upid
 func (upid *Upid) uri(bd *BitDecoder, upidlen uint8) {
-	upid.Value = bd.Ascii(uint(upidlen) << 3)
+	upid.Value = bd.ascii(uint(upidlen) << 3)
 }
 
 // Decode for ATSC Upid
 func (upid *Upid) atsc(bd *BitDecoder, upidlen uint8) {
-	upid.TSID = bd.UInt16(16)
-	upid.Reserved = bd.UInt8(2)
-	upid.EndOfDay = bd.UInt8(5)
-	upid.UniqueFor = bd.UInt16(9)
+	upid.TSID = bd.uInt16(16)
+	upid.Reserved = bd.uInt8(2)
+	upid.EndOfDay = bd.uInt8(5)
+	upid.UniqueFor = bd.uInt16(9)
 	upid.ContentID = bd.Bytes(uint((upidlen - 4) << 3))
 }
 
 // Decode for EIDR Upid
 func (upid *Upid) eidr(bd *BitDecoder, upidlen uint8) {
 	if upidlen == 12 {
-		head := bd.UInt64(16)
+		head := bd.uInt64(16)
 		tail := bd.Hex(80)
 		upid.Value = fmt.Sprintf("10%v/%v", head, tail)
 	}
@@ -122,9 +122,9 @@ func (upid *Upid) mid(bd *BitDecoder, upidlen uint8) {
 	var i uint8
 	i = 0
 	for i < upidlen {
-		utype := bd.UInt8(8)
+		utype := bd.uInt8(8)
 		i++
-		ulen := bd.UInt8(8)
+		ulen := bd.uInt8(8)
 		i++
 		i += ulen
 		var mupid Upid
