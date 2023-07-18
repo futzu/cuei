@@ -7,13 +7,13 @@ import (
 )
 
 // Decoder converts bytes to a list of bits.
-type BitDecoder struct {
+type bitDecoder struct {
 	idx  uint
 	bits string
 }
 
 // Load raw bytes and convert to bits
-func (bd *BitDecoder) load(bites []byte) {
+func (bd *bitDecoder) load(bites []byte) {
 	i := new(big.Int)
 	i.SetBytes(bites)
 	bd.bits = fmt.Sprintf("%b", i)
@@ -21,7 +21,7 @@ func (bd *BitDecoder) load(bites []byte) {
 }
 
 // chunk slices bitcount of bits and returns it as a uint64
-func (bd *BitDecoder) chunk(bitcount uint) *big.Int {
+func (bd *bitDecoder) chunk(bitcount uint) *big.Int {
 	j := new(big.Int)
 	d := bd.idx + bitcount
 	j.SetString(bd.bits[bd.idx:d], 2)
@@ -30,35 +30,35 @@ func (bd *BitDecoder) chunk(bitcount uint) *big.Int {
 }
 
 // uInt8 trims uint64 to 8 bits
-func (bd *BitDecoder) uInt8(bitcount uint) uint8 {
+func (bd *bitDecoder) uInt8(bitcount uint) uint8 {
 	j := bd.uInt64(bitcount)
 	return uint8(j)
 
 }
 
 // uInt16 trims uint64 to 16 bits
-func (bd *BitDecoder) uInt16(bitcount uint) uint16 {
+func (bd *bitDecoder) uInt16(bitcount uint) uint16 {
 	j := bd.uInt64(bitcount)
 	return uint16(j)
 
 }
 
 // uInt32 trims uint64 to 32 bits
-func (bd *BitDecoder) uInt32(bitcount uint) uint32 {
+func (bd *bitDecoder) uInt32(bitcount uint) uint32 {
 	j := bd.uInt64(bitcount)
 	return uint32(j)
 
 }
 
 // uInt64 is a wrapper for chunk
-func (bd *BitDecoder) uInt64(bitcount uint) uint64 {
+func (bd *bitDecoder) uInt64(bitcount uint) uint64 {
 	j := bd.chunk(bitcount)
 	return j.Uint64()
 
 }
 
 // asFlag slices 1 bit and returns true for 1 , false for 0
-func (bd *BitDecoder) asFlag() bool {
+func (bd *bitDecoder) asFlag() bool {
 	var bitcount uint
 	bitcount = 1
 	j := bd.uInt64(bitcount)
@@ -66,47 +66,47 @@ func (bd *BitDecoder) asFlag() bool {
 }
 
 // asFloat slices bitcount of bits and returns  float64
-func (bd *BitDecoder) asFloat(bitcount uint) float64 {
+func (bd *bitDecoder) asFloat(bitcount uint) float64 {
 	j := bd.uInt64(bitcount)
 	return float64(j)
 }
 
 // as90k is Float / 90000.00 rounded to six decimal places.
-func (bd *BitDecoder) as90k(bitcount uint) float64 {
+func (bd *bitDecoder) as90k(bitcount uint) float64 {
 	as90k := bd.asFloat(bitcount) / 90000.00
 	return float64(uint64(as90k*1000000)) / 1000000
 }
 
 // asHex slices bitcount of bits and returns as hex string
-func (bd *BitDecoder) asHex(bitcount uint) string {
+func (bd *bitDecoder) asHex(bitcount uint) string {
 	j := bd.uInt64(bitcount)
 	ashex := fmt.Sprintf("%#x", j)
 	return ashex
 }
 
 // asBytes slices bitcount of bits and returns as []bytes
-func (bd *BitDecoder) asBytes(bitcount uint) []byte {
+func (bd *bitDecoder) asBytes(bitcount uint) []byte {
 	j := bd.chunk(bitcount)
 	return j.Bytes()
 }
 
 // asAscii returns the ascii chars of Bytes
-func (bd *BitDecoder) asAscii(bitcount uint) string {
+func (bd *bitDecoder) asAscii(bitcount uint) string {
 	return string(bd.asBytes(bitcount))
 }
 
 // goForward advances g.idx by bitcount
-func (bd *BitDecoder) goForward(bitcount uint) {
+func (bd *bitDecoder) goForward(bitcount uint) {
 	bd.idx += bitcount
 }
 
 // Encoder packs  data as bits for encoding.
-type BitEncoder struct {
+type bitEncoder struct {
 	Bites big.Int
 }
 
 // Append a []byte as bits
-func (be *BitEncoder) AddBytes(bites []byte, nbits uint) {
+func (be *bitEncoder) AddBytes(bites []byte, nbits uint) {
 	t := new(big.Int)
 	t.SetBytes(bites)
 	o := be.Bites.Lsh(&be.Bites, nbits)
@@ -117,7 +117,7 @@ func (be *BitEncoder) AddBytes(bites []byte, nbits uint) {
 Add left shifts Encoder.Bites by nbits and add val interface{} as bits.
 Supports val as bool, float64, int, uint8, uint16, uint32,or  uint64.
 */
-func (be *BitEncoder) Add(val interface{}, nbits uint) {
+func (be *bitEncoder) Add(val interface{}, nbits uint) {
 	t := new(big.Int)
 	t.SetUint64(u64(val))
 	o := be.Bites.Lsh(&be.Bites, nbits)
@@ -125,7 +125,7 @@ func (be *BitEncoder) Add(val interface{}, nbits uint) {
 }
 
 // AddHex64 append a hex string as uint64 in bits
-func (be *BitEncoder) AddHex64(val string, nbits uint) {
+func (be *bitEncoder) AddHex64(val string, nbits uint) {
 	u := new(big.Int)
 	_, err := fmt.Sscan(val, u)
 	if err != nil {
@@ -136,7 +136,7 @@ func (be *BitEncoder) AddHex64(val string, nbits uint) {
 }
 
 // Reserve left shifts Encoder.Bites by num and adds num bits  set to 1
-func (be *BitEncoder) Reserve(num int) {
+func (be *bitEncoder) Reserve(num int) {
 	for i := 0; i < num; i++ {
 		be.Add(1, 1)
 	}
