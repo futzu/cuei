@@ -20,8 +20,8 @@ func (bd *BitDecoder) Load(bites []byte) {
 	bd.idx = 0
 }
 
-// Chunk slices bitcount of bits and returns it as a uint64
-func (bd *BitDecoder) Chunk(bitcount uint) *big.Int {
+// chunk slices bitcount of bits and returns it as a uint64
+func (bd *BitDecoder) chunk(bitcount uint) *big.Int {
 	j := new(big.Int)
 	d := bd.idx + bitcount
 	j.SetString(bd.bits[bd.idx:d], 2)
@@ -29,30 +29,30 @@ func (bd *BitDecoder) Chunk(bitcount uint) *big.Int {
 	return j
 }
 
-// UInt8 trims uint64 to 8 bits
-func (bd *BitDecoder) UInt8(bitcount uint) uint8 {
-	j := bd.UInt64(bitcount)
+// uInt8 trims uint64 to 8 bits
+func (bd *BitDecoder) uInt8(bitcount uint) uint8 {
+	j := bd.uInt64(bitcount)
 	return uint8(j)
 
 }
 
-// UInt16 trims uint64 to 16 bits
-func (bd *BitDecoder) UInt16(bitcount uint) uint16 {
-	j := bd.UInt64(bitcount)
+// uInt16 trims uint64 to 16 bits
+func (bd *BitDecoder) uInt16(bitcount uint) uint16 {
+	j := bd.uInt64(bitcount)
 	return uint16(j)
 
 }
 
-// UInt32 trims uint64 to 32 bits
-func (bd *BitDecoder) UInt32(bitcount uint) uint32 {
-	j := bd.UInt64(bitcount)
+// uInt32 trims uint64 to 32 bits
+func (bd *BitDecoder) uInt32(bitcount uint) uint32 {
+	j := bd.uInt64(bitcount)
 	return uint32(j)
 
 }
 
-// UInt64 is a wrapper for Chunk
-func (bd *BitDecoder) UInt64(bitcount uint) uint64 {
-	j := bd.Chunk(bitcount)
+// uInt64 is a wrapper for chunk
+func (bd *BitDecoder) uInt64(bitcount uint) uint64 {
+	j := bd.chunk(bitcount)
 	return j.Uint64()
 
 }
@@ -61,7 +61,7 @@ func (bd *BitDecoder) UInt64(bitcount uint) uint64 {
 func (bd *BitDecoder) Flag() bool {
 	var bitcount uint
 	bitcount = 1
-	j := bd.UInt64(bitcount)
+	j := bd.uInt64(bitcount)
 	return j == 1
 }
 
@@ -71,7 +71,7 @@ func (bd *BitDecoder) Bool() bool {
 
 // Float slices bitcount of bits and returns  float64
 func (bd *BitDecoder) Float(bitcount uint) float64 {
-	j := bd.UInt64(bitcount)
+	j := bd.uInt64(bitcount)
 	return float64(j)
 }
 
@@ -83,19 +83,19 @@ func (bd *BitDecoder) As90k(bitcount uint) float64 {
 
 // Hex slices bitcount of bits and returns as hex string
 func (bd *BitDecoder) Hex(bitcount uint) string {
-	j := bd.UInt64(bitcount)
+	j := bd.uInt64(bitcount)
 	ashex := fmt.Sprintf("%#x", j)
 	return ashex
 }
 
 // Bytes slices bitcount of bits and returns as []bytes
 func (bd *BitDecoder) Bytes(bitcount uint) []byte {
-	j := bd.Chunk(bitcount)
+	j := bd.chunk(bitcount)
 	return j.Bytes()
 }
 
-// Ascii returns the Ascii chars of Bytes
-func (bd *BitDecoder) Ascii(bitcount uint) string {
+// ascii returns the ascii chars of Bytes
+func (bd *BitDecoder) ascii(bitcount uint) string {
 	return string(bd.Bytes(bitcount))
 }
 
