@@ -13,7 +13,7 @@ type BitDecoder struct {
 }
 
 // Load raw bytes and convert to bits
-func (bd *BitDecoder) Load(bites []byte) {
+func (bd *BitDecoder) load(bites []byte) {
 	i := new(big.Int)
 	i.SetBytes(bites)
 	bd.bits = fmt.Sprintf("%b", i)
@@ -57,50 +57,46 @@ func (bd *BitDecoder) uInt64(bitcount uint) uint64 {
 
 }
 
-// Flag slices 1 bit and returns true for 1 , false for 0
-func (bd *BitDecoder) Flag() bool {
+// asFlag slices 1 bit and returns true for 1 , false for 0
+func (bd *BitDecoder) asFlag() bool {
 	var bitcount uint
 	bitcount = 1
 	j := bd.uInt64(bitcount)
 	return j == 1
 }
 
-func (bd *BitDecoder) Bool() bool {
-	return bd.Flag()
-}
-
-// Float slices bitcount of bits and returns  float64
-func (bd *BitDecoder) Float(bitcount uint) float64 {
+// asFloat slices bitcount of bits and returns  float64
+func (bd *BitDecoder) asFloat(bitcount uint) float64 {
 	j := bd.uInt64(bitcount)
 	return float64(j)
 }
 
-// As90k is Float / 90000.00 rounded to six decimal places.
-func (bd *BitDecoder) As90k(bitcount uint) float64 {
-	as90k := bd.Float(bitcount) / 90000.00
+// as90k is Float / 90000.00 rounded to six decimal places.
+func (bd *BitDecoder) as90k(bitcount uint) float64 {
+	as90k := bd.asFloat(bitcount) / 90000.00
 	return float64(uint64(as90k*1000000)) / 1000000
 }
 
-// Hex slices bitcount of bits and returns as hex string
-func (bd *BitDecoder) Hex(bitcount uint) string {
+// asHex slices bitcount of bits and returns as hex string
+func (bd *BitDecoder) asHex(bitcount uint) string {
 	j := bd.uInt64(bitcount)
 	ashex := fmt.Sprintf("%#x", j)
 	return ashex
 }
 
-// Bytes slices bitcount of bits and returns as []bytes
-func (bd *BitDecoder) Bytes(bitcount uint) []byte {
+// asBytes slices bitcount of bits and returns as []bytes
+func (bd *BitDecoder) asBytes(bitcount uint) []byte {
 	j := bd.chunk(bitcount)
 	return j.Bytes()
 }
 
-// ascii returns the ascii chars of Bytes
-func (bd *BitDecoder) ascii(bitcount uint) string {
-	return string(bd.Bytes(bitcount))
+// asAscii returns the ascii chars of Bytes
+func (bd *BitDecoder) asAscii(bitcount uint) string {
+	return string(bd.asBytes(bitcount))
 }
 
-// Forward advances g.idx by bitcount
-func (bd *BitDecoder) Forward(bitcount uint) {
+// goForward advances g.idx by bitcount
+func (bd *BitDecoder) goForward(bitcount uint) {
 	bd.idx += bitcount
 }
 
