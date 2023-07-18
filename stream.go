@@ -48,7 +48,7 @@ func (stream *Stream) Decode(fname string) []*Cue {
 	stream.mkMaps()
 	file, err := os.Open(fname)
 	var cues []*Cue
-	Chk(err)
+	chk(err)
 	defer file.Close()
 	buffer := make([]byte, BufSz)
 	for {
@@ -211,7 +211,7 @@ func (stream *Stream) parsePat(pay []byte, pid uint16) {
 		for idx < end {
 			prgm := parsePrgm(pay[idx], pay[idx+1])
 			if prgm > 0 {
-				if !IsIn(stream.Programs, prgm) {
+				if !isIn(stream.Programs, prgm) {
 					stream.Programs = append(stream.Programs, prgm)
 				}
 				pmtpid := parsePid(pay[idx+2], pay[idx+3])
