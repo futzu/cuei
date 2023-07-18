@@ -31,7 +31,7 @@ type Cue struct {
 // Decode extracts bits for the Cue values.
 func (cue *Cue) Decode(bites []byte) bool {
 	var bd BitDecoder
-	bd.Load(bites)
+	bd.load(bites)
 	cue.InfoSection = &InfoSection{}
 	if cue.InfoSection.Decode(&bd) {
 		cue.Command = &Command{}
