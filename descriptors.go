@@ -48,8 +48,8 @@ type Descriptor struct {
 	SegmentationUpidLength           uint8       `json:",omitempty"`
 	SegmentationUpid                 *Upid       `json:",omitempty"`
 	SegmentationTypeID               uint8       `json:",omitempty"`
-	SegmentNum                       uint8       `json:",omitempty"`
-	SegmentsExpected                 uint8       `json:",omitempty"`
+	SegmentNum                       uint8       // `json:",omitempty"`
+	SegmentsExpected                 uint8       //  `json:",omitempty"`
 	SubSegmentNum                    uint8       `json:",omitempty"`
 	SubSegmentsExpected              uint8       `json:",omitempty"`
 }
@@ -91,16 +91,16 @@ func (dscptr *Descriptor) Decode(bd *BitDecoder, tag uint8, length uint8) {
 func (dscptr *Descriptor) audioDescriptor(bd *BitDecoder, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
-	dscptr.Identifier = bd.ascii(32)
+	dscptr.Identifier = bd.asAscii(32)
 	ccount := bd.uInt8(4)
-	bd.Forward(4)
+	bd.goForward(4)
 	for ccount > 0 {
 		ccount--
 		ct := bd.uInt8(8)
 		iso := bd.uInt32(24)
 		bsm := bd.uInt8(3)
 		nc := bd.uInt8(4)
-		fsa := bd.Flag()
+		fsa := bd.asFlag()
 		dscptr.AudioComponents = append(dscptr.AudioComponents, audioCmpt{ct, iso, bsm, nc, fsa})
 	}
 }
@@ -109,7 +109,7 @@ func (dscptr *Descriptor) audioDescriptor(bd *BitDecoder, tag uint8, length uint
 func (dscptr *Descriptor) availDescriptor(bd *BitDecoder, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
-	dscptr.Identifier = bd.ascii(32)
+	dscptr.Identifier = bd.asAscii(32)
 	dscptr.Name = "Avail Descriptor"
 	dscptr.ProviderAvailID = bd.uInt32(32)
 }
@@ -118,11 +118,11 @@ func (dscptr *Descriptor) availDescriptor(bd *BitDecoder, tag uint8, length uint
 func (dscptr *Descriptor) dtmfDescriptor(bd *BitDecoder, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
-	dscptr.Identifier = bd.ascii(32)
+	dscptr.Identifier = bd.asAscii(32)
 	dscptr.Name = "DTMF Descriptor"
 	dscptr.PreRoll = bd.uInt8(8)
 	dscptr.DTMFCount = bd.uInt8(3)
-	//bd.Forward(5)
+	//bd.goForward(5)
 	dscptr.DTMFChars = bd.uInt64(uint(8 * dscptr.DTMFCount))
 
 }
@@ -131,7 +131,7 @@ func (dscptr *Descriptor) dtmfDescriptor(bd *BitDecoder, tag uint8, length uint8
 func (dscptr *Descriptor) timeDescriptor(bd *BitDecoder, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
-	dscptr.Identifier = bd.ascii(32)
+	dscptr.Identifier = bd.asAscii(32)
 	dscptr.Name = "Time Descriptor"
 	dscptr.TAISeconds = bd.uInt64(48)
 	dscptr.TAINano = bd.uInt32(32)
@@ -142,11 +142,11 @@ func (dscptr *Descriptor) timeDescriptor(bd *BitDecoder, tag uint8, length uint8
 func (dscptr *Descriptor) segmentationDescriptor(bd *BitDecoder, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
-	dscptr.Identifier = bd.ascii(32)
+	dscptr.Identifier = bd.asAscii(32)
 	dscptr.Name = "Segmentation Descriptor"
-	dscptr.SegmentationEventID = bd.Hex(32)
-	dscptr.SegmentationEventCancelIndicator = bd.Flag()
-	bd.Forward(7)
+	dscptr.SegmentationEventID = bd.asHex(32)
+	dscptr.SegmentationEventCancelIndicator = bd.asFlag()
+	bd.goForward(7)
 	if !dscptr.SegmentationEventCancelIndicator {
 		dscptr.decodeSegFlags(bd)
 		if !dscptr.ProgramSegmentationFlag {
@@ -157,16 +157,16 @@ func (dscptr *Descriptor) segmentationDescriptor(bd *BitDecoder, tag uint8, leng
 }
 
 func (dscptr *Descriptor) decodeSegFlags(bd *BitDecoder) {
-	dscptr.ProgramSegmentationFlag = bd.Flag()
-	dscptr.SegmentationDurationFlag = bd.Flag()
-	dscptr.DeliveryNotRestrictedFlag = bd.Flag()
+	dscptr.ProgramSegmentationFlag = bd.asFlag()
+	dscptr.SegmentationDurationFlag = bd.asFlag()
+	dscptr.DeliveryNotRestrictedFlag = bd.asFlag()
 	if !dscptr.DeliveryNotRestrictedFlag {
-		dscptr.WebDeliveryAllowedFlag = bd.Flag()
-		dscptr.NoRegionalBlackoutFlag = bd.Flag()
-		dscptr.ArchiveAllowedFlag = bd.Flag()
+		dscptr.WebDeliveryAllowedFlag = bd.asFlag()
+		dscptr.NoRegionalBlackoutFlag = bd.asFlag()
+		dscptr.ArchiveAllowedFlag = bd.asFlag()
 		dscptr.DeviceRestrictions = table20[bd.uInt8(2)]
 	} else {
-		bd.Forward(5)
+		bd.goForward(5)
 	}
 }
 
@@ -175,15 +175,15 @@ func (dscptr *Descriptor) decodeSegCmpnts(bd *BitDecoder) {
 	for ccount > 0 { // 6 bytes each
 		ccount--
 		ct := bd.uInt8(8)
-		bd.Forward(7)
-		po := bd.As90k(33)
+		bd.goForward(7)
+		po := bd.as90k(33)
 		dscptr.Components = append(dscptr.Components, segCmpt{ct, po})
 	}
 }
 
 func (dscptr *Descriptor) decodeSegmentation(bd *BitDecoder) {
 	if dscptr.SegmentationDurationFlag {
-		dscptr.SegmentationDuration = bd.As90k(40)
+		dscptr.SegmentationDuration = bd.as90k(40)
 	}
 	dscptr.SegmentationUpidType = bd.uInt8(8)
 	dscptr.SegmentationUpidLength = bd.uInt8(8)
