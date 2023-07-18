@@ -1,6 +1,6 @@
 package cuei
 
-// Polynomial value for CRC32 table
+// Polynomial value for cRC32 table
 const initPoly = 0x104C11DB7
 
 // initial Crc32 value
@@ -38,7 +38,7 @@ func mkTable() [256]int {
 }
 
 // generate a 32 bit Crc
-func CRC32(data []byte) uint32 {
+func cRC32(data []byte) uint32 {
 	crc := initValue
 	tbl := mkTable()
 	for _, bite := range data {
