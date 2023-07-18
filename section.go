@@ -19,7 +19,7 @@ type InfoSection struct {
 }
 
 // Decode Splice Info Section values.
-func (infosec *InfoSection) Decode(bd *BitDecoder) bool {
+func (infosec *InfoSection) Decode(bd *bitDecoder) bool {
 	infosec.Name = "Splice Info Section"
 	infosec.TableID = bd.asHex(8)
 	if infosec.TableID != "0xfc" {
@@ -69,7 +69,7 @@ Encodes the InfoSection variables to bytes.
 */
 func (infosec *InfoSection) Encode() []byte {
 	//	infosec.Defaults()
-	be := &BitEncoder{}
+	be := &bitEncoder{}
 	be.Add(uint16(0xfc), 16)
 	be.Add(48, 8)
 	be.Add(uint8(infosec.SectionLength), 8)
