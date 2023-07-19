@@ -144,9 +144,25 @@ func (upid *Upid) Encode(be *bitEncoder, upidType uint8) {
 
 }
 
+// encode for Uri Upids
 func (upid *Upid) encodeUri(be *bitEncoder) {
 	if len(upid.Value) > 0 {
 		be.AddBytes([]byte(upid.Value), uint(len(upid.Value)<<3))
 	}
 
+}
+
+//   encode for AirId
+func (upid *Upid) encodeAirId(be *bitEncoder) {
+	if len(upid.Value) > 0 {	
+	  be.AddBytes([]byte(upid.Value), uint(len(upid.Value)<<3))
+	}
+}
+
+
+// encode for Isan Upid
+func (upid *Upid) encodeIsan(be *bitEncoder) {
+	if len(upid.Value) > 0 {	
+	be.AddBytes([]byte(upid.Value), uint(len(upid.Value)<<3))
+	}
 }
