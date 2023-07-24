@@ -135,13 +135,14 @@ func (upid *Upid) mid(bd *bitDecoder, upidlen uint8) {
 
 // Encode Upids
 func (upid *Upid) Encode(be *bitEncoder, upidType uint8) {
-	upid.UpidType = upidType
-	name, ok := uriUpids[upid.UpidType]
-	if ok {
-		upid.Name = name
+	switch upid.UpidType {
+	case 0x05, 0x06:
+		upid.encodeIsan(be)
+	case 0x08:
+		upid.encodeAirId(be)
+	default:
 		upid.encodeUri(be)
 	}
-
 }
 
 // encode for Uri Upids
@@ -152,17 +153,16 @@ func (upid *Upid) encodeUri(be *bitEncoder) {
 
 }
 
-//   encode for AirId
+// encode for AirId
 func (upid *Upid) encodeAirId(be *bitEncoder) {
-	if len(upid.Value) > 0 {	
-	  be.AddBytes([]byte(upid.Value), uint(len(upid.Value)<<3))
+	if len(upid.Value) > 0 {
+		be.AddBytes([]byte(upid.Value), uint(len(upid.Value)<<3))
 	}
 }
 
-
 // encode for Isan Upid
 func (upid *Upid) encodeIsan(be *bitEncoder) {
-	if len(upid.Value) > 0 {	
-	be.AddBytes([]byte(upid.Value), uint(len(upid.Value)<<3))
+	if len(upid.Value) > 0 {
+		be.AddBytes([]byte(upid.Value), uint(len(upid.Value)<<3))
 	}
 }
