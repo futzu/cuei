@@ -48,8 +48,8 @@ type Descriptor struct {
 	SegmentationUpidLength           uint8       `json:",omitempty"`
 	SegmentationUpid                 *Upid       `json:",omitempty"`
 	SegmentationTypeID               uint8       `json:",omitempty"`
-	SegmentNum                       uint8       // `json:",omitempty"`
-	SegmentsExpected                 uint8       //  `json:",omitempty"`
+	SegmentNum                       uint8       `json:",omitempty"`
+	SegmentsExpected                 uint8       `json:",omitempty"`
 	SubSegmentNum                    uint8       `json:",omitempty"`
 	SubSegmentsExpected              uint8       `json:",omitempty"`
 }
