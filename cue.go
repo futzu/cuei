@@ -65,12 +65,16 @@ func (cue *Cue) rollLoop() []byte {
 	be := &bitEncoder{}
 	be.Add(1, 8) //bumper
 	for _, dscptr := range cue.Descriptors {
+		bf := &bitEncoder{}
+		dscptr.Encode(bf)
 		be.Add(dscptr.Tag, 8)
-		be.Add(dscptr.Length, 8)
+		be.Add(len(bf.Bites.Bytes())+4, 8)
 		be.AddBytes([]byte("CUEI"), 32)
 		dscptr.Encode(be)
-	}
 
+	}
+	cue.Dll = uint16(len(be.Bites.Bytes()) - 1)
+	fmt.Printf("dloop len %v", cue.Dll)
 	return be.Bites.Bytes()[1:]
 }
 
@@ -94,12 +98,12 @@ func (cue *Cue) Encode() []byte {
 	be.AddBytes(isecb, isecbits)
 	cmdbits := uint(cmdl << 3)
 	be.AddBytes(cmdb, cmdbits)
+	dloop := cue.rollLoop()
 	be.Add(cue.Dll, 16)
-	if cue.Dll > 6 {
-		dloop := cue.rollLoop()
-		cue.Dll = uint16(len(dloop))
-		be.AddBytes(dloop, uint(cue.Dll<<3))
-	}
+
+	//cue.Dll = uint16(len(dloop))
+	be.AddBytes(dloop, uint(cue.Dll<<3))
+
 	cue.Crc32 = cRC32(be.Bites.Bytes())
 	be.Add(cue.Crc32, 32)
 	return be.Bites.Bytes()
