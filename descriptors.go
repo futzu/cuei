@@ -164,7 +164,7 @@ func (dscptr *Descriptor) decodeSegFlags(bd *bitDecoder) {
 		dscptr.WebDeliveryAllowedFlag = bd.asFlag()
 		dscptr.NoRegionalBlackoutFlag = bd.asFlag()
 		dscptr.ArchiveAllowedFlag = bd.asFlag()
-		dscptr.DeviceRestrictions = table20[bd.uInt8(2)]
+		dscptr.DeviceRestrictions = table20[bd.uInt8(2)] // 8
 	} else {
 		bd.goForward(5)
 	}
