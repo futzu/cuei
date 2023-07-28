@@ -74,11 +74,18 @@ func (cue *Cue) rollLoop() []byte {
 
 	}
 	cue.Dll = uint16(len(be.Bites.Bytes()) - 1)
-	return be.Bites.Bytes()[1:]}
+	//fmt.Printf("dloop len %v", cue.Dll)
+	return be.Bites.Bytes()[1:]
+}
 
 // Show display SCTE-35 data as JSON.
 func (cue *Cue) Show() {
 	fmt.Println(MkJson(&cue))
+}
+
+// AdjustPts adds seconds to cue.InfoSection.PtsAdjustment
+func (cue *Cue) AdjustPts(seconds float64) {
+	cue.InfoSection.PtsAdjustment += seconds
 }
 
 // Encode Cue currently works for Splice Inserts and Time Signals
@@ -128,8 +135,34 @@ func (cue *Cue) mkSpliceInsert() {
 }
 
 /*
-	Convert  Cue.Command  from a  Time Signal
-	to a Splice Insert and return a base64 string
+	 *
+
+		Convert  Cue.Command  from a  Time Signal
+		to a Splice Insert and return a base64 string
+
+		Example Usage:
+
+			package main
+
+		import (
+			"os"
+			"fmt"
+			"github.com/futzu/cuei"
+		)
+
+		func main() {
+			args := os.Args[1:]
+			for _,arg := range args {
+				fmt.Printf("\nNext File: %s\n\n", arg)
+				stream := cuei.NewStream()
+				cues :=stream.Decode(arg)
+				for _,c:= range cues {
+					fmt.Println(c.Six2Five())
+				}
+			}
+		}
+
+*
 */
 func (cue *Cue) Six2Five() string {
 	segStarts := []uint16{0x22, 0x30, 0x32, 0x34, 0x36, 0x38, 0x3a, 0x3c, 0x3e, 0x44, 0x46}
