@@ -62,7 +62,7 @@ func MkJson(i interface{}) string {
 // Take a JSON string and return a *Cue
 func Json2Cue(s string) *Cue {
 	b := []byte(s)
-	cue := &Cue{}
+	cue := NewCue()
 	json.Unmarshal(b, cue)
 	return cue
 }
