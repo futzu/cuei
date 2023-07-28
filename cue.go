@@ -86,6 +86,7 @@ func (cue *Cue) Show() {
 // AdjustPts adds seconds to cue.InfoSection.PtsAdjustment
 func (cue *Cue) AdjustPts(seconds float64) {
 	cue.InfoSection.PtsAdjustment += seconds
+	cue.Encode()
 }
 
 // Encode Cue currently works for Splice Inserts and Time Signals
