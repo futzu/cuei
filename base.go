@@ -38,14 +38,14 @@ func hex2Int(str string) uint64 {
 }
 
 // isIn is a test for slice membership
-func isIn(slice []uint16, val uint16) bool {
+func isIn[T comparable](slice []T, val T) bool {
 	for _, item := range slice {
 		if item == val {
 			return true
 		}
 	}
 	return false
-}
+}	
 
 func mk90k(raw uint64) float64 {
 	nk := float64(raw) / 90000.0
