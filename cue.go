@@ -66,9 +66,11 @@ func (cue *Cue) rollLoop() []byte {
 	be.Add(1, 8) //bumper
 	for _, dscptr := range cue.Descriptors {
 		bf := &bitEncoder{}
+		bf.Add(1, 8) //bumper to keep leading zeros
 		dscptr.Encode(bf)
 		be.Add(dscptr.Tag, 8)
-		be.Add(len(bf.Bites.Bytes())+4, 8)
+		// +3 is  +4 for identifier and -1 for the bumper.
+		be.Add(len(bf.Bites.Bytes())+3, 8)
 		be.AddBytes([]byte("CUEI"), 32)
 		dscptr.Encode(be)
 
