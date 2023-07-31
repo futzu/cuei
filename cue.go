@@ -91,10 +91,8 @@ func (cue *Cue) rollLoop() []byte {
 		be.Add(len(bf.Bites.Bytes())+3, 8)
 		be.AddBytes([]byte("CUEI"), 32)
 		dscptr.Encode(be)
-
 	}
 	cue.Dll = uint16(len(be.Bites.Bytes()) - 1)
-	//fmt.Printf("dloop len %v", cue.Dll)
 	return be.Bites.Bytes()[1:]
 }
 
@@ -126,10 +124,7 @@ func (cue *Cue) Encode() []byte {
 	be.AddBytes(cmdb, cmdbits)
 	dloop := cue.rollLoop()
 	be.Add(cue.Dll, 16)
-
-	//cue.Dll = uint16(len(dloop))
 	be.AddBytes(dloop, uint(cue.Dll<<3))
-
 	cue.Crc32 = cRC32(be.Bites.Bytes())
 	be.Add(cue.Crc32, 32)
 	return be.Bites.Bytes()
@@ -168,32 +163,12 @@ func (cue *Cue) mkSpliceInsert() {
 }
 
 /*
-Convert  Cue.Command  from a  Time Signal
-to a Splice Insert and return a base64 string
+*
 
-Example Usage:
+	Convert  Cue.Command  from a  Time Signal
+	to a Splice Insert and return a base64 string
 
-	package main
-
-import (
-
-	"os"
-	"fmt"
-	"github.com/futzu/cuei"
-
-)
-
-	func main() {
-		args := os.Args[1:]
-		for _,arg := range args {
-			fmt.Printf("\nNext File: %s\n\n", arg)
-			stream := cuei.NewStream()
-			cues :=stream.Decode(arg)
-			for _,c:= range cues {
-				fmt.Println(c.Six2Five())
-			}
-		}
-	}
+*
 */
 func (cue *Cue) Six2Five() string {
 	segStarts := []uint16{0x22, 0x30, 0x32, 0x34, 0x36, 0x38, 0x3a, 0x3c, 0x3e, 0x44, 0x46}
@@ -222,7 +197,6 @@ func (cue *Cue) Six2Five() string {
 		}
 	}
 	return EncB64(cue.Encode())
-
 }
 
 // initialize and return a *Cue
