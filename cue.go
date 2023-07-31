@@ -2,6 +2,7 @@ package cuei
 
 import (
 	"fmt"
+	"math/big"
 )
 
 /*
@@ -28,8 +29,25 @@ type Cue struct {
 	Crc32       uint32
 }
 
-// Decode extracts bits for the Cue values.
-func (cue *Cue) Decode(bites []byte) bool {
+// Decode takes Cue data as  []byte, base64 or hex string.
+func (cue *Cue) Decode(i interface{}) bool {
+	switch i.(type) {
+	case string:
+		str := i.(string)
+		j := new(big.Int)
+		_, err := fmt.Sscan(str, j)
+		if err != nil {
+			return cue.decodeBytes(DecB64(str))
+		}
+		return cue.decodeBytes(j.Bytes())
+
+	default:
+		return cue.decodeBytes(i.([]byte))
+	}
+}
+
+// decodeBytes extracts bits for the Cue values.
+func (cue *Cue) decodeBytes(bites []byte) bool {
 	var bd bitDecoder
 	bd.load(bites)
 	cue.InfoSection = &InfoSection{}
@@ -117,6 +135,18 @@ func (cue *Cue) Encode() []byte {
 	return be.Bites.Bytes()
 }
 
+// Encode2B64 Encodes cue and returns Base64 string
+func (cue *Cue) Encode2B64() string {
+	return EncB64(cue.Encode())
+}
+
+// Encode2Hex encodes cue and returns as a hex string
+func (cue *Cue) Encode2Hex() string {
+	b := new(big.Int)
+	b.SetBytes(cue.Encode())
+	return fmt.Sprintf("0x%v", b.Text(16))
+}
+
 // used by Six2Five to convert a time signal to a splice insert
 func (cue *Cue) mkSpliceInsert() {
 	cue.Command.CommandType = 5
@@ -138,34 +168,32 @@ func (cue *Cue) mkSpliceInsert() {
 }
 
 /*
-	 *
+Convert  Cue.Command  from a  Time Signal
+to a Splice Insert and return a base64 string
 
-		Convert  Cue.Command  from a  Time Signal
-		to a Splice Insert and return a base64 string
+Example Usage:
 
-		Example Usage:
+	package main
 
-			package main
+import (
 
-		import (
-			"os"
-			"fmt"
-			"github.com/futzu/cuei"
-		)
+	"os"
+	"fmt"
+	"github.com/futzu/cuei"
 
-		func main() {
-			args := os.Args[1:]
-			for _,arg := range args {
-				fmt.Printf("\nNext File: %s\n\n", arg)
-				stream := cuei.NewStream()
-				cues :=stream.Decode(arg)
-				for _,c:= range cues {
-					fmt.Println(c.Six2Five())
-				}
+)
+
+	func main() {
+		args := os.Args[1:]
+		for _,arg := range args {
+			fmt.Printf("\nNext File: %s\n\n", arg)
+			stream := cuei.NewStream()
+			cues :=stream.Decode(arg)
+			for _,c:= range cues {
+				fmt.Println(c.Six2Five())
 			}
 		}
-
-*
+	}
 */
 func (cue *Cue) Six2Five() string {
 	segStarts := []uint16{0x22, 0x30, 0x32, 0x34, 0x36, 0x38, 0x3a, 0x3c, 0x3e, 0x44, 0x46}
