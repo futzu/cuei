@@ -45,7 +45,7 @@ func isIn[T comparable](slice []T, val T) bool {
 		}
 	}
 	return false
-}	
+}
 
 func mk90k(raw uint64) float64 {
 	nk := float64(raw) / 90000.0
@@ -64,6 +64,7 @@ func Json2Cue(s string) *Cue {
 	b := []byte(s)
 	cue := NewCue()
 	json.Unmarshal(b, cue)
+	cue.Encode()
 	return cue
 }
 
