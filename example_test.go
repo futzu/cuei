@@ -108,8 +108,8 @@ func ExampleCue_AdjustPts() {
 	// Change cue.InfoSection.PtsAdjustment and re-encode cue to bytes
 	cue.AdjustPts(33.333)
 	cue.Show()
-	fmt.Println(data)
-	fmt.Println(cuei.EncB64(cue.Encode()))
+	fmt.Println("Was", data)
+	fmt.Println("Is", cue.Encode2B64())
 }
 
 func Test(t *testing.T) {
