@@ -1,21 +1,40 @@
 
 # cuei is a SCTE35 parser library in Go.
 
-- [x] Parses SCTE-35 Cues from MPEGTS or Bytes or Base64
+- [x] Parses SCTE-35 Cues from MPEGTS or Bytes or Base64 or Hex or Int or Octal or even Base 36.
 - [x] Parses SCTE-35 Cues spread over multiple MPEGTS packets
 - [x] Supports multi-packet PAT and PMT tables
 - [x] Supports multiple MPEGTS Programs and multiple SCTE-35 streams
-
+- [x] Encodes Time Signals and Splice Inserts with Descriptors and Upids. 
 
 ###  
+> _To me, a library means you shouldn't have to write a lot of code. Almost everything cuei does can be done in about ten lines of code._
+> _Want to parse an MPEGTS video and print the SCTE-35?  Do it in ten lines._
+```go
+package main                          // 1
+
+import (                              // 2
+        "os"                          // 3    
+        "github.com/futzu/cuei"       // 4
+)                                     // 5
+
+func main(){                          // 6
+        arg := os.Args[1]             // 7
+        stream := cuei.NewStream()    // 8
+        stream.Decode(arg)            // 9
+}                                    // 10  lines
+```
+
+
+
+
+
 
 * [Install](#install-cuei)
 
-* [In a nutshell](#nutshell)
+* [Go Docs](https://pkg.go.dev/github.com/futzu/cuei) 
 
-* [Go Docs](https://pkg.go.dev/github.com/futzu/cuei)
-
-* [Examples](#parse-base64-encoded-scte-35) 
+* [Examples](https://pkg.go.dev/github.com/futzu/cuei) 
 
 	* [Parse SCTE-35 from MPEGTS](#quick-demo)
 	
@@ -34,12 +53,7 @@
 go install github.com/futzu/cuei@latest
 
 ```
-# `Nutshell`
-| Use this        |   To do this                                                  |
-|-----------------|---------------------------------------------------------------|
-|[cuei.Cue.Decode([]byte)](https://github.com/futzu/cuei/blob/main/cue.go)         | Parse SCTE-35 from a Base64 or Byte string.                   |
-|[cuei.Stream.Decode(filename)](https://github.com/futzu/cuei/blob/main/stream.go)      |        Parse SCTE35 Cues from a MPEGTS file.    |
-|[cuei.Stream.DecodeBytes([]byte)](https://github.com/futzu/cuei/blob/main/stream.go) | Parse MPEGTS packets as an array of bytes, like from a network stream. | 
+
 
 
 # `Quick Demo`
@@ -250,7 +264,7 @@ func (cue2 *Cue2) Show() {        	// Override Show
 func main(){
 
 	var cue2 Cue2
-	data := cuei.DeB64("/DA7AAAAAAAAAP/wFAUAAAABf+/+AItfZn4AKTLgAAEAAAAWAhRDVUVJAAAAAX//AAApMuABACIBAIoXZrM=")
+	data := "/DA7AAAAAAAAAP/wFAUAAAABf+/+AItfZn4AKTLgAAEAAAAWAhRDVUVJAAAAAX//AAApMuABACIBAIoXZrM="
         cue2.Decode(data) 
         cue2.Show()
 	
