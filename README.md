@@ -48,6 +48,7 @@ func main(){                          // 6
 	
 	* [Shadow a Cue Method and call the Shadowed Method ( like super in python )](#call-a-shadowed-method)
 
+  	* [Load a SCTE-35 Cue from JSON and Encode it](#load-json-and-encode)
 
 # `Install cuei`
 
@@ -207,7 +208,7 @@ import (
 func main(){
 
 	cue := cuei.NewCue()
-	data := cuei.DeB64("/DA7AAAAAAAAAP/wFAUAAAABf+/+AItfZn4AKTLgAAEAAAAWAhRDVUVJAAAAAX//AAApMuABACIBAIoXZrM=")
+	data := "/DA7AAAAAAAAAP/wFAUAAAABf+/+AItfZn4AKTLgAAEAAAAWAhRDVUVJAAAAAX//AAApMuABACIBAIoXZrM="
         cue.Decode(data) 
         fmt.Println("Cue as Json")
         cue.Show()
@@ -233,7 +234,7 @@ func (cue2 *Cue2) Show() {        	// Override Show
 func main(){
 
 	var cue2 Cue2
-	data := cuei.DeB64("/DA7AAAAAAAAAP/wFAUAAAABf+/+AItfZn4AKTLgAAEAAAAWAhRDVUVJAAAAAX//AAApMuABACIBAIoXZrM=")
+	data := "/DA7AAAAAAAAAP/wFAUAAAABf+/+AItfZn4AKTLgAAEAAAAWAhRDVUVJAAAAAX//AAApMuABACIBAIoXZrM="
         cue2.Decode(data) 
         cue2.Show()
 	
@@ -298,5 +299,69 @@ func main() {
 		fmt.Printf("PTS: %v, Splice Command: %v\n",c.PacketData.Pts, c.Command.Name )
 	}
 }
+
+```
+
+# `Load JSON and Encode`
+* cuei can accept SCTE-35 data as JSON and encode it to Base64, Bytes, or Hex string.
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/futzu/cuei"
+)
+
+func main() {
+
+	js := `{
+    "InfoSection": {
+        "Name": "Splice Info Section",
+        "TableID": "0xfc",
+        "SectionSyntaxIndicator": false,
+        "Private": false,
+        "Reserved": "0x3",
+        "SectionLength": 42,
+        "ProtocolVersion": 0,
+        "EncryptedPacket": false,
+        "EncryptionAlgorithm": 0,
+        "PtsAdjustment": 0,
+        "CwIndex": "0xff",
+        "Tier": "0xfff",
+        "CommandLength": 15,
+        "CommandType": 5
+    },
+    "Command": {
+        "Name": "Splice Insert",
+        "CommandType": 5,
+        "SpliceEventID": 5690,
+        "OutOfNetworkIndicator": true,
+        "ProgramSpliceFlag": true,
+        "TimeSpecifiedFlag": true,
+        "PTS": 23683.480033
+    },
+    "DescriptorLoopLength": 10,
+    "Descriptors": [
+        {
+            "Length": 8,
+            "Identifier": "CUEI",
+            "Name": "Avail Descriptor"
+        }
+    ],
+    "Crc32": 3608566905
+}
+`
+	cue :=  cuei.Json2Cue(js)
+	
+	cue.AdjustPts(28.0)   	 // Apply pts adjustment
+	
+	fmt.Println("\nBytes:\n\t", cue.Encode())	// Bytes
+	
+	fmt.Println("\nBase64:\n\t",cue.Encode2B64())  	// Base64
+	
+	fmt.Println("\nHex:\n\t",cue.Encode2Hex()) 	// Hex
+
+}
+
 
 ```
