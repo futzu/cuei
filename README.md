@@ -151,7 +151,7 @@ Next File: mpegts/out.ts
 
 ```
 *  Use cuei.Stream.DecodeBytes for more fine-grained control of MPEGTS stream parsing. 
-```go
+```json
 package main
 
 import (
@@ -197,7 +197,7 @@ func main() {
 ```
 
 # `Parse base64 encoded SCTE-35`
-```go
+```json
 package main
 
 import (
@@ -216,7 +216,7 @@ func main(){
 ```
 ---
 # `Shadow a Cue struct method`
-```go
+```json
 package main
 
 import (
@@ -243,7 +243,7 @@ func main(){
 ```
 
 # `Call a shadowed method`
-```go
+```json
 package main
 
 import (
@@ -276,7 +276,7 @@ func main(){
 
 ```
 # `Use Dot notation to access SCTE-35 Cue values`
-```go
+```json
 
 /**
 Show  the packet PTS time and Splice Command Name of SCTE-35 Cues
@@ -304,7 +304,7 @@ func main() {
 
 # `Load JSON and Encode`
 * cuei can accept SCTE-35 data as JSON and encode it to Base64, Bytes, or Hex string.
-```go
+```json
 package main
 
 import (
@@ -362,6 +362,20 @@ func main() {
 	fmt.Println("\nHex:\n\t",cue.Encode2Hex()) 	// Hex
 
 }
+
+
+```
+* Output
+```go
+Bytes:
+	[252 48 42 0 0 0 38 115 192 255 255 240 15 5 0 0 22 58 127 207 254 127 12 79 115
+	0 0 0 0 0 10 0 8 67 85 69 73 0 0 0 0 236 139 53 78]
+
+Base64:
+	 /DAqAAAAJnPA///wDwUAABY6f8/+fwxPcwAAAAAACgAIQ1VFSQAAAADsizVO
+
+Hex:
+	 0xfc302a0000002673c0fffff00f050000163a7fcffe7f0c4f7300000000000a00084355454900000000ec8b354e
 
 
 ```
