@@ -1,15 +1,17 @@
 
 # cuei is a SCTE35 parser library in Go.
 
-- [x] Parses SCTE-35 Cues from MPEGTS or Bytes or Base64 or Hex or Int or Octal or even Base 36.
-- [x] Parses SCTE-35 Cues spread over multiple MPEGTS packets
-- [x] Supports multi-packet PAT and PMT tables
-- [x] Supports multiple MPEGTS Programs and multiple SCTE-35 streams
-- [x] Encodes Time Signals and Splice Inserts with Descriptors and Upids. 
+- [x] Parses SCTE-35 Cues from MPEGTS or Bytes or Base64 or Hex or Int or Octal or even Base 36.🚡
+- [x] Parses SCTE-35 Cues spread over multiple MPEGTS packets  🪗
+- [x] Supports multi-packet PAT and PMT tables  🎚️
+- [x] Supports multiple MPEGTS Programs and multiple SCTE-35 streams 🩹
+- [x] Encodes Time Signals and Splice Inserts with Descriptors and Upids. 🧺
 
 ###  
-> _To me, a library means you shouldn't have to write a lot of code. Almost everything cuei does can be done in about ten lines of code._
-> _Want to parse an MPEGTS video and print the SCTE-35?  Do it in ten lines._
+  
+ Want to parse an MPEGTS video and print the SCTE-35?  🧮
+<div>Do it in ten lines.</div> ⚗️
+
 ```go
 package main                          // 1
 
@@ -30,15 +32,15 @@ func main(){                          // 6
 
 
 
-* [Install](#install-cuei)
+* [Install](#install-cuei)  🦼
 
-* [Go Docs](https://pkg.go.dev/github.com/futzu/cuei) 
+* [Go Docs](https://pkg.go.dev/github.com/futzu/cuei)  🔌
 
-* [Examples](https://pkg.go.dev/github.com/futzu/cuei) 
+* [Examples](https://pkg.go.dev/github.com/futzu/cuei) 🥑
 
-	* [Parse SCTE-35 from MPEGTS](#quick-demo)
+	* [Parse SCTE-35 from MPEGTS](#quick-demo) 🧲
 	
-	* [Parse Base64 encoded SCTE-35](#parse-base64-encoded-scte-35)
+	* [Parse Base64 encoded SCTE-35](#parse-base64-encoded-scte-35) 🏌️‍♂️
 	      
 	* [Use Dot Notation to access SCTE-35 Cue values](#use-dot-notation-to-access-scte-35-cue-values)
 		
