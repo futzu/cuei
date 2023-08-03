@@ -12,7 +12,7 @@
  Want to parse an MPEGTS video and print the SCTE-35?  🧮
 <div>Do it in ten lines.</div> ⚗️
 
-```go
+```smalltalk
 package main                          // 1
 
 import (                              // 2
@@ -63,7 +63,7 @@ go install github.com/futzu/cuei@latest
 
 * cueidemo.go
 
-```go 
+```smalltalk
 package main
 
 import (
@@ -151,7 +151,7 @@ Next File: mpegts/out.ts
 
 ```
 *  Use cuei.Stream.DecodeBytes for more fine-grained control of MPEGTS stream parsing. 
-```json
+```smalltalk
 package main
 
 import (
@@ -167,9 +167,6 @@ func main() {
 		var cues []*cuei.Cue
 		stream := cuei.NewStream() // New StreamParser for each file
 		stream.Quiet = true // suppress printing SCTE-35 messages 
-		
-		// you don't have to use a file
-		// Stream.DecodeBytes takes a []byte as input
 		
 		file, err := os.Open(arg)
 		if err != nil {
@@ -197,7 +194,7 @@ func main() {
 ```
 
 # `Parse base64 encoded SCTE-35`
-```json
+```smalltalk
 package main
 
 import (
@@ -216,7 +213,7 @@ func main(){
 ```
 ---
 # `Shadow a Cue struct method`
-```json
+```smalltalk
 package main
 
 import (
@@ -243,7 +240,7 @@ func main(){
 ```
 
 # `Call a shadowed method`
-```json
+```smalltalk
 package main
 
 import (
@@ -276,7 +273,7 @@ func main(){
 
 ```
 # `Use Dot notation to access SCTE-35 Cue values`
-```json
+```smalltalk
 
 /**
 Show  the packet PTS time and Splice Command Name of SCTE-35 Cues
@@ -304,7 +301,7 @@ func main() {
 
 # `Load JSON and Encode`
 * cuei can accept SCTE-35 data as JSON and encode it to Base64, Bytes, or Hex string.
-```json
+```smalltalk
 package main
 
 import (
