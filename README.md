@@ -53,7 +53,7 @@ func main(){                          // 6
 # `Install cuei`
 
 ```go
-go install github.com/futzu/cuei@latest
+go get github.com/futzu/cuei@latest
 
 ```
 
