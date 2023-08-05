@@ -1,6 +1,5 @@
 
 # cuei is a SCTE35 parser library in Go.
-
 - [x] Parses SCTE-35 Cues from MPEGTS or Bytes or Base64 or Hex or Int or Octal or even Base 36.🚡
 - [x] Parses SCTE-35 Cues spread over multiple MPEGTS packets  🪗
 - [x] Supports multi-packet PAT and PMT tables  🎚️
@@ -376,3 +375,4 @@ Hex:
 
 
 ```
+ `Cuei is the FourCC / identifier for SCTE-35`
