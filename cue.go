@@ -37,7 +37,7 @@ func (cue *Cue) Decode(i interface{}) bool {
 		j := new(big.Int)
 		_, err := fmt.Sscan(str, j)
 		if err != nil {
-			return cue.decodeBytes(DecB64(str))
+			return cue.decodeBytes(decB64(str))
 		}
 		return cue.decodeBytes(j.Bytes())
 
@@ -98,7 +98,7 @@ func (cue *Cue) rollLoop() []byte {
 
 // Show display SCTE-35 data as JSON.
 func (cue *Cue) Show() {
-	fmt.Println(MkJson(&cue))
+	fmt.Println(mkJson(&cue))
 }
 
 // AdjustPts adds seconds to cue.InfoSection.PtsAdjustment
@@ -132,7 +132,7 @@ func (cue *Cue) Encode() []byte {
 
 // Encode2B64 Encodes cue and returns Base64 string
 func (cue *Cue) Encode2B64() string {
-	return EncB64(cue.Encode())
+	return encB64(cue.Encode())
 }
 
 // Encode2Hex encodes cue and returns as a hex string
@@ -185,18 +185,18 @@ func (cue *Cue) Six2Five() string {
 						cue.Command.DurationFlag = true
 						cue.Command.BreakAutoReturn = true
 						cue.Command.BreakDuration = dscptr.SegmentationDuration
-						//	return EncB64(cue.Encode())
+						//	return encB64(cue.Encode())
 					}
 				} else {
 					if isIn(segStops, uint16(dscptr.SegmentationTypeID)) {
 						cue.mkSpliceInsert()
-						//	return EncB64(cue.Encode())
+						//	return encB64(cue.Encode())
 					}
 				}
 			}
 		}
 	}
-	return EncB64(cue.Encode())
+	return encB64(cue.Encode())
 }
 
 // initialize and return a *Cue
