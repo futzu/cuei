@@ -41,8 +41,8 @@ func (infosec *InfoSection) Decode(bd *bitDecoder) bool {
 	return true
 }
 
-// Defaults sets default InfoSection values for encoding
-func (infosec *InfoSection) Defaults() {
+// defaults sets default InfoSection values for encoding
+func (infosec *InfoSection) defaults() {
 	infosec.Name = "Splice Info Section"
 	infosec.TableID = "0xfc"
 	infosec.SectionSyntaxIndicator = false
@@ -56,19 +56,14 @@ func (infosec *InfoSection) Defaults() {
 	infosec.CwIndex = "0x0"
 	infosec.Tier = "0xfff"
 	infosec.CommandLength = 0
-
 	infosec.CommandType = 0
 }
 
 /*
-*
-
 Encode Splice Info Section
 Encodes the InfoSection variables to bytes.
-*
 */
 func (infosec *InfoSection) Encode() []byte {
-	//	infosec.Defaults()
 	be := &bitEncoder{}
 	be.Add(uint16(0xfc), 16)
 	be.Add(48, 8)
