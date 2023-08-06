@@ -14,10 +14,10 @@ type packetData struct {
 }
 
 // pktSz is the size of an MPEG-TS packet in bytes.
-const PktSz = 188
+const pktSz = 188
 
 // bufSz is the size of a read when parsing files.
-const BufSz = 8192 * PktSz
+const bufSz = 8192 * pktSz
 
 // Stream for parsing MPEGTS for SCTE-35
 type Stream struct {
@@ -50,7 +50,7 @@ func (stream *Stream) Decode(fname string) []*Cue {
 	var cues []*Cue
 	chk(err)
 	defer file.Close()
-	buffer := make([]byte, BufSz)
+	buffer := make([]byte, bufSz)
 	for {
 		_, err := file.Read(buffer)
 		if err != nil {
@@ -63,9 +63,9 @@ func (stream *Stream) Decode(fname string) []*Cue {
 
 // DecodeBytes Parses a chunk of mpegts bytes for SCTE-35
 func (stream *Stream) DecodeBytes(bites []byte) []*Cue {
-	for i := 1; i <= (len(bites) / PktSz); i++ {
-		end := i * PktSz
-		start := end - PktSz
+	for i := 1; i <= (len(bites) / pktSz); i++ {
+		end := i * pktSz
+		start := end - pktSz
 		p := bites[start:end]
 		pkt := &p
 		stream.parse(*pkt)
@@ -133,8 +133,8 @@ func (stream *Stream) parsePayload(pkt []byte) []byte {
 		afl := int(pkt[4])
 		head += afl + 1
 	}
-	if head > PktSz {
-		head = PktSz
+	if head > pktSz {
+		head = pktSz
 	}
 	return pkt[head:]
 }
