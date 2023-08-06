@@ -16,15 +16,15 @@ func chk(e error) {
 	}
 }
 
-// DecB64 decodes base64 strings.
-func DecB64(b64 string) []byte {
+// decB64 decodes base64 strings.
+func decB64(b64 string) []byte {
 	deb64, err := base64.StdEncoding.DecodeString(b64)
 	chk(err)
 	return deb64
 }
 
-// EncB64 encodes  bytes to a Base64 string
-func EncB64(data []byte) string {
+// encB64 encodes  bytes to a Base64 string
+func encB64(data []byte) string {
 	b64 := base64.StdEncoding.EncodeToString(data)
 	return b64
 }
@@ -52,8 +52,8 @@ func mk90k(raw uint64) float64 {
 	return float64(uint64(nk*1000000)) / 1000000
 }
 
-// MkJson structs to JSON
-func MkJson(i interface{}) string {
+// mkJson structs to JSON
+func mkJson(i interface{}) string {
 	jason, err := json.MarshalIndent(&i, "", "    ")
 	chk(err)
 	return string(jason)
