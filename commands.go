@@ -1,5 +1,9 @@
 package cuei
 
+import (
+	"fmt"
+	)
+
 /*
 Command
 
@@ -29,6 +33,16 @@ type Command struct {
 	AvailExpected              uint8   `json:",omitempty"`
 	TimeSpecifiedFlag          bool    `json:",omitempty"`
 	PTS                        float64 `json:",omitempty"`
+}
+
+// Return Command as JSON
+func (cmd *Command)Json() string{
+	return mkJson(cmd)	
+}
+
+// Print Command as JSON
+func (cmd *Command)Show(){
+	fmt.Printf(cmd.Json())
 }
 
 // Decode a Splice Command
