@@ -54,6 +54,17 @@ type Descriptor struct {
 	SubSegmentsExpected              uint8       `json:",omitempty"`
 }
 
+// Return Descriptor as JSON
+func (dscptr *Descriptor)Json() string{
+	return mkJson(dscptr)	
+}
+
+// Print Descriptor as JSON
+func (dscptr *Descriptor)Show(){
+	fmt.Printf(dscptr.Json())
+}
+
+
 /*
 *
 Decode returns a Splice Descriptor by tag.
