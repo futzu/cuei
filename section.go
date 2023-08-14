@@ -27,6 +27,9 @@ func (infosec *InfoSection) Decode(bd *bitDecoder) bool {
 	}
 	infosec.SectionSyntaxIndicator = bd.asFlag()
 	infosec.Private = bd.asFlag()
+	if infosec.Private {
+		return false
+	}
 	infosec.Reserved = bd.asHex(2)
 	infosec.SectionLength = bd.uInt16(12)
 	infosec.ProtocolVersion = bd.uInt8(8)
