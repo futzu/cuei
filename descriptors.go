@@ -2,6 +2,7 @@ package cuei
 
 import (
 	"fmt"
+	"log"
 )
 
 // audioCmpt is a struct for audioDscptr Components
@@ -55,15 +56,14 @@ type Descriptor struct {
 }
 
 // Return Descriptor as JSON
-func (dscptr *Descriptor)Json() string{
-	return mkJson(dscptr)	
+func (dscptr *Descriptor) Json() string {
+	return mkJson(dscptr)
 }
 
 // Print Descriptor as JSON
-func (dscptr *Descriptor)Show(){
+func (dscptr *Descriptor) Show() {
 	fmt.Printf(dscptr.Json())
 }
-
 
 /*
 *
@@ -153,7 +153,11 @@ func (dscptr *Descriptor) timeDescriptor(bd *bitDecoder, tag uint8, length uint8
 func (dscptr *Descriptor) segmentationDescriptor(bd *bitDecoder, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
+	fmt.Println("Seg Desc Length: ", dscptr.Length)
 	dscptr.Identifier = bd.asAscii(32)
+	if dscptr.Identifier != "0x43554549" {
+		log.Fatal("Segmentation Descriptor Identifies is not 0x43554549")
+	}
 	dscptr.Name = "Segmentation Descriptor"
 	dscptr.SegmentationEventID = bd.asHex(32)
 	dscptr.SegmentationEventCancelIndicator = bd.asFlag()
