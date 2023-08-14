@@ -156,7 +156,7 @@ func (dscptr *Descriptor) segmentationDescriptor(bd *bitDecoder, tag uint8, leng
 	fmt.Println("Seg Desc Length: ", dscptr.Length)
 	dscptr.Identifier = bd.asAscii(32)
 	if dscptr.Identifier != "0x43554549" {
-		log.Fatal("Segmentation Descriptor Identifies is not 0x43554549")
+		log.Fatal("Segmentation Descriptor Identifies is not 0x43554549 but is ", dscptr.Identifier)
 	}
 	dscptr.Name = "Segmentation Descriptor"
 	dscptr.SegmentationEventID = bd.asHex(32)
