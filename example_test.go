@@ -62,7 +62,18 @@ func ExampleCue_Decode() {
 	data := "/DAWAAAAAAAAAP/wBQb+AKmKxwAACzuu2Q=="
 	cue := cuei.NewCue()
 	cue.Decode(data)
-	cue.Show()
+
+	// Cue values can be accessed via dot notiation
+
+	fmt.Println("Cue values can be accessed via dot notiation,")
+	fmt.Println("Cue.Command.Show()")
+	cue.Command.Show()
+	fmt.Println("\n\nSet cue.Command.PTS")
+	cue.Command.PTS = 987.654321
+	fmt.Printf("cue.Command.PTS = %v\n\n", cue.Command.PTS)
+	fmt.Println("Cue.Command.Show()")
+	cue.Command.Show()
+
 }
 
 func ExampleCue_Encode() {
@@ -86,6 +97,7 @@ func ExampleCue_Encode2Hex() {
 	fmt.Println(cue.Encode2Hex())
 	cue.Decode(cue.Encode2Hex())
 	cue.Show()
+	cue.Command.Show()
 }
 
 func ExampleCue_AdjustPts() {
@@ -123,4 +135,5 @@ func Test(t *testing.T) {
 	t.Run("Cue_Encode2Hex", func(t *testing.T) {
 		ExampleCue_Encode2Hex()
 	})
+
 }
