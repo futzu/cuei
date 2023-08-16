@@ -6,7 +6,7 @@ import (
 )
 
 /*
-
+*
 Cue is a SCTE35 cue.
 
 A Cue contains:
@@ -16,7 +16,9 @@ A Cue contains:
 	   	1 Dll  Descriptor loop length
 	   	0 or more Splice Descriptors
 	   	1 Crc32
-	   	0 or 1 packetData (if parsed from MPEGTS)
+	   	1 packetData (if parsed from MPEGTS)
+
+*
 */
 type Cue struct {
 	InfoSection *InfoSection
@@ -123,7 +125,7 @@ func (cue *Cue) Encode() []byte {
 	dloop := cue.rollLoop()
 	be.Add(cue.Dll, 16)
 	be.AddBytes(dloop, uint(cue.Dll<<3))
-	cue.Crc32 = cRC32(be.Bites.Bytes())
+	cue.Crc32 = MkCrc32(be.Bites.Bytes())
 	be.Add(cue.Crc32, 32)
 	return be.Bites.Bytes()
 }
@@ -161,8 +163,12 @@ func (cue *Cue) mkSpliceInsert() {
 }
 
 /*
+*
+
 	Convert  Cue.Command  from a  Time Signal
 	to a Splice Insert and return a base64 string
+
+*
 */
 func (cue *Cue) Six2Five() string {
 	segStarts := []uint16{0x22, 0x30, 0x32, 0x34, 0x36, 0x38, 0x3a, 0x3c, 0x3e, 0x44, 0x46}
@@ -179,10 +185,12 @@ func (cue *Cue) Six2Five() string {
 						cue.Command.DurationFlag = true
 						cue.Command.BreakAutoReturn = true
 						cue.Command.BreakDuration = dscptr.SegmentationDuration
+						//	return encB64(cue.Encode())
 					}
 				} else {
 					if isIn(segStops, uint16(dscptr.SegmentationTypeID)) {
 						cue.mkSpliceInsert()
+						//	return encB64(cue.Encode())
 					}
 				}
 			}
