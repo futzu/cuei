@@ -2,7 +2,7 @@ package cuei
 
 import (
 	"fmt"
-	)
+)
 
 /*
 Command
@@ -36,12 +36,12 @@ type Command struct {
 }
 
 // Return Command as JSON
-func (cmd *Command)Json() string{
-	return mkJson(cmd)	
+func (cmd *Command) Json() string {
+	return mkJson(cmd)
 }
 
 // Print Command as JSON
-func (cmd *Command)Show(){
+func (cmd *Command) Show() {
 	fmt.Printf(cmd.Json())
 }
 
