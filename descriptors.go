@@ -55,15 +55,14 @@ type Descriptor struct {
 }
 
 // Return Descriptor as JSON
-func (dscptr *Descriptor)Json() string{
-	return mkJson(dscptr)	
+func (dscptr *Descriptor) Json() string {
+	return mkJson(dscptr)
 }
 
 // Print Descriptor as JSON
-func (dscptr *Descriptor)Show(){
+func (dscptr *Descriptor) Show() {
 	fmt.Printf(dscptr.Json())
 }
-
 
 /*
 *
@@ -212,10 +211,10 @@ func (dscptr *Descriptor) decodeSegmentation(bd *bitDecoder) {
 	dscptr.SegmentsExpected = bd.uInt8(8)
 	subSegIDs := []uint16{0x34, 0x36, 0x38, 0x3a}
 	if isIn(subSegIDs, uint16(dscptr.SegmentationTypeID)) {
-		//dscptr.SubSegmentNum = bd.uInt8(8)
-		//dscptr.SubSegmentsExpected = bd.uInt8(8)
-		dscptr.SubSegmentNum = 0
-		dscptr.SubSegmentsExpected = 0
+		dscptr.SubSegmentNum = bd.uInt8(8)
+		dscptr.SubSegmentsExpected = bd.uInt8(8)
+		//dscptr.SubSegmentNum = 0
+		//dscptr.SubSegmentsExpected = 0
 	}
 }
 
