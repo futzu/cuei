@@ -20,10 +20,10 @@ type segCmpt struct {
 }
 
 type Descriptor struct {
-	Tag                              uint8       `json:",omitempty"`
-	Length                           uint8       `json:",omitempty"`
-	Identifier                       string      `json:",omitempty"`
-	Name                             string      `json:",omitempty"`
+	Tag                              uint8       
+	Length                           uint8       
+	Identifier                       string     
+	Name                             string      
 	AudioComponents                  []audioCmpt `json:",omitempty"`
 	ProviderAvailID                  uint32      `json:",omitempty"`
 	PreRoll                          uint8       `json:",omitempty"`
@@ -220,16 +220,15 @@ func (dscptr *Descriptor) decodeSegmentation(bd *bitDecoder) {
 
 func (dscptr *Descriptor) Encode(be *bitEncoder) {
 	switch dscptr.Tag {
+	case 0x0:
+		dscptr.encodeAvailDescriptor(be)
 	case 0x2:
 		dscptr.encodeSegmentationDescriptor(be)
-	case 0x0:
-		be.Add(uint32(dscptr.ProviderAvailID), 32)
 	}
 }
 
 // Encode for Avail Descriptors
 func (dscptr *Descriptor) encodeAvailDescriptor(be *bitEncoder) {
-	fmt.Printf("ProAvailID %v\n", dscptr.ProviderAvailID)
 	be.Add(uint32(dscptr.ProviderAvailID), 32)
 }
 
