@@ -1,10 +1,10 @@
 
 # cuei is a SCTE35 parser library in Go.
-- [x] Parses SCTE-35 Cues from MPEGTS or Bytes or Base64 or Hex or Int or Octal or even Base 36.🚡
-- [x] Parses SCTE-35 Cues spread over multiple MPEGTS packets  🪗
-- [x] Supports multi-packet PAT and PMT tables  🎚️
-- [x] Supports multiple MPEGTS Programs and multiple SCTE-35 streams 🩹
-- [x] Encodes Time Signals and Splice Inserts with Descriptors and Upids. 🧺
+- [x] Parses SCTE-35 Cues from MPEGTS or Bytes or Base64 or Hex or Int or Octal or even Base 36.
+- [x] Parses SCTE-35 Cues spread over multiple MPEGTS packets  
+- [x] Supports multi-packet PAT and PMT tables  
+- [x] Supports multiple MPEGTS Programs and multiple SCTE-35 streams 
+- [x] Encodes Time Signals and Splice Inserts with Descriptors and Upids. 
 
 ###  
   
@@ -33,13 +33,13 @@ func main(){                          // 6
 
 * [Install](#install-cuei)  🦼
 
-* [Go Docs](https://pkg.go.dev/github.com/futzu/cuei)  🔌
+* [Go Docs](https://pkg.go.dev/github.com/futzu/cuei)  
 
-* [Examples](https://pkg.go.dev/github.com/futzu/cuei) 🥑
+* [Examples](https://pkg.go.dev/github.com/futzu/cuei) 
 
-	* [Parse SCTE-35 from MPEGTS](#quick-demo) 🧲
+	* [Parse SCTE-35 from MPEGTS](#quick-demo) 
 	
-	* [Parse Base64 encoded SCTE-35](#parse-base64-encoded-scte-35) 🏌️‍♂️
+	* [Parse Base64 encoded SCTE-35](#parse-base64-encoded-scte-35) 
 	      
 	* [Use Dot Notation to access SCTE-35 Cue values](#use-dot-notation-to-access-scte-35-cue-values)
 		
