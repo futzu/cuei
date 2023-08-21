@@ -1,5 +1,9 @@
 package cuei
 
+import(
+	"fmt"
+)
+
 // InfoSection is the splice info section of the SCTE 35 cue.
 type InfoSection struct {
 	Name                   string
@@ -79,3 +83,14 @@ func (infosec *InfoSection) Encode() []byte {
 	return be.Bites.Bytes()
 
 }
+
+// Return InfoSection as JSON
+func (infosec *InfoSection) Json() string{
+	return mkJson(infosec)	
+}
+
+// Print InfoSection as JSON
+func (infosec *InfoSection) Show(){
+	fmt.Printf(infosec.Json())
+}
+
