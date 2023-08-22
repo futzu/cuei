@@ -51,9 +51,9 @@ func (cue *Cue) decodeBytes(bites []byte) bool {
 	var bd bitDecoder
 	bd.load(bites)
 	cue.InfoSection = &InfoSection{}
-	if cue.InfoSection.Decode(&bd) {
+	if cue.InfoSection.decode(&bd) {
 		cue.Command = &Command{}
-		cue.Command.Decode(cue.InfoSection.CommandType, &bd)
+		cue.Command.decode(cue.InfoSection.CommandType, &bd)
 		cue.Dll = bd.uInt16(16)
 		cue.dscptrLoop(cue.Dll, &bd)
 		cue.Crc32 = bd.uInt32(32)
@@ -74,7 +74,7 @@ func (cue *Cue) dscptrLoop(dll uint16, bd *bitDecoder) {
 		i++
 		i += length
 		var sdr Descriptor
-		sdr.Decode(bd, tag, uint8(length))
+		sdr.decode(bd, tag, uint8(length))
 		cue.Descriptors = append(cue.Descriptors, sdr)
 	}
 }
@@ -85,12 +85,12 @@ func (cue *Cue) rollLoop() []byte {
 	for _, dscptr := range cue.Descriptors {
 		bf := &bitEncoder{}
 		bf.Add(1, 8) //bumper to keep leading zeros
-		dscptr.Encode(bf)
+		dscptr.encode(bf)
 		be.Add(dscptr.Tag, 8)
 		// +3 is  +4 for identifier and -1 for the bumper.
 		be.Add(len(bf.Bites.Bytes())+3, 8)
 		be.AddBytes([]byte("CUEI"), 32)
-		dscptr.Encode(be)
+		dscptr.encode(be)
 	}
 	cue.Dll = uint16(len(be.Bites.Bytes()) - 1)
 	return be.Bites.Bytes()[1:]
@@ -109,14 +109,14 @@ func (cue *Cue) AdjustPts(seconds float64) {
 
 // Encode Cue currently works for Splice Inserts and Time Signals
 func (cue *Cue) Encode() []byte {
-	cmdb := cue.Command.Encode()
+	cmdb := cue.Command.encode()
 	cmdl := len(cmdb)
 	cue.InfoSection.CommandLength = uint16(cmdl)
 	cue.InfoSection.CommandType = cue.Command.CommandType
 	// 11 bytes for info section + command + 2 descriptor loop length
 	// + descriptor loop + 4 for crc
 	cue.InfoSection.SectionLength = uint16(11+cmdl+2+4) + cue.Dll
-	isecb := cue.InfoSection.Encode()
+	isecb := cue.InfoSection.encode()
 	be := &bitEncoder{}
 	isecbits := uint(len(isecb) << 3)
 	be.AddBytes(isecb, isecbits)
