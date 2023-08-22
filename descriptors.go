@@ -20,10 +20,10 @@ type segCmpt struct {
 }
 
 type Descriptor struct {
-	Tag                              uint8       
-	Length                           uint8       
-	Identifier                       string     
-	Name                             string      
+	Tag                              uint8
+	Length                           uint8
+	Identifier                       string
+	Name                             string
 	AudioComponents                  []audioCmpt `json:",omitempty"`
 	ProviderAvailID                  uint32      `json:",omitempty"`
 	PreRoll                          uint8       `json:",omitempty"`
@@ -78,7 +78,7 @@ Decode returns a Splice Descriptor by tag.
 
 *
 */
-func (dscptr *Descriptor) Decode(bd *bitDecoder, tag uint8, length uint8) {
+func (dscptr *Descriptor) decode(bd *bitDecoder, tag uint8, length uint8) {
 	switch tag {
 	case 0x0:
 		dscptr.Tag = 0x0
@@ -199,7 +199,7 @@ func (dscptr *Descriptor) decodeSegmentation(bd *bitDecoder) {
 	dscptr.SegmentationUpidLength = bd.uInt8(8)
 	if dscptr.SegmentationUpidLength > 0 {
 		dscptr.SegmentationUpid = &Upid{}
-		dscptr.SegmentationUpid.Decode(bd, dscptr.SegmentationUpidType, dscptr.SegmentationUpidLength)
+		dscptr.SegmentationUpid.decode(bd, dscptr.SegmentationUpidType, dscptr.SegmentationUpidLength)
 	}
 	dscptr.SegmentationTypeID = bd.uInt8(8)
 
@@ -218,7 +218,7 @@ func (dscptr *Descriptor) decodeSegmentation(bd *bitDecoder) {
 	}
 }
 
-func (dscptr *Descriptor) Encode(be *bitEncoder) {
+func (dscptr *Descriptor) encode(be *bitEncoder) {
 	switch dscptr.Tag {
 	case 0x0:
 		dscptr.encodeAvailDescriptor(be)
@@ -283,7 +283,7 @@ func (dscptr *Descriptor) encodeSegmentation(be *bitEncoder) {
 	be.Add(dscptr.SegmentationUpidLength, 8)
 	//be.Reserve(int(dscptr.SegmentationUpidLength <<3))
 	if dscptr.SegmentationUpidLength > 0 {
-		dscptr.SegmentationUpid.Encode(be, dscptr.SegmentationUpidType)
+		dscptr.SegmentationUpid.encode(be, dscptr.SegmentationUpidType)
 	}
 	be.Add(dscptr.SegmentationTypeID, 8)
 	dscptr.encodeSegments(be)
