@@ -46,7 +46,7 @@ func (cmd *Command) Show() {
 }
 
 // Decode a Splice Command
-func (cmd *Command) Decode(cmdtype uint8, bd *bitDecoder) {
+func (cmd *Command) decode(cmdtype uint8, bd *bitDecoder) {
 	cmd.CommandType = cmdtype
 	switch cmdtype {
 	case 0x0:
@@ -65,7 +65,7 @@ func (cmd *Command) Decode(cmdtype uint8, bd *bitDecoder) {
 
 // Encode a Splice Command and return the bytes
 // mostly used by cuei.Cue
-func (cmd *Command) Encode() []byte {
+func (cmd *Command) encode() []byte {
 	blank := []byte{}
 	switch cmd.CommandType {
 	case 0x5:
