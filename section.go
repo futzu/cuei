@@ -1,6 +1,6 @@
 package cuei
 
-import(
+import (
 	"fmt"
 )
 
@@ -22,8 +22,8 @@ type InfoSection struct {
 	CommandType            uint8
 }
 
-// Decode Splice Info Section values.
-func (infosec *InfoSection) Decode(bd *bitDecoder) bool {
+// decode Splice Info Section values.
+func (infosec *InfoSection) decode(bd *bitDecoder) bool {
 	infosec.Name = "Splice Info Section"
 	infosec.TableID = bd.asHex(8)
 	if infosec.TableID != "0xfc" {
@@ -67,7 +67,7 @@ func (infosec *InfoSection) defaults() {
 Encode Splice Info Section
 Encodes the InfoSection variables to bytes.
 */
-func (infosec *InfoSection) Encode() []byte {
+func (infosec *InfoSection) encode() []byte {
 	be := &bitEncoder{}
 	be.Add(uint16(0xfc), 16)
 	be.Add(48, 8)
@@ -85,12 +85,11 @@ func (infosec *InfoSection) Encode() []byte {
 }
 
 // Return InfoSection as JSON
-func (infosec *InfoSection) Json() string{
-	return mkJson(infosec)	
+func (infosec *InfoSection) Json() string {
+	return mkJson(infosec)
 }
 
 // Print InfoSection as JSON
-func (infosec *InfoSection) Show(){
+func (infosec *InfoSection) Show() {
 	fmt.Printf(infosec.Json())
 }
-
