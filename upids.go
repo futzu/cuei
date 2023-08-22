@@ -41,7 +41,7 @@ type Upid struct {
 }
 
 // Decode Upids
-func (upid *Upid) Decode(bd *bitDecoder, upidType uint8, upidlen uint8) {
+func (upid *Upid) decode(bd *bitDecoder, upidType uint8, upidlen uint8) {
 
 	upid.UpidType = upidType
 
@@ -128,13 +128,13 @@ func (upid *Upid) mid(bd *bitDecoder, upidlen uint8) {
 		i++
 		i += ulen
 		var mupid Upid
-		upid.Decode(bd, utype, ulen)
+		upid.decode(bd, utype, ulen)
 		upid.Upids = append(upid.Upids, mupid)
 	}
 }
 
 // Encode Upids
-func (upid *Upid) Encode(be *bitEncoder, upidType uint8) {
+func (upid *Upid) encode(be *bitEncoder, upidType uint8) {
 	switch upid.UpidType {
 	case 0x05, 0x06:
 		upid.encodeIsan(be)
