@@ -26,7 +26,7 @@ func bytecrc(crc int, aPoly int) int {
 func mkTable() [twoFiftySix]int {
 	var tbl [twoFiftySix]int
 	newPoly := initPoly & initValue
-	for idx, _ := range tbl {
+	for idx := range tbl {
 		tbl[idx] = bytecrc((idx << twentyFour), newPoly)
 	}
 	return tbl
