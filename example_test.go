@@ -62,17 +62,11 @@ func ExampleCue_Decode() {
 	data := "/DAWAAAAAAAAAP/wBQb+AKmKxwAACzuu2Q=="
 	cue := cuei.NewCue()
 	cue.Decode(data)
-
-	// Cue values can be accessed via dot notiation
-
-	fmt.Println("Cue values can be accessed via dot notiation,")
-	fmt.Println("Cue.Command.Show()")
-	cue.Command.Show()
-	fmt.Println("\n\nSet cue.Command.PTS")
+	fmt.Println("Cue.Decode() parses data and populate the fields in the Cue.")
+	cue.Show()
+	fmt.Println("\n\nCue values can be accessed via dot notiation,")
 	cue.Command.PTS = 987.654321
-	fmt.Printf("cue.Command.PTS = %v\n\n", cue.Command.PTS)
-	fmt.Println("Cue.Command.Show()")
-	cue.Command.Show()
+	fmt.Printf("cue.Command.PTS = %v\n", cue.Command.PTS)
 
 }
 
@@ -104,12 +98,24 @@ func ExampleCue_AdjustPts() {
 	data := "/DAWAAAAAAAAAP/wBQb+AKmKxwAACzuu2Q=="
 	cue := cuei.NewCue()
 	cue.Decode(data)
-	cue.Show()
+	fmt.Println("Before calling Cue.AdjustPts")
+	fmt.Println(data)
+	cue.InfoSection.Show()
+	fmt.Println()
 	// Change cue.InfoSection.PtsAdjustment and re-encode cue to bytes
 	cue.AdjustPts(33.333)
+	fmt.Println("After calling Cue.AdjustPts")
+	fmt.Println(cue.Encode2B64())
+	cue.InfoSection.Show()
+
+
+}
+
+func ExampleCue_Show() {
+	data := "/DAWAAAAAAAAAP/wBQb+AKmKxwAACzuu2Q=="
+	cue := cuei.NewCue()
+	cue.Decode(data)
 	cue.Show()
-	fmt.Println("Was", data)
-	fmt.Println("Is", cue.Encode2B64())
 }
 
 func Test(t *testing.T) {
@@ -135,5 +141,7 @@ func Test(t *testing.T) {
 	t.Run("Cue_Encode2Hex", func(t *testing.T) {
 		ExampleCue_Encode2Hex()
 	})
-
+	t.Run("Cue_Show", func(t *testing.T) {
+		ExampleCue_Show()
+	})
 }
