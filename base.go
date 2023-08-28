@@ -29,7 +29,7 @@ func encB64(data []byte) string {
 	return b64
 }
 
-// hex2Int Hexidecimal string to uint64
+// hex2Int Hexadecimal string to uint64
 func hex2Int(str string) uint64 {
 	i := new(big.Int)
 	_, err := fmt.Sscan(str, i)
