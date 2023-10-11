@@ -167,12 +167,13 @@ func (cue *Cue) mkSpliceInsert() {
 
 	Convert  Cue.Command  from a  Time Signal
 	to a Splice Insert and return a base64 string
-
+ 	SegmentationTypeIds to trigger CUE-OUTs : 0x22, 0x30, 0x32, 0x34, 0x36, 0x44, 0x46
+	SegmentationTypeIds to trigger CUE-INs:  0x23, 0x31, 0x33, 0x35, 0x37, 0x45, 0x47
 *
 */
 func (cue *Cue) Six2Five() string {
-	segStarts := []uint16{0x22, 0x30, 0x32}
-	segStops := []uint16{0x23, 0x31, 0x33}
+	segStarts := []uint16{0x22, 0x30, 0x32, 0x34, 0x36, 0x44, 0x46}
+	segStops := []uint16{0x23, 0x31, 0x33, 0x35, 0x37, 0x45, 0x47}
 	if cue.InfoSection.CommandType == 6 {
 		for _, dscptr := range cue.Descriptors {
 			if dscptr.Tag == 2 {
