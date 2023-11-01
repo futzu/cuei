@@ -98,7 +98,6 @@ func (stream *Stream) parsePusi(pkt []byte) bool {
 
 // parsePts parses a packet for PTS
 func (stream *Stream) parsePts(pay []byte, pid uint16) {
-    if stream.Pids.isPcrPid(pid){
         if stream.ptsFlag(pay) {
             prgm, ok := stream.Pid2Prgm[pid]
             if ok {
@@ -107,11 +106,19 @@ func (stream *Stream) parsePts(pay []byte, pid uint16) {
                 pts |= (uint64(pay[11]) >> 1) << 15
                 pts |= uint64(pay[12]) << 7
                 pts |= uint64(pay[13]) >> 1
+                // stops the pts from going backwards 
+                // if the streams are out of sync
+                current, ok := stream.Prgm2Pts[prgm] 
+                if  ok {
+                        if current > pts {
+                            return 
+                        }
+                }
                 stream.Prgm2Pts[prgm] = pts
             }
+                    
         }
     }
-}
 
 
 // parsePcr parses a packet for PCR
