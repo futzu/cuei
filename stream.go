@@ -108,12 +108,12 @@ func (stream *Stream) parsePts(pay []byte, pid uint16) {
                 pts |= uint64(pay[13]) >> 1
                 // stops the pts from going backwards 
                 // if the streams are out of sync
-                current, ok := stream.Prgm2Pts[prgm] 
-                if  ok {
-                        if current > pts {
-                            return 
-                        }
-                }
+              //  current, ok := stream.Prgm2Pts[prgm] 
+            //    if  ok {
+             //           if current > pts {
+               //             return 
+               //         }
+              //  }
                 stream.Prgm2Pts[prgm] = pts
             }
                     
