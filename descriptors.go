@@ -2,6 +2,7 @@ package cuei
 
 import (
 	"fmt"
+	"log"
 )
 
 // audioCmpt is a struct for audioDscptr Components
@@ -153,6 +154,9 @@ func (dscptr *Descriptor) segmentationDescriptor(bd *bitDecoder, tag uint8, leng
 	dscptr.Tag = tag
 	dscptr.Length = length
 	dscptr.Identifier = bd.asAscii(32)
+	if dscptr.Identifier != "CUEI" {
+		log.Fatal("Segmentation Descriptor Identifies is not 0x43554549 but is ", dscptr.Identifier)
+	}
 	dscptr.Name = "Segmentation Descriptor"
 	dscptr.SegmentationEventID = bd.asHex(32)
 	dscptr.SegmentationEventCancelIndicator = bd.asFlag()
