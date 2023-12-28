@@ -15,24 +15,37 @@ Command
 	     0x7: Bandwidth Reservation,
 	     0xff: Private,
 */
-type Command struct {
-	Name                       string
-	CommandType                uint8
-	PrivateBytes               []byte  `json:",omitempty"`
-	Identifier                 uint32  `json:",omitempty"`
+
+type SpliceInsert struct {
 	SpliceEventID              uint32  `json:",omitempty"`
 	SpliceEventCancelIndicator bool    `json:",omitempty"`
 	OutOfNetworkIndicator      bool    `json:",omitempty"`
 	ProgramSpliceFlag          bool    `json:",omitempty"`
 	DurationFlag               bool    `json:",omitempty"`
-	BreakAutoReturn            bool    `json:",omitempty"`
 	BreakDuration              float64 `json:",omitempty"`
+	BreakAutoReturn            bool    `json:",omitempty"`
 	SpliceImmediateFlag        bool    `json:",omitempty"`
 	UniqueProgramID            uint16  `json:",omitempty"`
 	AvailNum                   uint8   `json:",omitempty"`
 	AvailExpected              uint8   `json:",omitempty"`
-	TimeSpecifiedFlag          bool    `json:",omitempty"`
-	PTS                        float64 `json:",omitempty"`
+}
+
+type TimeSignal struct {
+	TimeSpecifiedFlag bool `json:",omitempty"`
+}
+
+type PrivateCommand struct {
+	Identifier   uint32 `json:",omitempty"`
+	PrivateBytes []byte `json:",omitempty"`
+}
+
+type Command struct {
+	Name           string
+	CommandType    uint8
+	PTS            float64 `json:",omitempty"`
+	SpliceInsert   `json:",omitempty"`
+	TimeSignal     `json:",omitempty"`
+	PrivateCommand `json:",omitempty"`
 }
 
 // Return Command as JSON
