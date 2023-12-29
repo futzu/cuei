@@ -1,6 +1,7 @@
 package cuei
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
@@ -15,37 +16,84 @@ Command
 	     0x7: Bandwidth Reservation,
 	     0xff: Private,
 */
-
-type SpliceInsert struct {
-	SpliceEventID              uint32  `json:",omitempty"`
-	SpliceEventCancelIndicator bool    `json:",omitempty"`
-	OutOfNetworkIndicator      bool    `json:",omitempty"`
-	ProgramSpliceFlag          bool    `json:",omitempty"`
-	DurationFlag               bool    `json:",omitempty"`
-	BreakDuration              float64 `json:",omitempty"`
-	BreakAutoReturn            bool    `json:",omitempty"`
-	SpliceImmediateFlag        bool    `json:",omitempty"`
-	UniqueProgramID            uint16  `json:",omitempty"`
-	AvailNum                   uint8   `json:",omitempty"`
-	AvailExpected              uint8   `json:",omitempty"`
-}
-
-type TimeSignal struct {
-	TimeSpecifiedFlag bool `json:",omitempty"`
-}
-
-type PrivateCommand struct {
-	Identifier   uint32 `json:",omitempty"`
-	PrivateBytes []byte `json:",omitempty"`
-}
-
 type Command struct {
-	Name           string
-	CommandType    uint8
-	PTS            float64 `json:",omitempty"`
-	SpliceInsert   `json:",omitempty"`
-	TimeSignal     `json:",omitempty"`
-	PrivateCommand `json:",omitempty"`
+	Name                       string
+	CommandType                uint8
+	PrivateBytes               []byte
+	Identifier                 uint32
+	SpliceEventID              uint32
+	SpliceEventCancelIndicator bool
+	OutOfNetworkIndicator      bool
+	ProgramSpliceFlag          bool
+	DurationFlag               bool
+	BreakAutoReturn            bool
+	BreakDuration              float64
+	SpliceImmediateFlag        bool
+	UniqueProgramID            uint16
+	AvailNum                   uint8
+	AvailExpected              uint8
+	TimeSpecifiedFlag          bool
+	PTS                        float64
+}
+
+// only show TimeSignal values in JSON, used by cmd.MarshalJSON()
+func (cmd *Command) jsonTimeSignal() ([]byte, error) {
+	return json.Marshal(struct {
+		Name              string
+		CommandType       uint8
+		TimeSpecifiedFlag bool
+		PTS               float64
+	}{
+		Name:              cmd.Name,
+		CommandType:       cmd.CommandType,
+		TimeSpecifiedFlag: cmd.TimeSpecifiedFlag,
+		PTS:               cmd.PTS})
+
+}
+
+// only show SpliceInsert values in JSON, used by cmd.MarshalJSON()
+func (cmd *Command) jsonSpliceInsert() ([]byte, error) {
+	return json.Marshal(struct {
+		Name                       string
+		CommandType                uint8
+		SpliceEventID              uint32
+		SpliceEventCancelIndicator bool
+		OutOfNetworkIndicator      bool
+		ProgramSpliceFlag          bool
+		DurationFlag               bool
+		BreakDuration              float64
+		BreakAutoReturn            bool
+		SpliceImmediateFlag        bool
+		UniqueProgramID            uint16
+		AvailNum                   uint8
+		AvailExpected              uint8
+		PTS                        float64
+	}{
+		Name:                       cmd.Name,
+		CommandType:                cmd.CommandType,
+		SpliceEventID:              cmd.SpliceEventID,
+		SpliceEventCancelIndicator: cmd.SpliceEventCancelIndicator,
+		OutOfNetworkIndicator:      cmd.OutOfNetworkIndicator,
+		ProgramSpliceFlag:          cmd.ProgramSpliceFlag,
+		DurationFlag:               cmd.DurationFlag,
+		BreakDuration:              cmd.BreakDuration,
+		BreakAutoReturn:            cmd.BreakAutoReturn,
+		SpliceImmediateFlag:        cmd.SpliceImmediateFlag,
+		UniqueProgramID:            cmd.UniqueProgramID,
+		AvailNum:                   cmd.AvailNum,
+		AvailExpected:              cmd.AvailExpected,
+		PTS:                        cmd.PTS})
+}
+
+func (cmd *Command) MarshalJSON() ([]byte, error) {
+	switch cmd.CommandType {
+	case 0x5:
+		return cmd.jsonSpliceInsert()
+	case 0x6:
+		return cmd.jsonTimeSignal()
+	}
+	return json.Marshal(cmd)
+
 }
 
 // Return Command as JSON
