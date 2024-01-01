@@ -1,6 +1,7 @@
 package cuei
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
@@ -20,43 +21,136 @@ type segCmpt struct {
 }
 
 type Descriptor struct {
-	Tag                              uint8
-	Length                           uint8
-	Identifier                       string
-	Name                             string
-	AudioComponents                  []audioCmpt `json:",omitempty"`
-	ProviderAvailID                  uint32      `json:",omitempty"`
-	PreRoll                          uint8       `json:",omitempty"`
-	DTMFCount                        uint8       `json:",omitempty"`
-	DTMFChars                        uint64      `json:",omitempty"`
-	TAISeconds                       uint64      `json:",omitempty"`
-	TAINano                          uint32      `json:",omitempty"`
-	UTCOffset                        uint16      `json:",omitempty"`
-	SegmentationEventID              string      `json:",omitempty"`
-	SegmentationEventCancelIndicator bool        `json:",omitempty"`
-	ProgramSegmentationFlag          bool        `json:",omitempty"`
-	SegmentationDurationFlag         bool        `json:",omitempty"`
-	DeliveryNotRestrictedFlag        bool        `json:",omitempty"`
-	WebDeliveryAllowedFlag           bool        `json:",omitempty"`
-	NoRegionalBlackoutFlag           bool        `json:",omitempty"`
-	ArchiveAllowedFlag               bool        `json:",omitempty"`
-	DeviceRestrictions               string      `json:",omitempty"`
-	Components                       []segCmpt   `json:",omitempty"`
-	SegmentationDuration             float64     `json:",omitempty"`
-	SegmentationMessage              string      `json:",omitempty"`
-	SegmentationUpidType             uint8       `json:",omitempty"`
-	SegmentationUpidLength           uint8       `json:",omitempty"`
-	SegmentationUpid                 *Upid       `json:",omitempty"`
-	SegmentationTypeID               uint8       `json:",omitempty"`
-	SegmentNum                       uint8       `json:",omitempty"`
-	SegmentsExpected                 uint8       `json:",omitempty"`
-	SubSegmentNum                    uint8       `json:",omitempty"`
-	SubSegmentsExpected              uint8       `json:",omitempty"`
+	Tag             uint8
+	Length          uint8
+	Identifier      string
+	Name            string
+	ProviderAvailID uint32
+	AudioComponents []audioCmpt
+	PreRoll                          uint8
+	DTMFCount                        uint8
+	DTMFChars                        uint64
+	TAISeconds                       uint64
+	TAINano                          uint32
+	UTCOffset                        uint16
+	SegmentationEventID              string
+	SegmentationEventCancelIndicator bool
+	ProgramSegmentationFlag          bool
+	SegmentationDurationFlag         bool
+	DeliveryNotRestrictedFlag        bool
+	WebDeliveryAllowedFlag           bool
+	NoRegionalBlackoutFlag           bool
+	ArchiveAllowedFlag               bool
+	DeviceRestrictions               string
+	Components                       []segCmpt
+	SegmentationDuration             float64
+	SegmentationMessage              string
+	SegmentationUpidType             uint8
+	SegmentationUpidLength           uint8
+	SegmentationUpid                 *Upid
+	SegmentationTypeID               uint8
+	SegmentNum                       uint8
+	SegmentsExpected                 uint8
+	SubSegmentNum                    uint8
+	SubSegmentsExpected              uint8
+}
+
+func (dscptr *Descriptor) jsonAvailDescriptor() ([]byte, error) {
+	return json.Marshal(struct {
+		Tag             uint8
+		Length          uint8
+		Identifier      string
+		Name            string
+		ProviderAvailID uint32
+	}{Tag: dscptr.Tag,
+		Length:          dscptr.Length,
+		Identifier:      dscptr.Identifier,
+		Name:            dscptr.Name,
+		ProviderAvailID: dscptr.ProviderAvailID})
+}
+
+func (dscptr *Descriptor) jsonDTMFDescriptor() ([]byte, error) {
+	return json.Marshal(struct {
+		Tag        uint8
+		Length     uint8
+		Identifier string
+		Name       string
+		PreRoll    uint8
+		DTMFCount  uint8
+		DTMFChars  uint64
+	}{
+		Tag:        dscptr.Tag,
+		Length:     dscptr.Length,
+		Identifier: dscptr.Identifier,
+		Name:       dscptr.Name,
+		PreRoll:    dscptr.PreRoll,
+		DTMFCount:  dscptr.DTMFCount,
+		DTMFChars:  dscptr.DTMFChars})
+}
+
+func (dscptr *Descriptor) jsonSegmentationDescriptor() ([]byte, error) {
+	return json.Marshal(struct {
+		SegmentationEventID              string
+		SegmentationEventCancelIndicator bool
+		ProgramSegmentationFlag          bool
+		SegmentationDurationFlag         bool
+		DeliveryNotRestrictedFlag        bool
+		WebDeliveryAllowedFlag           bool
+		NoRegionalBlackoutFlag           bool
+		ArchiveAllowedFlag               bool
+		DeviceRestrictions               string
+		Components                       []segCmpt
+		SegmentationDuration             float64
+		SegmentationMessage              string
+		SegmentationUpidType             uint8
+		SegmentationUpidLength           uint8
+		SegmentationUpid                 *Upid
+		SegmentationTypeID               uint8
+		SegmentNum                       uint8
+		SegmentsExpected                 uint8
+		SubSegmentNum                    uint8
+		SubSegmentsExpected              uint8
+	}{SegmentationEventID: dscptr.SegmentationEventID,
+		SegmentationEventCancelIndicator: dscptr.SegmentationEventCancelIndicator,
+		ProgramSegmentationFlag:          dscptr.ProgramSegmentationFlag,
+		SegmentationDurationFlag:         dscptr.SegmentationDurationFlag,
+		DeliveryNotRestrictedFlag:        dscptr.DeliveryNotRestrictedFlag,
+		WebDeliveryAllowedFlag:           dscptr.WebDeliveryAllowedFlag,
+		NoRegionalBlackoutFlag:           dscptr.NoRegionalBlackoutFlag,
+		ArchiveAllowedFlag:               dscptr.ArchiveAllowedFlag,
+		DeviceRestrictions:               dscptr.DeviceRestrictions,
+		Components:                       dscptr.Components,
+		SegmentationDuration:             dscptr.SegmentationDuration,
+		SegmentationMessage:              dscptr.SegmentationMessage,
+		SegmentationUpidType:             dscptr.SegmentationUpidType,
+		SegmentationUpidLength:           dscptr.SegmentationUpidLength,
+		SegmentationUpid:                 dscptr.SegmentationUpid,
+		SegmentationTypeID:               dscptr.SegmentationTypeID,
+		SegmentNum:                       dscptr.SegmentNum,
+		SegmentsExpected:                 dscptr.SegmentsExpected,
+		SubSegmentNum:                    dscptr.SubSegmentNum,
+		SubSegmentsExpected:              dscptr.SubSegmentsExpected})
+}
+
+func (dscptr *Descriptor) MarshalJSON() ([]byte, error) {
+	switch dscptr.Tag {
+	case 0x0:
+		return dscptr.jsonAvailDescriptor()
+	case 0x1:
+		return dscptr.jsonDTMFDescriptor()
+	case 0x2:
+		return dscptr.jsonSegmentationDescriptor()
+	}
+	jason, err := json.Marshal("smashin' stacks")
+	chk(err)
+	return jason, err
 }
 
 // Return Descriptor as JSON
 func (dscptr *Descriptor) Json() string {
-	return mkJson(dscptr)
+	stuff, err := dscptr.MarshalJSON()
+	chk(err)
+	return string(stuff)
 }
 
 // Print Descriptor as JSON
