@@ -23,6 +23,7 @@ type Command struct {
 	Identifier                 uint32
 	SpliceEventID              uint32
 	SpliceEventCancelIndicator bool
+    EventIDComplianceFlag      bool
 	OutOfNetworkIndicator      bool
 	ProgramSpliceFlag          bool
 	DurationFlag               bool
@@ -58,12 +59,13 @@ func (cmd *Command) jsonSpliceInsert() ([]byte, error) {
 		CommandType                uint8
 		SpliceEventID              uint32
 		SpliceEventCancelIndicator bool
-		OutOfNetworkIndicator      bool
+        OutOfNetworkIndicator      bool
 		ProgramSpliceFlag          bool
 		DurationFlag               bool
 		BreakDuration              float64
 		BreakAutoReturn            bool
 		SpliceImmediateFlag        bool
+        EventIDComplianceFlag       bool
 		UniqueProgramID            uint16
 		AvailNum                   uint8
 		AvailExpected              uint8
@@ -79,6 +81,7 @@ func (cmd *Command) jsonSpliceInsert() ([]byte, error) {
 		BreakDuration:              cmd.BreakDuration,
 		BreakAutoReturn:            cmd.BreakAutoReturn,
 		SpliceImmediateFlag:        cmd.SpliceImmediateFlag,
+        EventIDComplianceFlag:      cmd.EventIDComplianceFlag,
 		UniqueProgramID:            cmd.UniqueProgramID,
 		AvailNum:                   cmd.AvailNum,
 		AvailExpected:              cmd.AvailExpected,
@@ -168,7 +171,8 @@ func (cmd *Command) decodeSpliceInsert(bd *bitDecoder) {
 	cmd.ProgramSpliceFlag = bd.asFlag()
 	cmd.DurationFlag = bd.asFlag()
 	cmd.SpliceImmediateFlag = bd.asFlag()
-	bd.goForward(4)
+    cmd.EventIDComplianceFlag = bd.Flag()
+	bd.goForward(3)
 	if !cmd.SpliceImmediateFlag {
 		cmd.spliceTime(bd)
 	}
@@ -191,7 +195,8 @@ func (cmd *Command) encodeSpliceInsert() []byte {
 	be.Add(cmd.ProgramSpliceFlag, 1)
 	be.Add(cmd.DurationFlag, 1)
 	be.Add(cmd.SpliceImmediateFlag, 1)
-	be.Reserve(4)
+    be.Add(cmd.EventIDComplianceFlag,1)
+	be.Reserve(3)
 	if !cmd.SpliceImmediateFlag {
 		cmd.encodeSpliceTime(be)
 	}
