@@ -14,12 +14,6 @@ type audioCmpt struct {
 	FullSrvcAudio bool
 }
 
-// segCmpt Segmentation Descriptor Component
-type segCmpt struct {
-	ComponentTag uint8
-	PtsOffset    float64
-}
-
 type Descriptor struct {
 	Tag             uint8
 	Length          uint8
@@ -27,6 +21,7 @@ type Descriptor struct {
 	Name            string
 	ProviderAvailID uint32
 	AudioComponents []audioCmpt
+
 	PreRoll                          uint8
 	DTMFCount                        uint8
 	DTMFChars                        uint64
@@ -35,6 +30,7 @@ type Descriptor struct {
 	UTCOffset                        uint16
 	SegmentationEventID              string
 	SegmentationEventCancelIndicator bool
+    SegmentationEventIDComplianceIndicator bool
 	ProgramSegmentationFlag          bool
 	SegmentationDurationFlag         bool
 	DeliveryNotRestrictedFlag        bool
@@ -42,7 +38,6 @@ type Descriptor struct {
 	NoRegionalBlackoutFlag           bool
 	ArchiveAllowedFlag               bool
 	DeviceRestrictions               string
-	Components                       []segCmpt
 	SegmentationDuration             float64
 	SegmentationMessage              string
 	SegmentationUpidType             uint8
@@ -92,6 +87,7 @@ func (dscptr *Descriptor) jsonSegmentationDescriptor() ([]byte, error) {
 	return json.Marshal(struct {
 		SegmentationEventID              string
 		SegmentationEventCancelIndicator bool
+        SegmentationEventIDComplianceIndicator bool
 		ProgramSegmentationFlag          bool
 		SegmentationDurationFlag         bool
 		DeliveryNotRestrictedFlag        bool
@@ -112,6 +108,7 @@ func (dscptr *Descriptor) jsonSegmentationDescriptor() ([]byte, error) {
 		SubSegmentsExpected              uint8
 	}{SegmentationEventID: dscptr.SegmentationEventID,
 		SegmentationEventCancelIndicator: dscptr.SegmentationEventCancelIndicator,
+        SegmentationEventIDComplianceIndicator: dscptr.SegmentationEventIDComplianceIndicator,
 		ProgramSegmentationFlag:          dscptr.ProgramSegmentationFlag,
 		SegmentationDurationFlag:         dscptr.SegmentationDurationFlag,
 		DeliveryNotRestrictedFlag:        dscptr.DeliveryNotRestrictedFlag,
@@ -250,12 +247,10 @@ func (dscptr *Descriptor) segmentationDescriptor(bd *bitDecoder, tag uint8, leng
 	dscptr.Name = "Segmentation Descriptor"
 	dscptr.SegmentationEventID = bd.asHex(32)
 	dscptr.SegmentationEventCancelIndicator = bd.asFlag()
-	bd.goForward(7)
+    dscptr.SegmentationEventIDComplianceIndicator = bd.asFlag()
+	bd.goForward(6)
 	if !dscptr.SegmentationEventCancelIndicator {
 		dscptr.decodeSegFlags(bd)
-		if !dscptr.ProgramSegmentationFlag {
-			dscptr.decodeSegCmpnts(bd)
-		}
 		dscptr.decodeSegmentation(bd)
 	}
 }
@@ -274,16 +269,6 @@ func (dscptr *Descriptor) decodeSegFlags(bd *bitDecoder) {
 	}
 }
 
-func (dscptr *Descriptor) decodeSegCmpnts(bd *bitDecoder) {
-	ccount := bd.uInt8(8)
-	for ccount > 0 { // 6 bytes each
-		ccount--
-		ct := bd.uInt8(8)
-		bd.goForward(7)
-		po := bd.as90k(33)
-		dscptr.Components = append(dscptr.Components, segCmpt{ct, po})
-	}
-}
 
 func (dscptr *Descriptor) decodeSegmentation(bd *bitDecoder) {
 	if dscptr.SegmentationDurationFlag {
@@ -330,26 +315,11 @@ func (dscptr *Descriptor) encodeAvailDescriptor(be *bitEncoder) {
 func (dscptr *Descriptor) encodeSegmentationDescriptor(be *bitEncoder) {
 	be.AddHex64(dscptr.SegmentationEventID, 32)
 	be.Add(dscptr.SegmentationEventCancelIndicator, 1)
-	be.Reserve(7)
+    be.Add(dscptr.SegmentationEventIDComplianceIndicator,1)
+	be.Reserve(6)
 	if !dscptr.SegmentationEventCancelIndicator {
 		dscptr.encodeFlags(be)
-		if !dscptr.ProgramSegmentationFlag {
-			dscptr.encodeComponents(be)
-		}
 		dscptr.encodeSegmentation(be)
-	}
-}
-
-func (dscptr *Descriptor) encodeComponents(be *bitEncoder) {
-	count := uint8(len(dscptr.Components))
-	be.Add(count, 8)
-	cc := uint8(0)
-	for cc < count {
-		comp := dscptr.Components[cc]
-		be.Add(comp.ComponentTag, 8)
-		be.Reserve(7)
-		be.Add(comp.PtsOffset, 33)
-		cc++
 	}
 }
 
