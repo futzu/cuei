@@ -171,7 +171,7 @@ func (cmd *Command) decodeSpliceInsert(bd *bitDecoder) {
 	cmd.ProgramSpliceFlag = bd.asFlag()
 	cmd.DurationFlag = bd.asFlag()
 	cmd.SpliceImmediateFlag = bd.asFlag()
-    cmd.EventIDComplianceFlag = bd.Flag()
+    cmd.EventIDComplianceFlag = bd.asFlag()
 	bd.goForward(3)
 	if !cmd.SpliceImmediateFlag {
 		cmd.spliceTime(bd)
