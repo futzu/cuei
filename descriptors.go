@@ -56,11 +56,12 @@ func (dscptr *Descriptor) jsonAvailDescriptor() ([]byte, error) {
 		Identifier      string
 		Name            string
 		ProviderAvailID uint32
-	}{Tag: dscptr.Tag,
-		Length:          dscptr.Length,
-		Identifier:      dscptr.Identifier,
-		Name:            dscptr.Name,
-		ProviderAvailID: dscptr.ProviderAvailID})
+	}{
+		Tag:                dscptr.Tag,
+		Length:             dscptr.Length,
+		Identifier:         dscptr.Identifier,
+		Name:               dscptr.Name,
+		ProviderAvailID:    dscptr.ProviderAvailID})
 }
 
 func (dscptr *Descriptor) jsonDTMFDescriptor() ([]byte, error) {
@@ -136,7 +137,7 @@ func (dscptr *Descriptor) MarshalJSON() ([]byte, error) {
 	case 0x2:
 		return dscptr.jsonSegmentationDescriptor()
 	}
-	jason, err := json.Marshal("smashin' stacks")
+	jason, err := json.Marshal("Smashed")
 	chk(err)
 	return jason, err
 }
