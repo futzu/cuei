@@ -15,39 +15,38 @@ type audioCmpt struct {
 }
 
 type Descriptor struct {
-	Tag             uint8
-	Length          uint8
-	Identifier      string
-	Name            string
-	ProviderAvailID uint32
-	AudioComponents []audioCmpt
-
-	PreRoll                          uint8
-	DTMFCount                        uint8
-	DTMFChars                        uint64
-	TAISeconds                       uint64
-	TAINano                          uint32
-	UTCOffset                        uint16
-	SegmentationEventID              string
-	SegmentationEventCancelIndicator bool
-    SegmentationEventIDComplianceIndicator bool
-	ProgramSegmentationFlag          bool
-	SegmentationDurationFlag         bool
-	DeliveryNotRestrictedFlag        bool
-	WebDeliveryAllowedFlag           bool
-	NoRegionalBlackoutFlag           bool
-	ArchiveAllowedFlag               bool
-	DeviceRestrictions               string
-	SegmentationDuration             float64
-	SegmentationMessage              string
-	SegmentationUpidType             uint8
-	SegmentationUpidLength           uint8
-	SegmentationUpid                 *Upid
-	SegmentationTypeID               uint8
-	SegmentNum                       uint8
-	SegmentsExpected                 uint8
-	SubSegmentNum                    uint8
-	SubSegmentsExpected              uint8
+	Tag                                    uint8
+	Length                                 uint8
+	Identifier                             string
+	Name                                   string
+	ProviderAvailID                        uint32
+	AudioComponents                        []audioCmpt
+	PreRoll                                uint8
+	DTMFCount                              uint8
+	DTMFChars                              uint64
+	TAISeconds                             uint64
+	TAINano                                uint32
+	UTCOffset                              uint16
+	SegmentationEventID                    string
+	SegmentationEventCancelIndicator       bool
+	SegmentationEventIDComplianceIndicator bool
+	ProgramSegmentationFlag                bool
+	SegmentationDurationFlag               bool
+	DeliveryNotRestrictedFlag              bool
+	WebDeliveryAllowedFlag                 bool
+	NoRegionalBlackoutFlag                 bool
+	ArchiveAllowedFlag                     bool
+	DeviceRestrictions                     string
+	SegmentationDuration                   float64
+	SegmentationMessage                    string
+	SegmentationUpidType                   uint8
+	SegmentationUpidLength                 uint8
+	SegmentationUpid                       *Upid
+	SegmentationTypeID                     uint8
+	SegmentNum                             uint8
+	SegmentsExpected                       uint8
+	SubSegmentNum                          uint8
+	SubSegmentsExpected                    uint8
 }
 
 func (dscptr *Descriptor) jsonAvailDescriptor() ([]byte, error) {
@@ -85,48 +84,47 @@ func (dscptr *Descriptor) jsonDTMFDescriptor() ([]byte, error) {
 
 func (dscptr *Descriptor) jsonSegmentationDescriptor() ([]byte, error) {
 	return json.Marshal(struct {
-		SegmentationEventID              string
-		SegmentationEventCancelIndicator bool
-        SegmentationEventIDComplianceIndicator bool
-		ProgramSegmentationFlag          bool
-		SegmentationDurationFlag         bool
-		DeliveryNotRestrictedFlag        bool
-		WebDeliveryAllowedFlag           bool
-		NoRegionalBlackoutFlag           bool
-		ArchiveAllowedFlag               bool
-		DeviceRestrictions               string
-		Components                       []segCmpt
-		SegmentationDuration             float64
-		SegmentationMessage              string
-		SegmentationUpidType             uint8
-		SegmentationUpidLength           uint8
-		SegmentationUpid                 *Upid
-		SegmentationTypeID               uint8
-		SegmentNum                       uint8
-		SegmentsExpected                 uint8
-		SubSegmentNum                    uint8
-		SubSegmentsExpected              uint8
-	}{SegmentationEventID: dscptr.SegmentationEventID,
-		SegmentationEventCancelIndicator: dscptr.SegmentationEventCancelIndicator,
-        SegmentationEventIDComplianceIndicator: dscptr.SegmentationEventIDComplianceIndicator,
-		ProgramSegmentationFlag:          dscptr.ProgramSegmentationFlag,
-		SegmentationDurationFlag:         dscptr.SegmentationDurationFlag,
-		DeliveryNotRestrictedFlag:        dscptr.DeliveryNotRestrictedFlag,
-		WebDeliveryAllowedFlag:           dscptr.WebDeliveryAllowedFlag,
-		NoRegionalBlackoutFlag:           dscptr.NoRegionalBlackoutFlag,
-		ArchiveAllowedFlag:               dscptr.ArchiveAllowedFlag,
-		DeviceRestrictions:               dscptr.DeviceRestrictions,
-		Components:                       dscptr.Components,
-		SegmentationDuration:             dscptr.SegmentationDuration,
-		SegmentationMessage:              dscptr.SegmentationMessage,
-		SegmentationUpidType:             dscptr.SegmentationUpidType,
-		SegmentationUpidLength:           dscptr.SegmentationUpidLength,
-		SegmentationUpid:                 dscptr.SegmentationUpid,
-		SegmentationTypeID:               dscptr.SegmentationTypeID,
-		SegmentNum:                       dscptr.SegmentNum,
-		SegmentsExpected:                 dscptr.SegmentsExpected,
-		SubSegmentNum:                    dscptr.SubSegmentNum,
-		SubSegmentsExpected:              dscptr.SubSegmentsExpected})
+		SegmentationEventID                    string
+		SegmentationEventCancelIndicator       bool
+		SegmentationEventIDComplianceIndicator bool
+		ProgramSegmentationFlag                bool
+		SegmentationDurationFlag               bool
+		DeliveryNotRestrictedFlag              bool
+		WebDeliveryAllowedFlag                 bool
+		NoRegionalBlackoutFlag                 bool
+		ArchiveAllowedFlag                     bool
+		DeviceRestrictions                     string
+		SegmentationDuration                   float64
+		SegmentationMessage                    string
+		SegmentationUpidType                   uint8
+		SegmentationUpidLength                 uint8
+		SegmentationUpid                       *Upid
+		SegmentationTypeID                     uint8
+		SegmentNum                             uint8
+		SegmentsExpected                       uint8
+		SubSegmentNum                          uint8
+		SubSegmentsExpected                    uint8
+	}{
+		SegmentationEventID:                    dscptr.SegmentationEventID,
+		SegmentationEventCancelIndicator:       dscptr.SegmentationEventCancelIndicator,
+		SegmentationEventIDComplianceIndicator: dscptr.SegmentationEventIDComplianceIndicator,
+		ProgramSegmentationFlag:                dscptr.ProgramSegmentationFlag,
+		SegmentationDurationFlag:               dscptr.SegmentationDurationFlag,
+		DeliveryNotRestrictedFlag:              dscptr.DeliveryNotRestrictedFlag,
+		WebDeliveryAllowedFlag:                 dscptr.WebDeliveryAllowedFlag,
+		NoRegionalBlackoutFlag:                 dscptr.NoRegionalBlackoutFlag,
+		ArchiveAllowedFlag:                     dscptr.ArchiveAllowedFlag,
+		DeviceRestrictions:                     dscptr.DeviceRestrictions,
+		SegmentationDuration:                   dscptr.SegmentationDuration,
+		SegmentationMessage:                    dscptr.SegmentationMessage,
+		SegmentationUpidType:                   dscptr.SegmentationUpidType,
+		SegmentationUpidLength:                 dscptr.SegmentationUpidLength,
+		SegmentationUpid:                       dscptr.SegmentationUpid,
+		SegmentationTypeID:                     dscptr.SegmentationTypeID,
+		SegmentNum:                             dscptr.SegmentNum,
+		SegmentsExpected:                       dscptr.SegmentsExpected,
+		SubSegmentNum:                          dscptr.SubSegmentNum,
+		SubSegmentsExpected:                    dscptr.SubSegmentsExpected})
 }
 
 func (dscptr *Descriptor) MarshalJSON() ([]byte, error) {
@@ -247,7 +245,7 @@ func (dscptr *Descriptor) segmentationDescriptor(bd *bitDecoder, tag uint8, leng
 	dscptr.Name = "Segmentation Descriptor"
 	dscptr.SegmentationEventID = bd.asHex(32)
 	dscptr.SegmentationEventCancelIndicator = bd.asFlag()
-    dscptr.SegmentationEventIDComplianceIndicator = bd.asFlag()
+	dscptr.SegmentationEventIDComplianceIndicator = bd.asFlag()
 	bd.goForward(6)
 	if !dscptr.SegmentationEventCancelIndicator {
 		dscptr.decodeSegFlags(bd)
@@ -269,7 +267,6 @@ func (dscptr *Descriptor) decodeSegFlags(bd *bitDecoder) {
 	}
 }
 
-
 func (dscptr *Descriptor) decodeSegmentation(bd *bitDecoder) {
 	if dscptr.SegmentationDurationFlag {
 		dscptr.SegmentationDuration = bd.as90k(40)
@@ -288,7 +285,7 @@ func (dscptr *Descriptor) decodeSegmentation(bd *bitDecoder) {
 	}
 	dscptr.SegmentNum = bd.uInt8(8)
 	dscptr.SegmentsExpected = bd.uInt8(8)
-	subSegIDs := []uint16{0x34, 0x36, 0x38, 0x3a}
+	subSegIDs := []uint16{0x30,0x32,0x34,0x36,0x38,0x3A,0x44,0x46}
 	if isIn(subSegIDs, uint16(dscptr.SegmentationTypeID)) {
 		dscptr.SubSegmentNum = bd.uInt8(8)
 		dscptr.SubSegmentsExpected = bd.uInt8(8)
@@ -315,7 +312,7 @@ func (dscptr *Descriptor) encodeAvailDescriptor(be *bitEncoder) {
 func (dscptr *Descriptor) encodeSegmentationDescriptor(be *bitEncoder) {
 	be.AddHex64(dscptr.SegmentationEventID, 32)
 	be.Add(dscptr.SegmentationEventCancelIndicator, 1)
-    be.Add(dscptr.SegmentationEventIDComplianceIndicator,1)
+	be.Add(dscptr.SegmentationEventIDComplianceIndicator, 1)
 	be.Reserve(6)
 	if !dscptr.SegmentationEventCancelIndicator {
 		dscptr.encodeFlags(be)
@@ -356,7 +353,7 @@ func (dscptr *Descriptor) encodeSegmentation(be *bitEncoder) {
 func (dscptr *Descriptor) encodeSegments(be *bitEncoder) {
 	be.Add(dscptr.SegmentNum, 8)
 	be.Add(dscptr.SegmentsExpected, 8)
-	subSegIDs := []uint16{0x34, 0x36, 0x38, 0x3a}
+	subSegIDs := []uint16{0x30,0x32,0x34,0x36,0x38,0x3A,0x44,0x46}
 	if isIn(subSegIDs, uint16(dscptr.SegmentationTypeID)) {
 		be.Add(dscptr.SubSegmentNum, 8)
 		be.Add(dscptr.SubSegmentsExpected, 8)
