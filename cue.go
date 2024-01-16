@@ -149,6 +149,7 @@ func (cue *Cue) mkSpliceInsert() {
 	cue.InfoSection.CommandType = 5
 	cue.Command.ProgramSpliceFlag = true
 	cue.Command.SpliceEventCancelIndicator = false
+	cue.Command.EventIDComplianceFlag = true
 	cue.Command.OutOfNetworkIndicator = false
 	cue.Command.TimeSpecifiedFlag = false
 	cue.Command.DurationFlag = false
