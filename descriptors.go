@@ -57,11 +57,11 @@ func (dscptr *Descriptor) jsonAvailDescriptor() ([]byte, error) {
 		Name            string
 		ProviderAvailID uint32
 	}{
-		Tag:                dscptr.Tag,
-		Length:             dscptr.Length,
-		Identifier:         dscptr.Identifier,
-		Name:               dscptr.Name,
-		ProviderAvailID:    dscptr.ProviderAvailID})
+		Tag:             dscptr.Tag,
+		Length:          dscptr.Length,
+		Identifier:      dscptr.Identifier,
+		Name:            dscptr.Name,
+		ProviderAvailID: dscptr.ProviderAvailID})
 }
 
 func (dscptr *Descriptor) jsonDTMFDescriptor() ([]byte, error) {
@@ -137,9 +137,8 @@ func (dscptr *Descriptor) MarshalJSON() ([]byte, error) {
 	case 0x2:
 		return dscptr.jsonSegmentationDescriptor()
 	}
-	jason, err := json.Marshal("Smashed")
-	chk(err)
-	return jason, err
+	type Funk Descriptor
+	return json.Marshal(&struct{ *Funk }{(*Funk)(dscptr)})
 }
 
 // Return Descriptor as JSON
@@ -286,7 +285,7 @@ func (dscptr *Descriptor) decodeSegmentation(bd *bitDecoder) {
 	}
 	dscptr.SegmentNum = bd.uInt8(8)
 	dscptr.SegmentsExpected = bd.uInt8(8)
-	subSegIDs := []uint16{0x30,0x32,0x34,0x36,0x38,0x3A,0x44,0x46}
+	subSegIDs := []uint16{0x30, 0x32, 0x34, 0x36, 0x38, 0x3A, 0x44, 0x46}
 	if isIn(subSegIDs, uint16(dscptr.SegmentationTypeID)) {
 		dscptr.SubSegmentNum = bd.uInt8(8)
 		dscptr.SubSegmentsExpected = bd.uInt8(8)
@@ -354,7 +353,7 @@ func (dscptr *Descriptor) encodeSegmentation(be *bitEncoder) {
 func (dscptr *Descriptor) encodeSegments(be *bitEncoder) {
 	be.Add(dscptr.SegmentNum, 8)
 	be.Add(dscptr.SegmentsExpected, 8)
-	subSegIDs := []uint16{0x30,0x32,0x34,0x36,0x38,0x3A,0x44,0x46}
+	subSegIDs := []uint16{0x30, 0x32, 0x34, 0x36, 0x38, 0x3A, 0x44, 0x46}
 	if isIn(subSegIDs, uint16(dscptr.SegmentationTypeID)) {
 		be.Add(dscptr.SubSegmentNum, 8)
 		be.Add(dscptr.SubSegmentsExpected, 8)
