@@ -50,7 +50,7 @@ func main(){                          // 6
 ```
 
 
-## Latest version is `One`  `One`   `ninety-one`
+## Latest version is `One`  `One`   `ninety-three` aka `Junior`
 	* Includes 2023r1 Specification Updates.
  	* Custom JSON Marshaling for Splice Commands and Splice Descriptors to limit fields. 
 
