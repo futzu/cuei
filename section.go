@@ -10,7 +10,7 @@ type InfoSection struct {
 	TableID                string
 	SectionSyntaxIndicator bool
 	Private                bool
-	SapType				   uint8
+	SapType		       uint8
 	SapDetails             string
 	SectionLength          uint16
 	ProtocolVersion        uint8
