@@ -1,5 +1,13 @@
 package cuei
 
+
+var table6 = map[uint8]string{
+    0x00: "Type 1 Closed GOP with no leading pictures",
+    0x01: "Type 2 Closed GOP with leading pictures",
+    0x02: "Type 3 Open GOP",
+    0x03: "No Sap Type",
+}
+
 var table20 = map[uint8]string{
 	0x00: "Restrict Group 0",
 	0x01: "Restrict Group 1",
