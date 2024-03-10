@@ -10,7 +10,8 @@ type InfoSection struct {
 	TableID                string
 	SectionSyntaxIndicator bool
 	Private                bool
-	Reserved               string
+	SapType				   uint8
+	SapDetails             string
 	SectionLength          uint16
 	ProtocolVersion        uint8
 	EncryptedPacket        bool
@@ -31,7 +32,11 @@ func (infosec *InfoSection) decode(bd *bitDecoder) bool {
 	}
 	infosec.SectionSyntaxIndicator = bd.asFlag()
 	infosec.Private = bd.asFlag()
-	infosec.Reserved = bd.asHex(2)
+	infosec.SapType = bd.uInt8(2)
+	details, ok := table6[infosec.SapType]
+	if ok {
+		infosec.SapDetails = details
+	}
 	infosec.SectionLength = bd.uInt16(12)
 	infosec.ProtocolVersion = bd.uInt8(8)
 	infosec.EncryptedPacket = bd.asFlag()
@@ -51,7 +56,7 @@ func (infosec *InfoSection) defaults() {
 	infosec.TableID = "0xfc"
 	infosec.SectionSyntaxIndicator = false
 	infosec.Private = false
-	infosec.Reserved = "0x3"
+	infosec.SapType = 0x3
 	//infosec.SectionLength = 17
 	infosec.ProtocolVersion = 0
 	infosec.EncryptedPacket = false
@@ -70,8 +75,10 @@ Encodes the InfoSection variables to bytes.
 func (infosec *InfoSection) encode() []byte {
 	be := &bitEncoder{}
 	be.Add(uint16(0xfc), 16)
-	be.Add(48, 8)
-	be.Add(uint8(infosec.SectionLength), 8)
+	be.Add(infosec.SectionSyntaxIndicator,1)
+	be.Add(infosec.Private,1)
+	be.Add(infosec.SapType,2)
+	be.Add(uint16(infosec.SectionLength), 12)
 	be.Add(infosec.ProtocolVersion, 8)
 	be.Add(infosec.EncryptedPacket, 1)
 	be.Add(infosec.EncryptionAlgorithm, 6)
