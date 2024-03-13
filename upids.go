@@ -9,7 +9,6 @@ var uriUpids = map[uint8]string{
 	0x02: "Deprecated",
 	0x03: "AdID",
 	0x07: "TID",
-	0x08: "AiringID",
 	0x09: "ADI",
 	0x10: "UUID",
 	0x11: "ACR",
@@ -150,13 +149,12 @@ func (upid *Upid) encodeUri(be *bitEncoder) {
 	if len(upid.Value) > 0 {
 		be.AddBytes([]byte(upid.Value), uint(len(upid.Value)<<3))
 	}
-
 }
 
 // encode for AirId
 func (upid *Upid) encodeAirId(be *bitEncoder) {
 	if len(upid.Value) > 0 {
-		be.AddBytes([]byte(upid.Value), uint(len(upid.Value)<<3))
+		be.AddHex64(upid.Value, uint(len(upid.Value)<<3))
 	}
 }
 
