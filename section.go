@@ -10,7 +10,7 @@ type InfoSection struct {
 	TableID                string
 	SectionSyntaxIndicator bool
 	Private                bool
-	SapType		       uint8
+	SapType                uint8
 	SapDetails             string
 	SectionLength          uint16
 	ProtocolVersion        uint8
@@ -75,9 +75,9 @@ Encodes the InfoSection variables to bytes.
 func (infosec *InfoSection) encode() []byte {
 	be := &bitEncoder{}
 	be.Add(uint16(0xfc), 16)
-	be.Add(infosec.SectionSyntaxIndicator,1)
-	be.Add(infosec.Private,1)
-	be.Add(infosec.SapType,2)
+	be.Add(infosec.SectionSyntaxIndicator, 1)
+	be.Add(infosec.Private, 1)
+	be.Add(infosec.SapType, 2)
 	be.Add(uint16(infosec.SectionLength), 12)
 	be.Add(infosec.ProtocolVersion, 8)
 	be.Add(infosec.EncryptedPacket, 1)
