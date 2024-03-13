@@ -85,6 +85,10 @@ func (dscptr *Descriptor) jsonDTMFDescriptor() ([]byte, error) {
 
 func (dscptr *Descriptor) jsonSegmentationDescriptor() ([]byte, error) {
 	return json.Marshal(struct {
+		Tag                                    uint8
+		Length                                 uint8
+		Identifier                             string
+		Name                                   string
 		SegmentationEventID                    string
 		SegmentationEventCancelIndicator       bool
 		SegmentationEventIDComplianceIndicator bool
@@ -106,6 +110,10 @@ func (dscptr *Descriptor) jsonSegmentationDescriptor() ([]byte, error) {
 		SubSegmentNum                          uint8
 		SubSegmentsExpected                    uint8
 	}{
+		Tag:                                    dscptr.Tag,
+		Length:                                 dscptr.Length,
+		Identifier:                             dscptr.Identifier,
+		Name:                                   dscptr.Name,
 		SegmentationEventID:                    dscptr.SegmentationEventID,
 		SegmentationEventCancelIndicator:       dscptr.SegmentationEventCancelIndicator,
 		SegmentationEventIDComplianceIndicator: dscptr.SegmentationEventIDComplianceIndicator,
