@@ -16,6 +16,32 @@ Command
 	     0x7: Bandwidth Reservation,
 	     0xff: Private,
 */
+
+type SpliceInsert struct {
+	Name                       string
+	CommandType                uint8
+	PTS                        float64
+	SpliceEventID              uint32
+	SpliceEventCancelIndicator bool
+	OutOfNetworkIndicator      bool
+	ProgramSpliceFlag          bool
+	DurationFlag               bool
+	BreakDuration              float64
+	BreakAutoReturn            bool
+	SpliceImmediateFlag        bool
+	EventIDComplianceFlag      bool
+	UniqueProgramID            uint16
+	AvailNum                   uint8
+	AvailExpected              uint8
+}
+
+type TimeSignal struct {
+	Name              string
+	CommandType       uint8
+	TimeSpecifiedFlag bool
+	PTS               float64
+}
+
 type Command struct {
 	Name                       string
 	CommandType                uint8
@@ -39,39 +65,17 @@ type Command struct {
 
 // only show TimeSignal values in JSON, used by cmd.MarshalJSON()
 func (cmd *Command) jsonTimeSignal() ([]byte, error) {
-	return json.Marshal(struct {
-		Name              string
-		CommandType       uint8
-		TimeSpecifiedFlag bool
-		PTS               float64
-	}{
-		Name:              cmd.Name,
+	ts := TimeSignal{Name: cmd.Name,
 		CommandType:       cmd.CommandType,
 		TimeSpecifiedFlag: cmd.TimeSpecifiedFlag,
-		PTS:               cmd.PTS})
-
+		PTS:               cmd.PTS}
+	return json.Marshal(ts)
 }
 
 // only show SpliceInsert values in JSON, used by cmd.MarshalJSON()
 func (cmd *Command) jsonSpliceInsert() ([]byte, error) {
-	return json.Marshal(struct {
-		Name                       string
-		CommandType                uint8
-		SpliceEventID              uint32
-		SpliceEventCancelIndicator bool
-		OutOfNetworkIndicator      bool
-		ProgramSpliceFlag          bool
-		DurationFlag               bool
-		BreakDuration              float64
-		BreakAutoReturn            bool
-		SpliceImmediateFlag        bool
-		EventIDComplianceFlag      bool
-		UniqueProgramID            uint16
-		AvailNum                   uint8
-		AvailExpected              uint8
-		PTS                        float64
-	}{
-		Name:                       cmd.Name,
+
+	si := SpliceInsert{Name: cmd.Name,
 		CommandType:                cmd.CommandType,
 		SpliceEventID:              cmd.SpliceEventID,
 		SpliceEventCancelIndicator: cmd.SpliceEventCancelIndicator,
@@ -85,7 +89,8 @@ func (cmd *Command) jsonSpliceInsert() ([]byte, error) {
 		UniqueProgramID:            cmd.UniqueProgramID,
 		AvailNum:                   cmd.AvailNum,
 		AvailExpected:              cmd.AvailExpected,
-		PTS:                        cmd.PTS})
+		PTS:                        cmd.PTS}
+	return json.Marshal(si)
 }
 
 func (cmd *Command) MarshalJSON() ([]byte, error) {
