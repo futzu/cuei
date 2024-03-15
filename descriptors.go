@@ -15,7 +15,7 @@ type audioCmpt struct {
 }
 
 // Avail Descriptor
-type AvailDescriptor struct {
+type availDescriptor struct {
 	Tag             uint8
 	Length          uint8
 	Identifier      string
@@ -24,7 +24,7 @@ type AvailDescriptor struct {
 }
 
 // DTMF Descriptor
-type DTMFDescriptor struct {
+type dtmfDescriptor struct {
 	Tag        uint8
 	Length     uint8
 	Identifier string
@@ -35,7 +35,7 @@ type DTMFDescriptor struct {
 }
 
 // Segmentation Descriptor
-type SegmentationDescriptor struct {
+type segmentationDescriptor struct {
 	Tag                                    uint8
 	Length                                 uint8
 	Identifier                             string
@@ -106,7 +106,7 @@ type Descriptor struct {
 }
 
 func (dscptr *Descriptor) jsonAvailDescriptor() ([]byte, error) {
-	avail := AvailDescriptor{
+	avail := availDescriptor{
 		Tag:             dscptr.Tag,
 		Length:          dscptr.Length,
 		Identifier:      dscptr.Identifier,
@@ -117,7 +117,7 @@ func (dscptr *Descriptor) jsonAvailDescriptor() ([]byte, error) {
 }
 
 func (dscptr *Descriptor) jsonDTMFDescriptor() ([]byte, error) {
-	dtmf := DTMFDescriptor{
+	dtmf := dtmfDescriptor{
 		Tag:        dscptr.Tag,
 		Length:     dscptr.Length,
 		Identifier: dscptr.Identifier,
@@ -129,7 +129,7 @@ func (dscptr *Descriptor) jsonDTMFDescriptor() ([]byte, error) {
 }
 
 func (dscptr *Descriptor) jsonSegmentationDescriptor() ([]byte, error) {
-	seg := SegmentationDescriptor{
+	seg := segmentationDescriptor{
 		Tag:                                    dscptr.Tag,
 		Length:                                 dscptr.Length,
 		Identifier:                             dscptr.Identifier,
@@ -198,7 +198,7 @@ func (dscptr *Descriptor) Show() {
 
 /*
 *
-Decode a Splice Descriptor by tag.
+Decode returns a Splice Descriptor by tag.
 
 	The following Splice Descriptors are recognized.
 
