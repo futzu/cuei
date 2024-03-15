@@ -30,7 +30,7 @@ func main(){                          // 6
 ```
 
 
-## Latest version is `One`  `One`   `ninety-seven`
+## Latest version is `One`  `One`   `ninety-nine`
 * Super cool custom JSONMarshal stuff
 * Updated to 2023r1 Specification
 
