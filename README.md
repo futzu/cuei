@@ -1,8 +1,7 @@
 
 https://goreportcard.com/report/github.com/futzu/cuei
-![image](https://github.com/futzu/cuei/assets/52701496/8e0e7c8b-9f3f-4b20-b9c0-dbcb3a97f321)
 
-# cuei is a SCTE35 parser library in Go.
+# cuei is the fastest SCTE35 parser library on the planet. 
 - [x] Parses SCTE-35 Cues from MPEGTS or Bytes or Base64 or Hex or Int or Octal or even Base 36.
 - [x] Parses SCTE-35 Cues spread over multiple MPEGTS packets  
 - [x] Supports multi-packet PAT and PMT tables  
@@ -31,9 +30,9 @@ func main(){                          // 6
 ```
 
 
-## Latest version is `One`  `One`   `ninety-three` aka `Junior`
-
-* Fix for that __Nasty JSON stack overflow__ for Splice Null and Private Commands, and Audio Descriptors.
+## Latest version is `One`  `One`   `ninety-seven`
+* Super cool custom JSONMarshal stuff
+* Updated to 2023r1 Specification
 
 ---
 
