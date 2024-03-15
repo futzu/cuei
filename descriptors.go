@@ -125,7 +125,7 @@ func (dscptr *Descriptor) jsonDTMFDescriptor() ([]byte, error) {
 		PreRoll:    dscptr.PreRoll,
 		DTMFCount:  dscptr.DTMFCount,
 		DTMFChars:  dscptr.DTMFChars}
-	return json.Marshal(&dtmf)
+	return json.Marshal(dtmf)
 }
 
 func (dscptr *Descriptor) jsonSegmentationDescriptor() ([]byte, error) {
