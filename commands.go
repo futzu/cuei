@@ -17,7 +17,7 @@ Command
 	     0xff: Private,
 */
 
-type SpliceInsert struct {
+type spliceInsert struct {
 	Name                       string
 	CommandType                uint8
 	PTS                        float64
@@ -35,7 +35,7 @@ type SpliceInsert struct {
 	AvailExpected              uint8
 }
 
-type TimeSignal struct {
+type timeSignal struct {
 	Name              string
 	CommandType       uint8
 	TimeSpecifiedFlag bool
@@ -63,19 +63,19 @@ type Command struct {
 	PTS                        float64
 }
 
-// only show TimeSignal values in JSON, used by cmd.MarshalJSON()
+// only show timeSignal values in JSON, used by cmd.MarshalJSON()
 func (cmd *Command) jsonTimeSignal() ([]byte, error) {
-	ts := TimeSignal{Name: cmd.Name,
+	ts := timeSignal{Name: cmd.Name,
 		CommandType:       cmd.CommandType,
 		TimeSpecifiedFlag: cmd.TimeSpecifiedFlag,
 		PTS:               cmd.PTS}
 	return json.Marshal(ts)
 }
 
-// only show SpliceInsert values in JSON, used by cmd.MarshalJSON()
+// only show spliceInsert values in JSON, used by cmd.MarshalJSON()
 func (cmd *Command) jsonSpliceInsert() ([]byte, error) {
 
-	si := SpliceInsert{Name: cmd.Name,
+	si := spliceInsert{Name: cmd.Name,
 		CommandType:                cmd.CommandType,
 		SpliceEventID:              cmd.SpliceEventID,
 		SpliceEventCancelIndicator: cmd.SpliceEventCancelIndicator,
