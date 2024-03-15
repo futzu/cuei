@@ -14,6 +14,62 @@ type audioCmpt struct {
 	FullSrvcAudio bool
 }
 
+// Avail Descriptor
+type AvailDescriptor struct {
+	Tag             uint8
+	Length          uint8
+	Identifier      string
+	Name            string
+	ProviderAvailID uint32
+}
+
+// DTMF Descriptor
+type DTMFDescriptor struct {
+	Tag        uint8
+	Length     uint8
+	Identifier string
+	Name       string
+	PreRoll    uint8
+	DTMFCount  uint8
+	DTMFChars  uint64
+}
+
+// Segmentation Descriptor
+type SegmentationDescriptor struct {
+	Tag                                    uint8
+	Length                                 uint8
+	Identifier                             string
+	Name                                   string
+	SegmentationEventID                    string
+	SegmentationEventCancelIndicator       bool
+	SegmentationEventIDComplianceIndicator bool
+	ProgramSegmentationFlag                bool
+	SegmentationDurationFlag               bool
+	DeliveryNotRestrictedFlag              bool
+	WebDeliveryAllowedFlag                 bool
+	NoRegionalBlackoutFlag                 bool
+	ArchiveAllowedFlag                     bool
+	DeviceRestrictions                     string
+	SegmentationDuration                   float64
+	SegmentationMessage                    string
+	SegmentationUpidType                   uint8
+	SegmentationUpidLength                 uint8
+	SegmentationUpid                       *Upid
+	SegmentationTypeID                     uint8
+	SegmentNum                             uint8
+	SegmentsExpected                       uint8
+	SubSegmentNum                          uint8
+	SubSegmentsExpected                    uint8
+}
+
+/*
+*
+
+	Descriptor is the combination of all the descriptors
+	this is to maintain dot notation in the Cue struct.
+
+*
+*/
 type Descriptor struct {
 	Tag                                    uint8
 	Length                                 uint8
@@ -50,66 +106,30 @@ type Descriptor struct {
 }
 
 func (dscptr *Descriptor) jsonAvailDescriptor() ([]byte, error) {
-	return json.Marshal(struct {
-		Tag             uint8
-		Length          uint8
-		Identifier      string
-		Name            string
-		ProviderAvailID uint32
-	}{
+	avail := AvailDescriptor{
 		Tag:             dscptr.Tag,
 		Length:          dscptr.Length,
 		Identifier:      dscptr.Identifier,
 		Name:            dscptr.Name,
-		ProviderAvailID: dscptr.ProviderAvailID})
+		ProviderAvailID: dscptr.ProviderAvailID}
+
+	return json.Marshal(avail)
 }
 
 func (dscptr *Descriptor) jsonDTMFDescriptor() ([]byte, error) {
-	return json.Marshal(struct {
-		Tag        uint8
-		Length     uint8
-		Identifier string
-		Name       string
-		PreRoll    uint8
-		DTMFCount  uint8
-		DTMFChars  uint64
-	}{
+	dtmf := DTMFDescriptor{
 		Tag:        dscptr.Tag,
 		Length:     dscptr.Length,
 		Identifier: dscptr.Identifier,
 		Name:       dscptr.Name,
 		PreRoll:    dscptr.PreRoll,
 		DTMFCount:  dscptr.DTMFCount,
-		DTMFChars:  dscptr.DTMFChars})
+		DTMFChars:  dscptr.DTMFChars}
+	return json.Marshal(&dtmf)
 }
 
 func (dscptr *Descriptor) jsonSegmentationDescriptor() ([]byte, error) {
-	return json.Marshal(struct {
-		Tag                                    uint8
-		Length                                 uint8
-		Identifier                             string
-		Name                                   string
-		SegmentationEventID                    string
-		SegmentationEventCancelIndicator       bool
-		SegmentationEventIDComplianceIndicator bool
-		ProgramSegmentationFlag                bool
-		SegmentationDurationFlag               bool
-		DeliveryNotRestrictedFlag              bool
-		WebDeliveryAllowedFlag                 bool
-		NoRegionalBlackoutFlag                 bool
-		ArchiveAllowedFlag                     bool
-		DeviceRestrictions                     string
-		SegmentationDuration                   float64
-		SegmentationMessage                    string
-		SegmentationUpidType                   uint8
-		SegmentationUpidLength                 uint8
-		SegmentationUpid                       *Upid
-		SegmentationTypeID                     uint8
-		SegmentNum                             uint8
-		SegmentsExpected                       uint8
-		SubSegmentNum                          uint8
-		SubSegmentsExpected                    uint8
-	}{
+	seg := SegmentationDescriptor{
 		Tag:                                    dscptr.Tag,
 		Length:                                 dscptr.Length,
 		Identifier:                             dscptr.Identifier,
@@ -133,9 +153,24 @@ func (dscptr *Descriptor) jsonSegmentationDescriptor() ([]byte, error) {
 		SegmentNum:                             dscptr.SegmentNum,
 		SegmentsExpected:                       dscptr.SegmentsExpected,
 		SubSegmentNum:                          dscptr.SubSegmentNum,
-		SubSegmentsExpected:                    dscptr.SubSegmentsExpected})
+		SubSegmentsExpected:                    dscptr.SubSegmentsExpected}
+
+	return json.Marshal(seg)
 }
 
+/*
+	 *
+	    Custom MarshalJSON
+	        Marshal a Descriptor into
+
+	        0x0: AvailDescriptor,
+		    0x1: DTMFDescriptor,
+		    0x2: SegmentationDescriptor
+
+	        or just return the Descriptor
+
+*
+*/
 func (dscptr *Descriptor) MarshalJSON() ([]byte, error) {
 	switch dscptr.Tag {
 	case 0x0:
@@ -163,7 +198,7 @@ func (dscptr *Descriptor) Show() {
 
 /*
 *
-Decode returns a Splice Descriptor by tag.
+Decode a Splice Descriptor by tag.
 
 	The following Splice Descriptors are recognized.
 
@@ -179,23 +214,23 @@ func (dscptr *Descriptor) decode(bd *bitDecoder, tag uint8, length uint8) {
 	switch tag {
 	case 0x0:
 		dscptr.Tag = 0x0
-		dscptr.availDescriptor(bd, tag, length)
+		dscptr.decodeAvailDescriptor(bd, tag, length)
 	case 0x1:
 		dscptr.Tag = 0x1
-		dscptr.dtmfDescriptor(bd, tag, length)
+		dscptr.decodeDTMFDescriptor(bd, tag, length)
 	case 0x2:
 		dscptr.Tag = 0x2
-		dscptr.segmentationDescriptor(bd, tag, length)
+		dscptr.decodeSegmentationDescriptor(bd, tag, length)
 	case 0x3:
 		dscptr.Tag = 0x3
-		dscptr.timeDescriptor(bd, tag, length)
+		dscptr.decodeTimeDescriptor(bd, tag, length)
 	case 0x4:
 		dscptr.Tag = 0x4
-		dscptr.audioDescriptor(bd, tag, length)
+		dscptr.decodeAudioDescriptor(bd, tag, length)
 	}
 }
 
-func (dscptr *Descriptor) audioDescriptor(bd *bitDecoder, tag uint8, length uint8) {
+func (dscptr *Descriptor) decodeAudioDescriptor(bd *bitDecoder, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
 	dscptr.Identifier = bd.asAscii(32)
@@ -213,7 +248,7 @@ func (dscptr *Descriptor) audioDescriptor(bd *bitDecoder, tag uint8, length uint
 }
 
 // Decode for  Avail Descriptors
-func (dscptr *Descriptor) availDescriptor(bd *bitDecoder, tag uint8, length uint8) {
+func (dscptr *Descriptor) decodeAvailDescriptor(bd *bitDecoder, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
 	dscptr.Identifier = bd.asAscii(32)
@@ -221,8 +256,8 @@ func (dscptr *Descriptor) availDescriptor(bd *bitDecoder, tag uint8, length uint
 	dscptr.ProviderAvailID = bd.uInt32(32)
 }
 
-// DTMF Splice Descriptor
-func (dscptr *Descriptor) dtmfDescriptor(bd *bitDecoder, tag uint8, length uint8) {
+// Decode for DTMF Splice Descriptor
+func (dscptr *Descriptor) decodeDTMFDescriptor(bd *bitDecoder, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
 	dscptr.Identifier = bd.asAscii(32)
@@ -235,7 +270,7 @@ func (dscptr *Descriptor) dtmfDescriptor(bd *bitDecoder, tag uint8, length uint8
 }
 
 // Decode for the Time Descriptor
-func (dscptr *Descriptor) timeDescriptor(bd *bitDecoder, tag uint8, length uint8) {
+func (dscptr *Descriptor) decodeTimeDescriptor(bd *bitDecoder, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
 	dscptr.Identifier = bd.asAscii(32)
@@ -246,7 +281,7 @@ func (dscptr *Descriptor) timeDescriptor(bd *bitDecoder, tag uint8, length uint8
 }
 
 // Decode for the Segmentation Descriptor
-func (dscptr *Descriptor) segmentationDescriptor(bd *bitDecoder, tag uint8, length uint8) {
+func (dscptr *Descriptor) decodeSegmentationDescriptor(bd *bitDecoder, tag uint8, length uint8) {
 	dscptr.Tag = tag
 	dscptr.Length = length
 	dscptr.Identifier = bd.asAscii(32)
@@ -286,7 +321,6 @@ func (dscptr *Descriptor) decodeSegmentation(bd *bitDecoder) {
 		dscptr.SegmentationUpid.decode(bd, dscptr.SegmentationUpidType, dscptr.SegmentationUpidLength)
 	}
 	dscptr.SegmentationTypeID = bd.uInt8(8)
-
 	mesg, ok := table22[dscptr.SegmentationTypeID]
 	if ok {
 		dscptr.SegmentationMessage = mesg
