@@ -1,11 +1,8 @@
 
 https://goreportcard.com/report/github.com/futzu/cuei
 
-# cuei is the fastest SCTE35 parser library on the planet. 
-
-
-
-
+#  cuei is the fastest SCTE35 parser library on the planet.  🚀
+ 
 - [x] Parses SCTE-35 Cues from MPEGTS or Bytes or Base64 or Hex or Int or Octal or even Base 36.
 - [x] Parses SCTE-35 Cues spread over multiple MPEGTS packets  
 - [x] Supports multi-packet PAT and PMT tables  
@@ -15,8 +12,9 @@ https://goreportcard.com/report/github.com/futzu/cuei
 ---
 
   
-### Want to parse an MPEGTS video and print the SCTE-35?  🧮
-#### Do it in ten lines.⚗️
+### Want to parse an MPEGTS video and print the SCTE-35?  🛰️
+#### Do it in ten lines. 
+### 👾👾👾👾👾👾👾👾👾👾
 
 ```go
 package main                        
@@ -34,9 +32,10 @@ func main(){
 ```
 
 
-## Latest version is `One`  `One`   `ninety-nine`
+## Latest version is `One`  `One`   `ninety-nine` 🥇
 * Super cool custom JSONMarshal stuff
 * Updated to 2023r1 Specification
+* Average cyclomatic complexity is 1.88. ( _boom << boom_ )
 
 ---
 
@@ -58,7 +57,7 @@ func main(){
 
   	* [Load a SCTE-35 Cue from JSON and Encode it](#load-json-and-encode)
 
-# `Install cuei`
+# `Install cuei` 
 
 ```go
 go get github.com/futzu/cuei@latest
@@ -67,11 +66,11 @@ go get github.com/futzu/cuei@latest
 
 
 
-# `Quick Demo`
+# `Quick Demo` 
 
 * cueidemo.go
 
-```smalltalk
+```go
 package main
 
 import (
@@ -101,7 +100,7 @@ func main(){
 go build cueidemo.go
 ```
 #### `parse mpegts video for scte35` 
-```rebol
+```go
 ./cueidemo a_video_with_scte35.ts
 ```
 
@@ -159,7 +158,7 @@ Next File: mpegts/out.ts
 
 ```
 *  Use cuei.Stream.DecodeBytes for more fine-grained control of MPEGTS stream parsing. 
-```smalltalk
+```go
 package main
 
 import (
@@ -202,7 +201,7 @@ func main() {
 ```
 
 # `Parse base64 encoded SCTE-35`
-```smalltalk
+```go
 package main
 
 import (
@@ -221,7 +220,7 @@ func main(){
 ```
 ---
 # `Shadow a Cue struct method`
-```smalltalk
+```go
 package main
 
 import (
@@ -248,7 +247,7 @@ func main(){
 ```
 
 # `Call a shadowed method`
-```smalltalk
+```go
 package main
 
 import (
@@ -281,7 +280,7 @@ func main(){
 
 ```
 # `Use Dot notation to access SCTE-35 Cue values`
-```smalltalk
+```go
 
 /**
 Show  the packet PTS time and Splice Command Name of SCTE-35 Cues
@@ -309,7 +308,7 @@ func main() {
 
 # `Load JSON and Encode`
 * cuei can accept SCTE-35 data as JSON and encode it to Base64, Bytes, or Hex string.
-```smalltalk
+```go
 package main
 
 import (
@@ -384,4 +383,6 @@ Hex:
 
 
 ```
- `Cuei is the FourCC / identifier for SCTE-35`
+
+*️⃣  _CUEI is the FourCC / identifier for SCTE-35_, that's where I got the name.
+*️⃣  _what do I mean by fastest SCTE-35 parser? 14,862 SCTE-35 Cues per second on my $200 laptop._
