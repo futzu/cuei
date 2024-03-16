@@ -1,7 +1,7 @@
 
-https://goreportcard.com/report/github.com/futzu/cuei
+ [Install](#install-cuei)  | [Go Docs](https://pkg.go.dev/github.com/futzu/cuei)  | [Examples](https://pkg.go.dev/github.com/futzu/cuei) | [Parse SCTE-35 from MPEGTS](#quick-demo)  
 
-#  cuei is the fastest SCTE35 parser library on the planet.  🚀
+# cuei is a SCTE-35 parser lib written in Go.
  
 - [x] Parses SCTE-35 Cues from MPEGTS or Bytes or Base64 or Hex or Int or Octal or even Base 36.
 - [x] Parses SCTE-35 Cues spread over multiple MPEGTS packets  
@@ -11,11 +11,9 @@ https://goreportcard.com/report/github.com/futzu/cuei
  
 ---
 
-  
 ### Want to parse an MPEGTS video and print the SCTE-35?  🛰️
-#### Do it in ten lines. 
-### 👾👾👾👾👾👾👾👾👾👾
 
+### Do it in ten lines.
 ```go
 package main                        
 
@@ -30,18 +28,11 @@ func main(){
         stream.Decode(arg)           
 }                                    
 ```
-
-
-## Latest version is `One`  `One`   `ninety-nine` 🥇
-* Super cool custom JSONMarshal stuff
-* Updated to 2023r1 Specification
-* Average cyclomatic complexity is 1.88. ( _boom << boom_ )
-
 ---
+## Latest version is `One`  `One`   `ninety-nine`
 
-* [Install](#install-cuei)  🦼
+* [Install](#install-cuei)  
 
-* [Go Docs](https://pkg.go.dev/github.com/futzu/cuei)  
 
 * [Examples](https://pkg.go.dev/github.com/futzu/cuei) 
 
@@ -57,7 +48,7 @@ func main(){
 
   	* [Load a SCTE-35 Cue from JSON and Encode it](#load-json-and-encode)
 
-# `Install cuei` 
+### `Install cuei` 
 
 ```go
 go get github.com/futzu/cuei@latest
@@ -66,7 +57,7 @@ go get github.com/futzu/cuei@latest
 
 
 
-# `Quick Demo` 
+### `Quick Demo` 
 
 * cueidemo.go
 
@@ -200,7 +191,7 @@ func main() {
 }
 ```
 
-# `Parse base64 encoded SCTE-35`
+### `Parse base64 encoded SCTE-35`
 ```go
 package main
 
@@ -218,8 +209,8 @@ func main(){
         cue.Show()
 }
 ```
----
-# `Shadow a Cue struct method`
+
+### `Shadow a Cue struct method`
 ```go
 package main
 
@@ -246,7 +237,7 @@ func main(){
 
 ```
 
-# `Call a shadowed method`
+### `Call a shadowed method`
 ```go
 package main
 
@@ -279,7 +270,7 @@ func main(){
 
 
 ```
-# `Use Dot notation to access SCTE-35 Cue values`
+### `Use Dot notation to access SCTE-35 Cue values`
 ```go
 
 /**
@@ -306,7 +297,7 @@ func main() {
 
 ```
 
-# `Load JSON and Encode`
+### `Load JSON and Encode`
 * cuei can accept SCTE-35 data as JSON and encode it to Base64, Bytes, or Hex string.
 ```go
 package main
@@ -370,7 +361,7 @@ func main() {
 
 ```
 * Output
-```go
+```smalltalk
 Bytes:
 	[252 48 42 0 0 0 38 115 192 255 255 240 15 5 0 0 22 58 127 207 254 127 12 79 115
 	0 0 0 0 0 10 0 8 67 85 69 73 0 0 0 0 236 139 53 78]
@@ -380,7 +371,6 @@ Base64:
 
 Hex:
 	 0xfc302a0000002673c0fffff00f050000163a7fcffe7f0c4f7300000000000a00084355454900000000ec8b354e
-
 
 ```
 
