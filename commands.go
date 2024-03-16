@@ -5,17 +5,7 @@ import (
 	"fmt"
 )
 
-/*
-Command
 
-	These Splice Command types are consolidated into Command.
-
-	     0x0: Splice Null,
-	     0x5: Splice Insert,
-	     0x6: Time Signal,
-	     0x7: Bandwidth Reservation,
-	     0xff: Private,
-*/
 
 type spliceInsert struct {
 	Name                       string
@@ -42,6 +32,17 @@ type timeSignal struct {
 	PTS               float64
 }
 
+/*
+Command
+
+	These Splice Command types are consolidated into Command.
+
+	     0x0: Splice Null,
+	     0x5: Splice Insert,
+	     0x6: Time Signal,
+	     0x7: Bandwidth Reservation,
+	     0xff: Private,
+*/
 type Command struct {
 	Name                       string
 	CommandType                uint8
@@ -65,7 +66,7 @@ type Command struct {
 
 // only show timeSignal values in JSON, used by cmd.MarshalJSON()
 func (cmd *Command) jsonTimeSignal() ([]byte, error) {
-	ts := timeSignal{Name: cmd.Name,
+	ts := &timeSignal{Name: cmd.Name,
 		CommandType:       cmd.CommandType,
 		TimeSpecifiedFlag: cmd.TimeSpecifiedFlag,
 		PTS:               cmd.PTS}
@@ -75,7 +76,7 @@ func (cmd *Command) jsonTimeSignal() ([]byte, error) {
 // only show spliceInsert values in JSON, used by cmd.MarshalJSON()
 func (cmd *Command) jsonSpliceInsert() ([]byte, error) {
 
-	si := spliceInsert{Name: cmd.Name,
+	si := &spliceInsert{Name: cmd.Name,
 		CommandType:                cmd.CommandType,
 		SpliceEventID:              cmd.SpliceEventID,
 		SpliceEventCancelIndicator: cmd.SpliceEventCancelIndicator,
