@@ -37,8 +37,15 @@ func hex2Int(str string) uint64 {
 	return i.Uint64()
 }
 
-// isIn is a test for slice membership
-func isIn[T comparable](slice []T, val T) bool {
+// Hexed converts bytes to hex string
+func Hexed(somebites []byte) string {
+	b := new(big.Int)
+	b.SetBytes(somebites)
+	return fmt.Sprintf("0x%v", b.Text(16))
+}
+
+// IsIn is a test for slice membership
+func IsIn[T comparable](slice []T, val T) bool {
 	for _, item := range slice {
 		if item == val {
 			return true
