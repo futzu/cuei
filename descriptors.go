@@ -106,7 +106,7 @@ type Descriptor struct {
 }
 
 func (dscptr *Descriptor) jsonAvailDescriptor() ([]byte, error) {
-	avail := availDescriptor{
+	avail := &availDescriptor{
 		Tag:             dscptr.Tag,
 		Length:          dscptr.Length,
 		Identifier:      dscptr.Identifier,
@@ -117,7 +117,7 @@ func (dscptr *Descriptor) jsonAvailDescriptor() ([]byte, error) {
 }
 
 func (dscptr *Descriptor) jsonDTMFDescriptor() ([]byte, error) {
-	dtmf := dtmfDescriptor{
+	dtmf := &dtmfDescriptor{
 		Tag:        dscptr.Tag,
 		Length:     dscptr.Length,
 		Identifier: dscptr.Identifier,
@@ -129,7 +129,7 @@ func (dscptr *Descriptor) jsonDTMFDescriptor() ([]byte, error) {
 }
 
 func (dscptr *Descriptor) jsonSegmentationDescriptor() ([]byte, error) {
-	seg := segmentationDescriptor{
+	seg := &segmentationDescriptor{
 		Tag:                                    dscptr.Tag,
 		Length:                                 dscptr.Length,
 		Identifier:                             dscptr.Identifier,
@@ -328,7 +328,7 @@ func (dscptr *Descriptor) decodeSegmentation(bd *bitDecoder) {
 	dscptr.SegmentNum = bd.uInt8(8)
 	dscptr.SegmentsExpected = bd.uInt8(8)
 	subSegIDs := []uint16{0x30, 0x32, 0x34, 0x36, 0x38, 0x3A, 0x44, 0x46}
-	if isIn(subSegIDs, uint16(dscptr.SegmentationTypeID)) {
+	if IsIn(subSegIDs, uint16(dscptr.SegmentationTypeID)) {
 		dscptr.SubSegmentNum = bd.uInt8(8)
 		dscptr.SubSegmentsExpected = bd.uInt8(8)
 		//dscptr.SubSegmentNum = 0
@@ -396,7 +396,7 @@ func (dscptr *Descriptor) encodeSegments(be *bitEncoder) {
 	be.Add(dscptr.SegmentNum, 8)
 	be.Add(dscptr.SegmentsExpected, 8)
 	subSegIDs := []uint16{0x30, 0x32, 0x34, 0x36, 0x38, 0x3A, 0x44, 0x46}
-	if isIn(subSegIDs, uint16(dscptr.SegmentationTypeID)) {
+	if IsIn(subSegIDs, uint16(dscptr.SegmentationTypeID)) {
 		be.Add(dscptr.SubSegmentNum, 8)
 		be.Add(dscptr.SubSegmentsExpected, 8)
 	}
