@@ -137,9 +137,8 @@ func (cue *Cue) Encode2B64() string {
 
 // Encode2Hex encodes cue and returns as a hex string
 func (cue *Cue) Encode2Hex() string {
-	b := new(big.Int)
-	b.SetBytes(cue.Encode())
-	return fmt.Sprintf("0x%v", b.Text(16))
+
+	return Hexed(cue.Encode())
 }
 
 // used by Six2Five to convert a time signal to a splice insert
@@ -166,10 +165,11 @@ func (cue *Cue) mkSpliceInsert() {
 /*
 *
 
-	Convert  Cue.Command  from a  Time Signal
-	to a Splice Insert and return a base64 string
- 	SegmentationTypeIds to trigger CUE-OUTs : 0x22, 0x30, 0x32, 0x34, 0x36, 0x44, 0x46
-	SegmentationTypeIds to trigger CUE-INs:  0x23, 0x31, 0x33, 0x35, 0x37, 0x45, 0x47
+		Convert  Cue.Command  from a  Time Signal
+		to a Splice Insert and return a base64 string
+	 	SegmentationTypeIds to trigger CUE-OUTs : 0x22, 0x30, 0x32, 0x34, 0x36, 0x44, 0x46
+		SegmentationTypeIds to trigger CUE-INs:  0x23, 0x31, 0x33, 0x35, 0x37, 0x45, 0x47
+
 *
 */
 func (cue *Cue) Six2Five() string {
@@ -180,7 +180,7 @@ func (cue *Cue) Six2Five() string {
 			if dscptr.Tag == 2 {
 				//value, _ := strconv.ParseInt(hex, 16, 64)
 				cue.Command.SpliceEventID = uint32(hex2Int(dscptr.SegmentationEventID))
-				if isIn(segStarts, uint16(dscptr.SegmentationTypeID)) {
+				if IsIn(segStarts, uint16(dscptr.SegmentationTypeID)) {
 					if dscptr.SegmentationDurationFlag {
 						cue.mkSpliceInsert()
 						cue.Command.OutOfNetworkIndicator = true
@@ -190,7 +190,7 @@ func (cue *Cue) Six2Five() string {
 						//	return encB64(cue.Encode())
 					}
 				} else {
-					if isIn(segStops, uint16(dscptr.SegmentationTypeID)) {
+					if IsIn(segStops, uint16(dscptr.SegmentationTypeID)) {
 						cue.mkSpliceInsert()
 						//	return encB64(cue.Encode())
 					}
