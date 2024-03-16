@@ -2,31 +2,35 @@
 https://goreportcard.com/report/github.com/futzu/cuei
 
 # cuei is the fastest SCTE35 parser library on the planet. 
+
+
+
+
 - [x] Parses SCTE-35 Cues from MPEGTS or Bytes or Base64 or Hex or Int or Octal or even Base 36.
 - [x] Parses SCTE-35 Cues spread over multiple MPEGTS packets  
 - [x] Supports multi-packet PAT and PMT tables  
 - [x] Supports multiple MPEGTS Programs and multiple SCTE-35 streams 
 - [x] Encodes Time Signals and Splice Inserts with Descriptors and Upids. 
  
-
+---
 
   
- Want to parse an MPEGTS video and print the SCTE-35?  🧮
-<div>Do it in ten lines.</div> ⚗️
+### Want to parse an MPEGTS video and print the SCTE-35?  🧮
+#### Do it in ten lines.⚗️
 
-```smalltalk
-package main                          // 1
+```go
+package main                        
 
-import (                              // 2
-        "os"                          // 3    
-        "github.com/futzu/cuei"       // 4
-)                                     // 5
+import (                              
+        "os"                            
+        "github.com/futzu/cuei"       
+)                                    
 
-func main(){                          // 6
-        arg := os.Args[1]             // 7
-        stream := cuei.NewStream()    // 8
-        stream.Decode(arg)            // 9
-}                                     // 10  lines
+func main(){                         
+        arg := os.Args[1]             
+        stream := cuei.NewStream()    
+        stream.Decode(arg)           
+}                                    
 ```
 
 
