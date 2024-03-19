@@ -1,5 +1,5 @@
 
- [Install](#install-cuei)  | [Go Docs](https://pkg.go.dev/github.com/futzu/cuei)  | [Examples](https://pkg.go.dev/github.com/futzu/cuei) 
+ [Install](#install-cuei)  | [Go Docs](https://pkg.go.dev/github.com/futzu/cuei)  | [Examples](https://pkg.go.dev/github.com/futzu/cuei) | [cuei wins the SCTE-35 Parser Shoot Out](https://github.com/futzu/SCTE35-threefive/blob/master/speedtest.md)
 # cuei is a SCTE-35 parser lib written in Go.
  
 - [x] Parses SCTE-35 Cues from MPEGTS or Bytes or Base64 or Hex or Int or Octal or even Base 36.
@@ -9,6 +9,7 @@
 - [x] Encodes Time Signals and Splice Inserts with Descriptors and Upids. 
  
 ---
+#### 
 
 ### Want to parse an MPEGTS video and print the SCTE-35?  🛰️
 
@@ -29,12 +30,6 @@ func main(){
 ```
 ---
 ## Latest version is `One`  `One`   `ninety-nine`
-
-## cuei won the SCTE-35 Parser Shoot Out.
-* The challenge is to parse 14,862 SCTE-35 Cues from an MPEGTS as fast as possible. 
-* [`threefive + Python3` ](https://github.com/futzu/SCTE35-threefive/blob/master/speedtest.md) VS.[`threefive + pypy3`](https://github.com/futzu/SCTE35-threefive/blob/master/speedtest.md) VS. [ `tsduck in C++` ](https://github.com/futzu/SCTE35-threefive/blob/master/speedtest.md) VS.  [ `cuei in Go`.](https://github.com/futzu/SCTE35-threefive/blob/master/speedtest.md) 
-
-
 
 
 * [Install](#install-cuei)  
