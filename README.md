@@ -2,7 +2,6 @@
  [Install](#install-cuei)  | [Go Docs](https://pkg.go.dev/github.com/futzu/cuei)  | [Examples](https://pkg.go.dev/github.com/futzu/cuei) | [cuei wins the SCTE-35 Parser Shoot Out](https://github.com/futzu/SCTE35-threefive/blob/master/speedtest.md)
 
 
- `Heads Up`    I have applied to join the [SCTE Digital Video Subcommittee](https://www.scte.org/information-page-index/digital-video-subcommittee-dvs/)  _If someone asks you about me, say something nice._ 
 
 
 # cuei is a SCTE-35 parser lib written in Go.
