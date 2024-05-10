@@ -4,8 +4,11 @@
 
 
 
-# cuei is a SCTE-35 parser lib written in Go.
- 
+# cuei is a SCTE-35 parser lib written in Go.<br>
+*️⃣  _CUEI is the FourCC / identifier for SCTE-35_, that's where I got the name.
+<br>
+
+
 - [x] Parses SCTE-35 Cues from MPEGTS or Bytes or Base64 or Hex or Int or Octal or even Base 36.
 - [x] Parses SCTE-35 Cues spread over multiple MPEGTS packets  
 - [x] Supports multi-packet PAT and PMT tables  
