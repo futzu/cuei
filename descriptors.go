@@ -5,6 +5,14 @@ import (
 	"fmt"
 )
 
+// Tag, Length , Name and Identifier for Descriptors
+type TagLenNameId struct {
+	Tag        uint8
+	Length     uint8
+	Name       string
+	Identifier string
+}
+
 // audioCmpt is a struct for audioDscptr Components
 type audioCmpt struct {
 	ComponentTag  uint8
@@ -15,31 +23,19 @@ type audioCmpt struct {
 }
 
 // Avail Descriptor
-type availDescriptor struct {
-	Tag             uint8
-	Length          uint8
-	Identifier      string
-	Name            string
+type AvailDescriptor struct {
 	ProviderAvailID uint32
 }
 
 // DTMF Descriptor
-type dtmfDescriptor struct {
-	Tag        uint8
-	Length     uint8
-	Identifier string
-	Name       string
-	PreRoll    uint8
-	DTMFCount  uint8
-	DTMFChars  uint64
+type DTMFDescriptor struct {
+	PreRoll   uint8
+	DTMFCount uint8
+	DTMFChars uint64
 }
 
 // Segmentation Descriptor
-type segmentationDescriptor struct {
-	Tag                                    uint8
-	Length                                 uint8
-	Identifier                             string
-	Name                                   string
+type SegmentationDescriptor struct {
 	SegmentationEventID                    string
 	SegmentationEventCancelIndicator       bool
 	SegmentationEventIDComplianceIndicator bool
@@ -71,101 +67,54 @@ type segmentationDescriptor struct {
 *
 */
 type Descriptor struct {
-	Tag                                    uint8
-	Length                                 uint8
-	Identifier                             string
-	Name                                   string
-	ProviderAvailID                        uint32
-	AudioComponents                        []audioCmpt
-	PreRoll                                uint8
-	DTMFCount                              uint8
-	DTMFChars                              uint64
-	TAISeconds                             uint64
-	TAINano                                uint32
-	UTCOffset                              uint16
-	SegmentationEventID                    string
-	SegmentationEventCancelIndicator       bool
-	SegmentationEventIDComplianceIndicator bool
-	ProgramSegmentationFlag                bool
-	SegmentationDurationFlag               bool
-	DeliveryNotRestrictedFlag              bool
-	WebDeliveryAllowedFlag                 bool
-	NoRegionalBlackoutFlag                 bool
-	ArchiveAllowedFlag                     bool
-	DeviceRestrictions                     string
-	SegmentationDuration                   float64
-	SegmentationMessage                    string
-	SegmentationUpidType                   uint8
-	SegmentationUpidLength                 uint8
-	SegmentationUpid                       *Upid
-	SegmentationTypeID                     uint8
-	SegmentNum                             uint8
-	SegmentsExpected                       uint8
-	SubSegmentNum                          uint8
-	SubSegmentsExpected                    uint8
+	TagLenNameId
+	AvailDescriptor
+	DTMFDescriptor
+	SegmentationDescriptor
+	AudioComponents []audioCmpt
+	TAISeconds      uint64
+	TAINano         uint32
+	UTCOffset       uint16
 }
 
 func (dscptr *Descriptor) jsonAvailDescriptor() ([]byte, error) {
-	avail := &availDescriptor{
-		Tag:             dscptr.Tag,
-		Length:          dscptr.Length,
-		Identifier:      dscptr.Identifier,
-		Name:            dscptr.Name,
-		ProviderAvailID: dscptr.ProviderAvailID}
-
-	return json.Marshal(avail)
+	return json.Marshal(struct {
+		TagLenNameId
+		AvailDescriptor
+	}{
+		TagLenNameId:    dscptr.TagLenNameId,
+		AvailDescriptor: dscptr.AvailDescriptor,
+	})
 }
 
 func (dscptr *Descriptor) jsonDTMFDescriptor() ([]byte, error) {
-	dtmf := &dtmfDescriptor{
-		Tag:        dscptr.Tag,
-		Length:     dscptr.Length,
-		Identifier: dscptr.Identifier,
-		Name:       dscptr.Name,
-		PreRoll:    dscptr.PreRoll,
-		DTMFCount:  dscptr.DTMFCount,
-		DTMFChars:  dscptr.DTMFChars}
-	return json.Marshal(dtmf)
+	return json.Marshal(struct {
+		TagLenNameId
+		DTMFDescriptor
+	}{
+		TagLenNameId:   dscptr.TagLenNameId,
+		DTMFDescriptor: dscptr.DTMFDescriptor,
+	})
 }
 
 func (dscptr *Descriptor) jsonSegmentationDescriptor() ([]byte, error) {
-	seg := &segmentationDescriptor{
-		Tag:                                    dscptr.Tag,
-		Length:                                 dscptr.Length,
-		Identifier:                             dscptr.Identifier,
-		Name:                                   dscptr.Name,
-		SegmentationEventID:                    dscptr.SegmentationEventID,
-		SegmentationEventCancelIndicator:       dscptr.SegmentationEventCancelIndicator,
-		SegmentationEventIDComplianceIndicator: dscptr.SegmentationEventIDComplianceIndicator,
-		ProgramSegmentationFlag:                dscptr.ProgramSegmentationFlag,
-		SegmentationDurationFlag:               dscptr.SegmentationDurationFlag,
-		DeliveryNotRestrictedFlag:              dscptr.DeliveryNotRestrictedFlag,
-		WebDeliveryAllowedFlag:                 dscptr.WebDeliveryAllowedFlag,
-		NoRegionalBlackoutFlag:                 dscptr.NoRegionalBlackoutFlag,
-		ArchiveAllowedFlag:                     dscptr.ArchiveAllowedFlag,
-		DeviceRestrictions:                     dscptr.DeviceRestrictions,
-		SegmentationDuration:                   dscptr.SegmentationDuration,
-		SegmentationMessage:                    dscptr.SegmentationMessage,
-		SegmentationUpidType:                   dscptr.SegmentationUpidType,
-		SegmentationUpidLength:                 dscptr.SegmentationUpidLength,
-		SegmentationUpid:                       dscptr.SegmentationUpid,
-		SegmentationTypeID:                     dscptr.SegmentationTypeID,
-		SegmentNum:                             dscptr.SegmentNum,
-		SegmentsExpected:                       dscptr.SegmentsExpected,
-		SubSegmentNum:                          dscptr.SubSegmentNum,
-		SubSegmentsExpected:                    dscptr.SubSegmentsExpected}
-
-	return json.Marshal(seg)
+	return json.Marshal(struct {
+		TagLenNameId
+		SegmentationDescriptor
+	}{
+		TagLenNameId:           dscptr.TagLenNameId,
+		SegmentationDescriptor: dscptr.SegmentationDescriptor,
+	})
 }
 
 /*
 	 *
-	    Custom MarshalJSON
-	        Marshal a Descriptor into
+	    	Custom MarshalJSON
+		Marshal a Descriptor into
 
 	        0x0: AvailDescriptor,
-		    0x1: DTMFDescriptor,
-		    0x2: SegmentationDescriptor
+		0x1: DTMFDescriptor,
+		0x2: SegmentationDescriptor
 
 	        or just return the Descriptor
 
