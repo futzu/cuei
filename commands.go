@@ -6,11 +6,21 @@ import (
 )
 
 
+// Splice Command Name and Type
+type NameAndType struct {
+	Name        string
+	CommandType uint8
+}
 
-type spliceInsert struct {
-	Name                       string
-	CommandType                uint8
-	PTS                        float64
+// Splice Time is used by SpliceInsert and TimeSignal
+type SpliceTime struct {
+	TimeSpecifiedFlag bool
+	PTS               float64
+}
+
+
+// Splice Insert 
+type SpliceInsert struct {
 	SpliceEventID              uint32
 	SpliceEventCancelIndicator bool
 	OutOfNetworkIndicator      bool
@@ -25,81 +35,86 @@ type spliceInsert struct {
 	AvailExpected              uint8
 }
 
-type timeSignal struct {
-	Name              string
-	CommandType       uint8
-	TimeSpecifiedFlag bool
-	PTS               float64
+// Time Signal place holder
+type TimeSignal struct {
+}
+
+// Private Command
+type PrivateCommand struct {
+	PrivateBytes []byte
+	Identifier   uint32
 }
 
 /*
 Command
 
-	These Splice Command types are consolidated into Command.
+		These Splice Command types are consolidated into Command.
 
-	     0x0: Splice Null,
-	     0x5: Splice Insert,
-	     0x6: Time Signal,
-	     0x7: Bandwidth Reservation,
-	     0xff: Private,
+	        0x0: Splice Null,
+		     0x5: Splice Insert,
+		     0x6: Time Signal,
+		     0x7: Bandwidth Reservation,
+		     0xff: Private,
 */
 type Command struct {
-	Name                       string
-	CommandType                uint8
-	PrivateBytes               []byte
-	Identifier                 uint32
-	SpliceEventID              uint32
-	SpliceEventCancelIndicator bool
-	EventIDComplianceFlag      bool
-	OutOfNetworkIndicator      bool
-	ProgramSpliceFlag          bool
-	DurationFlag               bool
-	BreakAutoReturn            bool
-	BreakDuration              float64
-	SpliceImmediateFlag        bool
-	UniqueProgramID            uint16
-	AvailNum                   uint8
-	AvailExpected              uint8
-	TimeSpecifiedFlag          bool
-	PTS                        float64
+	SpliceInsert
+	PrivateCommand
+	SpliceTime
+	NameAndType
 }
 
-// only show timeSignal values in JSON, used by cmd.MarshalJSON()
-func (cmd *Command) jsonTimeSignal() ([]byte, error) {
-	ts := &timeSignal{Name: cmd.Name,
-		CommandType:       cmd.CommandType,
-		TimeSpecifiedFlag: cmd.TimeSpecifiedFlag,
-		PTS:               cmd.PTS}
-	return json.Marshal(ts)
+func (cmd *Command) jsonPrivateCommand() ([]byte, error) {
+	return json.Marshal(struct {
+		PrivateCommand
+		NameAndType
+	}{
+		PrivateCommand: cmd.PrivateCommand,
+		NameAndType:    cmd.NameAndType,
+	})
 }
 
-// only show spliceInsert values in JSON, used by cmd.MarshalJSON()
 func (cmd *Command) jsonSpliceInsert() ([]byte, error) {
+	return json.Marshal(struct {
+		SpliceInsert
+        SpliceTime
+		NameAndType
+	}{
+		SpliceInsert: cmd.SpliceInsert,
+        SpliceTime:    cmd.SpliceTime,
+		NameAndType:  cmd.NameAndType,
+	})
+}
 
-	si := &spliceInsert{Name: cmd.Name,
-		CommandType:                cmd.CommandType,
-		SpliceEventID:              cmd.SpliceEventID,
-		SpliceEventCancelIndicator: cmd.SpliceEventCancelIndicator,
-		OutOfNetworkIndicator:      cmd.OutOfNetworkIndicator,
-		ProgramSpliceFlag:          cmd.ProgramSpliceFlag,
-		DurationFlag:               cmd.DurationFlag,
-		BreakDuration:              cmd.BreakDuration,
-		BreakAutoReturn:            cmd.BreakAutoReturn,
-		SpliceImmediateFlag:        cmd.SpliceImmediateFlag,
-		EventIDComplianceFlag:      cmd.EventIDComplianceFlag,
-		UniqueProgramID:            cmd.UniqueProgramID,
-		AvailNum:                   cmd.AvailNum,
-		AvailExpected:              cmd.AvailExpected,
-		PTS:                        cmd.PTS}
-	return json.Marshal(si)
+func (cmd *Command) jsonSpliceNull() ([]byte, error) {
+	return json.Marshal(struct {
+		NameAndType
+	}{
+		NameAndType: cmd.NameAndType,
+	})
+}
+
+func (cmd *Command) jsonTimeSignal() ([]byte, error) {
+	return json.Marshal(struct {
+		SpliceTime
+		NameAndType
+	}{
+		SpliceTime:  cmd.SpliceTime,
+		NameAndType: cmd.NameAndType,
+	})
 }
 
 func (cmd *Command) MarshalJSON() ([]byte, error) {
 	switch cmd.CommandType {
+	case 0x0:
+		return cmd.jsonSpliceNull()
 	case 0x5:
 		return cmd.jsonSpliceInsert()
 	case 0x6:
 		return cmd.jsonTimeSignal()
+	case 0x7:
+		return cmd.jsonSpliceNull()
+	case 0xff:
+		return cmd.jsonPrivateCommand()
 	}
 	type Funk Command
 	return json.Marshal(&struct{ *Funk }{(*Funk)(cmd)})
@@ -132,6 +147,7 @@ func (cmd *Command) decode(cmdtype uint8, bd *bitDecoder) {
 		cmd.decodeBandwidthReservation(bd)
 	case 0xff:
 		cmd.decodePrivate(bd)
+
 	}
 
 }
@@ -158,6 +174,7 @@ func (cmd *Command) decodeBandwidthReservation(bd *bitDecoder) {
 }
 
 // private Command
+
 func (cmd *Command) decodePrivate(bd *bitDecoder) {
 	cmd.Name = "Private Command"
 	cmd.Identifier = bd.uInt32(32)
@@ -183,7 +200,7 @@ func (cmd *Command) decodeSpliceInsert(bd *bitDecoder) {
 	cmd.EventIDComplianceFlag = bd.asFlag()
 	bd.goForward(3)
 	if !cmd.SpliceImmediateFlag {
-		cmd.spliceTime(bd)
+		cmd.decodeSpliceTime(bd)
 	}
 	if cmd.DurationFlag == true {
 		cmd.parseBreak(bd)
@@ -242,7 +259,7 @@ func (cmd *Command) parseBreak(bd *bitDecoder) {
 	cmd.BreakDuration = bd.as90k(33)
 }
 
-func (cmd *Command) spliceTime(bd *bitDecoder) {
+func (cmd *Command) decodeSpliceTime(bd *bitDecoder) {
 	cmd.TimeSpecifiedFlag = bd.asFlag()
 	if cmd.TimeSpecifiedFlag {
 		bd.goForward(6)
@@ -255,7 +272,7 @@ func (cmd *Command) spliceTime(bd *bitDecoder) {
 // decode Time Signal Splice Commands
 func (cmd *Command) decodeTimeSignal(bd *bitDecoder) {
 	cmd.Name = "Time Signal"
-	cmd.spliceTime(bd)
+	cmd.decodeSpliceTime(bd)
 }
 
 // encode Time Signal Splice Commands
