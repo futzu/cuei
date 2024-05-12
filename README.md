@@ -36,7 +36,7 @@ func main(){
 }                                    
 ```
 ---
-## Latest version is `One`  `One`   `ninety-nine`
+## Latest version is `Two`  `zero`   `one`
 
 
 * [Install](#install-cuei)  
