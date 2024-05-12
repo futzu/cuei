@@ -52,7 +52,6 @@ func ExampleJson2Cue() {
 
 func ExampleNewCue() {
 	data := "/DCtAAAAAAAAAP/wBQb+Tq9DwQCXAixDVUVJCUvhcH+fAR1QQ1IxXzEyMTYyMTE0MDBXQUJDUkFDSEFFTFJBWSEBAQIsQ1VFSQlL4W9/nwEdUENSMV8xMjE2MjExNDAwV0FCQ1JBQ0hBRUxSQVkRAQECGUNVRUkJTBwVf58BClRLUlIxNjA4NEEQAQECHkNVRUkJTBwWf98AA3clYAEKVEtSUjE2MDg0QSABAdHBXYA="
-
 	cue := cuei.NewCue()
 	cue.Decode(data)
 	cue.Show()
@@ -74,6 +73,7 @@ func ExampleCue_Encode() {
 	data := "/DAWAAAAAAAAAP/wBQb+AKmKxwAACzuu2Q=="
 	cue := cuei.NewCue()
 	cue.Decode(data)
+	// encode to bytes
 	fmt.Println(cue.Encode())
 }
 
@@ -81,17 +81,21 @@ func ExampleCue_Encode2B64() {
 	data := "/DAWAAAAAAAAAP/wBQb+AKmKxwAACzuu2Q=="
 	cue := cuei.NewCue()
 	cue.Decode(data)
+	// encode to base64
 	fmt.Println(cue.Encode2B64())
 }
 
 func ExampleCue_Encode2Hex() {
 	data := "/DAWAAAAAAAAAP/wBQb+AKmKxwAACzuu2Q=="
 	cue := cuei.NewCue()
+	// decode base64 data into cue
 	cue.Decode(data)
-	fmt.Println(cue.Encode2Hex())
-	cue.Decode(cue.Encode2Hex())
+	// Encode the cue as hex
+	hexed := cue.Encode2Hex()
+	fmt.Println(hexed)
+	// decode the hex back into a Cue
+	cue.Decode(hexed)
 	cue.Show()
-	cue.Command.Show()
 }
 
 func ExampleCue_AdjustPts() {
@@ -108,13 +112,12 @@ func ExampleCue_AdjustPts() {
 	fmt.Println(cue.Encode2B64())
 	cue.InfoSection.Show()
 
-
 }
 
 func ExampleCue_Show() {
-	data := "/DAWAAAAAAAAAP/wBQb+AKmKxwAACzuu2Q=="
+	dee := "/DA0AAAAAAAAAAAABQb/4zZ7tQAeAhxDVUVJAA6Gjz/TAAESy7EICAAAAAAA0/cuIgAAjFLk9Q=="
 	cue := cuei.NewCue()
-	cue.Decode(data)
+	cue.Decode(dee)
 	cue.Show()
 }
 
