@@ -14,7 +14,7 @@ type TagLenNameId struct {
 }
 
 // audioCmpt is a struct for audioDscptr Components
-type audioCmpt struct {
+type AudioCmpt struct {
 	ComponentTag  uint8
 	ISOCode       uint32
 	BitstreamMode uint8
@@ -22,7 +22,7 @@ type audioCmpt struct {
 	FullSrvcAudio bool
 }
 
-// Avail Descriptor
+// avail Descriptor
 type AvailDescriptor struct {
 	ProviderAvailID uint32
 }
@@ -71,14 +71,14 @@ type Descriptor struct {
 	AvailDescriptor
 	DTMFDescriptor
 	SegmentationDescriptor
-	AudioComponents []audioCmpt
+	AudioComponents []AudioCmpt
 	TAISeconds      uint64
 	TAINano         uint32
 	UTCOffset       uint16
 }
 
 func (dscptr *Descriptor) jsonAvailDescriptor() ([]byte, error) {
-	return json.Marshal(struct {
+	return json.Marshal(&struct {
 		TagLenNameId
 		AvailDescriptor
 	}{
@@ -88,7 +88,7 @@ func (dscptr *Descriptor) jsonAvailDescriptor() ([]byte, error) {
 }
 
 func (dscptr *Descriptor) jsonDTMFDescriptor() ([]byte, error) {
-	return json.Marshal(struct {
+	return json.Marshal(&struct {
 		TagLenNameId
 		DTMFDescriptor
 	}{
@@ -98,7 +98,7 @@ func (dscptr *Descriptor) jsonDTMFDescriptor() ([]byte, error) {
 }
 
 func (dscptr *Descriptor) jsonSegmentationDescriptor() ([]byte, error) {
-	return json.Marshal(struct {
+	return json.Marshal(&struct {
 		TagLenNameId
 		SegmentationDescriptor
 	}{
@@ -109,12 +109,12 @@ func (dscptr *Descriptor) jsonSegmentationDescriptor() ([]byte, error) {
 
 /*
 	 *
-	    	Custom MarshalJSON
-		Marshal a Descriptor into
+	    Custom MarshalJSON
+	        Marshal a Descriptor into
 
 	        0x0: AvailDescriptor,
-		0x1: DTMFDescriptor,
-		0x2: SegmentationDescriptor
+		    0x1: DTMFDescriptor,
+		    0x2: SegmentationDescriptor
 
 	        or just return the Descriptor
 
@@ -192,7 +192,7 @@ func (dscptr *Descriptor) decodeAudioDescriptor(bd *bitDecoder, tag uint8, lengt
 		bsm := bd.uInt8(3)
 		nc := bd.uInt8(4)
 		fsa := bd.asFlag()
-		dscptr.AudioComponents = append(dscptr.AudioComponents, audioCmpt{ct, iso, bsm, nc, fsa})
+		dscptr.AudioComponents = append(dscptr.AudioComponents, AudioCmpt{ct, iso, bsm, nc, fsa})
 	}
 }
 
