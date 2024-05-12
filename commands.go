@@ -5,21 +5,16 @@ import (
 	"fmt"
 )
 
-
-// Splice Command Name and Type
 type NameAndType struct {
 	Name        string
 	CommandType uint8
 }
 
-// Splice Time is used by SpliceInsert and TimeSignal
 type SpliceTime struct {
 	TimeSpecifiedFlag bool
-	PTS               float64
+	PTS               float64 `json:",omitempty"`
 }
 
-
-// Splice Insert 
 type SpliceInsert struct {
 	SpliceEventID              uint32
 	SpliceEventCancelIndicator bool
@@ -35,11 +30,9 @@ type SpliceInsert struct {
 	AvailExpected              uint8
 }
 
-// Time Signal place holder
 type TimeSignal struct {
 }
 
-// Private Command
 type PrivateCommand struct {
 	PrivateBytes []byte
 	Identifier   uint32
@@ -57,36 +50,36 @@ Command
 		     0xff: Private,
 */
 type Command struct {
+	NameAndType
 	SpliceInsert
 	PrivateCommand
 	SpliceTime
-	NameAndType
 }
 
 func (cmd *Command) jsonPrivateCommand() ([]byte, error) {
-	return json.Marshal(struct {
-		PrivateCommand
+	return json.Marshal(&struct {
 		NameAndType
+		PrivateCommand
 	}{
-		PrivateCommand: cmd.PrivateCommand,
 		NameAndType:    cmd.NameAndType,
+		PrivateCommand: cmd.PrivateCommand,
 	})
 }
 
 func (cmd *Command) jsonSpliceInsert() ([]byte, error) {
-	return json.Marshal(struct {
+	return json.Marshal(&struct {
+        NameAndType
 		SpliceInsert
-        SpliceTime
-		NameAndType
+		SpliceTime
 	}{
-		SpliceInsert: cmd.SpliceInsert,
-        SpliceTime:    cmd.SpliceTime,
 		NameAndType:  cmd.NameAndType,
+		SpliceInsert: cmd.SpliceInsert,
+		SpliceTime:   cmd.SpliceTime,
 	})
 }
 
 func (cmd *Command) jsonSpliceNull() ([]byte, error) {
-	return json.Marshal(struct {
+	return json.Marshal(&struct {
 		NameAndType
 	}{
 		NameAndType: cmd.NameAndType,
@@ -94,12 +87,12 @@ func (cmd *Command) jsonSpliceNull() ([]byte, error) {
 }
 
 func (cmd *Command) jsonTimeSignal() ([]byte, error) {
-	return json.Marshal(struct {
-		SpliceTime
+	return json.Marshal(&struct {
 		NameAndType
+		SpliceTime
 	}{
-		SpliceTime:  cmd.SpliceTime,
 		NameAndType: cmd.NameAndType,
+		SpliceTime:  cmd.SpliceTime,
 	})
 }
 
