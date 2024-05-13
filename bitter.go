@@ -135,6 +135,17 @@ func (be *bitEncoder) AddHex64(val string, nbits uint) {
 	}
 }
 
+// AddHex32 append a hex string as uint32 in bits
+func (be *bitEncoder) AddHex32(val string, nbits uint) {
+	u := new(big.Int)
+	_, err := fmt.Sscan(val, u)
+	if err != nil {
+		fmt.Println("error scanning value:", err)
+	} else {
+		be.Add(uint32(u.Uint64()), nbits)
+	}
+}
+
 // Reserve left shifts Encoder.Bites by num and adds num bits  set to 1
 func (be *bitEncoder) Reserve(num int) {
 	for i := 0; i < num; i++ {
