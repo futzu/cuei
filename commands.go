@@ -5,11 +5,13 @@ import (
 	"fmt"
 )
 
+// Command Name and Type
 type NameAndType struct {
 	Name        string
 	CommandType uint8
 }
 
+// SpliceTime is Used by Time Signal and Splice Insert
 type SpliceTime struct {
 	TimeSpecifiedFlag bool
 	PTS               float64 `json:",omitempty"`
@@ -30,9 +32,12 @@ type SpliceInsert struct {
 	AvailExpected              uint8
 }
 
+// Time Signal
 type TimeSignal struct {
+	SpliceTime
 }
 
+// Private Command
 type PrivateCommand struct {
 	PrivateBytes []byte
 	Identifier   uint32
@@ -41,18 +46,28 @@ type PrivateCommand struct {
 /*
 Command
 
-		These Splice Command types are consolidated into Command.
+			These Splice Command types are consolidated into Command.
 
-	        0x0: Splice Null,
-		     0x5: Splice Insert,
-		     0x6: Time Signal,
-		     0x7: Bandwidth Reservation,
-		     0xff: Private,
+		        0x0: Splice Null,
+			     0x5: Splice Insert,
+			     0x6: Time Signal,
+			     0x7: Bandwidth Reservation,
+			     0xff: Private,
+
+	        Notes:
+
+	            - All Commands include a NameAndType struct.
+
+	            - SpliceNull and BandwidthReservation do not have
+	            structs since they don't have any specific fields.
+
+	            - SpliceTime is used by SpliceInsert and TimeSignal
 */
 type Command struct {
 	NameAndType
 	SpliceInsert
 	PrivateCommand
+	TimeSignal
 	SpliceTime
 }
 
@@ -68,7 +83,7 @@ func (cmd *Command) jsonPrivateCommand() ([]byte, error) {
 
 func (cmd *Command) jsonSpliceInsert() ([]byte, error) {
 	return json.Marshal(&struct {
-        NameAndType
+		NameAndType
 		SpliceInsert
 		SpliceTime
 	}{
@@ -96,6 +111,8 @@ func (cmd *Command) jsonTimeSignal() ([]byte, error) {
 	})
 }
 
+// MarshalJSON trims down a Command instance to a specific type
+// and then turns it into JSON.
 func (cmd *Command) MarshalJSON() ([]byte, error) {
 	switch cmd.CommandType {
 	case 0x0:
