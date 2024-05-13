@@ -42,7 +42,8 @@ func ExampleJson2Cue() {
             "Name": "Avail Descriptor"
         }
     ],
-    "Crc32": 3608566905
+    "Crc32": "0xd7165c79"
+
 }
 `
 	cue := cuei.Json2Cue(js)
