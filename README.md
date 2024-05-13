@@ -39,7 +39,7 @@ func main(){
 ```
 ---
 ## Latest version is `One`  `Two`   `one`
-
+* Cyclomatic complexity score for v1.2.1 is __1.89__
 
 * [Install](#install-cuei)  
 
