@@ -13,7 +13,7 @@ type TagLenNameId struct {
 	Identifier string
 }
 
-// audioCmpt is a struct for audioDscptr Components
+// AudioCmpt is a struct for AudioDescriptor Components
 type AudioCmpt struct {
 	ComponentTag  uint8
 	ISOCode       uint32
@@ -22,7 +22,12 @@ type AudioCmpt struct {
 	FullSrvcAudio bool
 }
 
-// avail Descriptor
+// Audio Descriptor
+type AudioDescriptor struct {
+	AudioComponents []AudioCmpt
+}
+
+// Avail Descriptor
 type AvailDescriptor struct {
 	ProviderAvailID uint32
 }
@@ -58,6 +63,13 @@ type SegmentationDescriptor struct {
 	SubSegmentsExpected                    uint8
 }
 
+// Time Descriptor
+type TimeDescriptor struct {
+	TAISeconds      uint64
+	TAINano         uint32
+	UTCOffset       uint16
+}
+
 /*
 *
 
@@ -68,13 +80,22 @@ type SegmentationDescriptor struct {
 */
 type Descriptor struct {
 	TagLenNameId
+	AudioDescriptor
 	AvailDescriptor
 	DTMFDescriptor
 	SegmentationDescriptor
-	AudioComponents []AudioCmpt
-	TAISeconds      uint64
-	TAINano         uint32
-	UTCOffset       uint16
+	TimeDescriptor
+
+}
+
+func (dscptr *Descriptor) jsonAudioDescriptor() ([]byte, error) {
+	return json.Marshal(&struct {
+		TagLenNameId
+		AudioDescriptor
+	}{
+		TagLenNameId:    dscptr.TagLenNameId,
+		AudioDescriptor: dscptr.AudioDescriptor,
+	})
 }
 
 func (dscptr *Descriptor) jsonAvailDescriptor() ([]byte, error) {
@@ -107,14 +128,26 @@ func (dscptr *Descriptor) jsonSegmentationDescriptor() ([]byte, error) {
 	})
 }
 
+func (dscptr *Descriptor) jsonTimeDescriptor() ([]byte, error) {
+	return json.Marshal(&struct {
+		TagLenNameId
+		TimeDescriptor
+	}{
+		TagLenNameId:   dscptr.TagLenNameId,
+		TimeDescriptor: dscptr.TimeDescriptor,
+	})
+}
+
 /*
 	 *
 	    Custom MarshalJSON
 	        Marshal a Descriptor into
 
-	        0x0: AvailDescriptor,
+	            0x0: AvailDescriptor,
 		    0x1: DTMFDescriptor,
-		    0x2: SegmentationDescriptor
+		    0x2: SegmentationDescriptor,
+		    0x3: TimeDescriptor,
+      	    	    0x4: Audio Descrioptor,
 
 	        or just return the Descriptor
 
@@ -128,6 +161,10 @@ func (dscptr *Descriptor) MarshalJSON() ([]byte, error) {
 		return dscptr.jsonDTMFDescriptor()
 	case 0x2:
 		return dscptr.jsonSegmentationDescriptor()
+	case 0x3:
+		return dscptr.jsonTimeDescriptor()
+	case  0x4:
+		return dscptr.jsonAudioDescriptor()
 	}
 	type Funk Descriptor
 	return json.Marshal(&struct{ *Funk }{(*Funk)(dscptr)})
@@ -333,7 +370,6 @@ func (dscptr *Descriptor) encodeSegmentation(be *bitEncoder) {
 	}
 	be.Add(dscptr.SegmentationUpidType, 8)
 	be.Add(dscptr.SegmentationUpidLength, 8)
-	//be.Reserve(int(dscptr.SegmentationUpidLength <<3))
 	if dscptr.SegmentationUpidLength > 0 {
 		dscptr.SegmentationUpid.encode(be, dscptr.SegmentationUpidType)
 	}
