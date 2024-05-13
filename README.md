@@ -38,8 +38,10 @@ func main(){
 }                                    
 ```
 ---
-## Latest version is `One`  `Two`   `one`
-* Cyclomatic complexity score for v1.2.1 is __1.89__
+### Latest version is `One`  `Two`   `three`
+* Cyclomatic complexity score for v1.2.3 is __1.89__
+
+# Documentation
 
 * [Install](#install-cuei)  
 
@@ -353,7 +355,7 @@ func main() {
             "Name": "Avail Descriptor"
         }
     ],
-    "Crc32": 3608566905
+    "Crc32": "0xd7165c79"
 }
 `
 	cue :=  cuei.Json2Cue(js)
@@ -383,6 +385,3 @@ Hex:
 	 0xfc302a0000002673c0fffff00f050000163a7fcffe7f0c4f7300000000000a00084355454900000000ec8b354e
 
 ```
-
-*️⃣  _CUEI is the FourCC / identifier for SCTE-35_, that's where I got the name.
-*️⃣  _what do I mean by fastest SCTE-35 parser? 14,862 SCTE-35 Cues per second on my $200 laptop._
