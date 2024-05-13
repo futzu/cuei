@@ -1,5 +1,9 @@
 package cuei
 
+import (
+	"fmt"
+)
+
 const zero = 0x00
 const one = 0x01
 const eight = 0x08
@@ -32,12 +36,12 @@ func mkTable() [twoFiftySix]int {
 	return tbl
 }
 
-// MkCrc32 generate a 32 bit Crc
-func MkCrc32(data []byte) uint32 {
+// MkCrc32 generate a 32 bit Crc as hex
+func MkCrc32(data []byte) string {
 	crc := initValue
 	tbl := mkTable()
 	for _, bite := range data {
 		crc = tbl[int(bite)^((crc>>twentyFour)&twoFiftyFive)] ^ ((crc << eight) & (initValue - twoFiftyFive))
 	}
-	return uint32(crc)
+	return fmt.Sprintf(" 0x%x",uint32(crc))
 }
