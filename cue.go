@@ -12,10 +12,10 @@ Cue is a SCTE35 cue.
 A Cue contains:
 
 		1 InfoSection
+	   	1 Crc32
 	   	1 Command
 	   	1 Dll  Descriptor loop length
 	   	0 or more Splice Descriptors
-	   	1 Crc32
 	   	1 packetData (if parsed from MPEGTS)
 
 *
@@ -25,8 +25,8 @@ type Cue struct {
 	Command     *Command
 	Dll         uint16       `json:"DescriptorLoopLength"`
 	Descriptors []Descriptor `json:",omitempty"`
-	PacketData  *packetData  `json:",omitempty"`
-	Crc32       uint32
+	Crc32       string
+	PacketData  *packetData `json:",omitempty"`
 }
 
 // Decode takes Cue data as  []byte, base64 or hex string.
@@ -56,7 +56,7 @@ func (cue *Cue) decodeBytes(bites []byte) bool {
 		cue.Command.decode(cue.InfoSection.CommandType, &bd)
 		cue.Dll = bd.uInt16(16)
 		cue.dscptrLoop(cue.Dll, &bd)
-		cue.Crc32 = bd.uInt32(32)
+		cue.Crc32 = fmt.Sprintf(" 0x%x", bd.uInt32(32))
 		return true
 	}
 	return false
@@ -126,7 +126,7 @@ func (cue *Cue) Encode() []byte {
 	be.Add(cue.Dll, 16)
 	be.AddBytes(dloop, uint(cue.Dll<<3))
 	cue.Crc32 = MkCrc32(be.Bites.Bytes())
-	be.Add(cue.Crc32, 32)
+	be.AddHex32(cue.Crc32, 32)
 	return be.Bites.Bytes()
 }
 
@@ -158,7 +158,7 @@ func (cue *Cue) mkSpliceInsert() {
 	cue.Command.AvailExpected = 0
 	if cue.Command.PTS > 0.0 {
 		cue.Command.TimeSpecifiedFlag = true
-		cue.Command.PTS = cue.Command.PTS
+		//cue.Command.PTS = cue.Command.PTS
 	}
 }
 
