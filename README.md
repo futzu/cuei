@@ -4,8 +4,10 @@
 
 
 
-# cuei is a SCTE-35 parser lib written in Go.<br>
-*️⃣  _CUEI is the FourCC / identifier for SCTE-35_, that's where I got the name.
+### cuei is a SCTE-35 parser lib written in Go.<br>
+*️⃣  CUEI is the FourCC / identifier for SCTE-35, that's where I got the name.
+___
+
 <br>
 
 
