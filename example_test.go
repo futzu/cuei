@@ -41,21 +41,27 @@ func ExampleJson2Cue() {
             "Identifier": "CUEI",
             "Name": "Avail Descriptor"
         }
-    ],
-    "Crc32": "0xd7165c79"
+    ]
 
 }
 `
 	cue := cuei.Json2Cue(js)
 	cue.Encode()
 	cue.Show()
+	cue.Command.PTS = 12345.12345
+	cue.Encode()
+	cue.Show()
+	cue2 := cuei.NewCue()
+	cue2.Decode(cue.Encode())
 }
 
 func ExampleNewCue() {
 	data := "/DCtAAAAAAAAAP/wBQb+Tq9DwQCXAixDVUVJCUvhcH+fAR1QQ1IxXzEyMTYyMTE0MDBXQUJDUkFDSEFFTFJBWSEBAQIsQ1VFSQlL4W9/nwEdUENSMV8xMjE2MjExNDAwV0FCQ1JBQ0hBRUxSQVkRAQECGUNVRUkJTBwVf58BClRLUlIxNjA4NEEQAQECHkNVRUkJTBwWf98AA3clYAEKVEtSUjE2MDg0QSABAdHBXYA="
 	cue := cuei.NewCue()
+	cue.Command = &cuei.Command{}
 	cue.Decode(data)
 	cue.Show()
+
 }
 
 func ExampleCue_Decode() {
@@ -67,6 +73,7 @@ func ExampleCue_Decode() {
 	fmt.Println("\n\nCue values can be accessed via dot notiation,")
 	cue.Command.PTS = 987.654321
 	fmt.Printf("cue.Command.PTS = %v\n", cue.Command.PTS)
+	cue.Show()
 
 }
 
@@ -76,6 +83,29 @@ func ExampleCue_Encode() {
 	cue.Decode(data)
 	// encode to bytes
 	fmt.Println(cue.Encode())
+	sp := cuei.SpliceInsert{
+		SpliceEventID:              1,
+		SpliceEventCancelIndicator: false,
+		OutOfNetworkIndicator:      true,
+		ProgramSpliceFlag:          true,
+		DurationFlag:               true,
+		BreakDuration:              60,
+		BreakAutoReturn:            true,
+		SpliceImmediateFlag:        true,
+		EventIDComplianceFlag:      true,
+		UniqueProgramID:            1,
+		AvailNum:                   0,
+		AvailExpected:              0,
+	}
+	cue.Command = &cuei.Command{}
+	cue.Command.CommandType = 5
+	cue.Command.Name = "Splice Insert"
+	cue.Command.SpliceInsert = sp
+	cue.Command.TimeSpecifiedFlag = true
+	cue.Command.PTS = 123456.9
+	cue.Encode()
+	cue.Show()
+
 }
 
 func ExampleCue_Encode2B64() {
