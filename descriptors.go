@@ -70,9 +70,9 @@ type SegmentationDescriptor struct {
 // Time Descriptor
 type TimeDescriptor struct {
 	TagLenNameId
-	TAISeconds      uint64
-	TAINano         uint32
-	UTCOffset       uint16
+	TAISeconds uint64
+	TAINano    uint32
+	UTCOffset  uint16
 }
 
 /*
@@ -90,55 +90,39 @@ type Descriptor struct {
 	DTMFDescriptor
 	SegmentationDescriptor
 	TimeDescriptor
-
-}
-
-func (dscptr *Descriptor) jsonAudioDescriptor() ([]byte, error) {
-	return json.Marshal(&dscptr.AudioDescriptor)
-}
-
-func (dscptr *Descriptor) jsonAvailDescriptor() ([]byte, error) {
-	return json.Marshal(&dscptr.AvailDescriptor)
-}
-
-func (dscptr *Descriptor) jsonDTMFDescriptor() ([]byte, error) {
-	return json.Marshal(&dscptr.DTMFDescriptor)
-}
-
-func (dscptr *Descriptor) jsonSegmentationDescriptor() ([]byte, error) {
-	return json.Marshal(&dscptr.SegmentationDescriptor)
-}
-
-func (dscptr *Descriptor) jsonTimeDescriptor() ([]byte, error) {
-	return json.Marshal(&dscptr.TimeDescriptor)
 }
 
 /*
-	 *
-	    Custom MarshalJSON
-	        Marshal a Descriptor into
+		 *
+		    Custom MarshalJSON
+		        Marshal a Descriptor into
 
-            0x0: AvailDescriptor,
-		    0x1: DTMFDescriptor,
-		    0x2: SegmentationDescriptor,
-		    0x3: TimeDescriptor,
-            0x4: Audio Descrioptor,
-	        or just return the Descriptor
+	            0x0: AvailDescriptor,
+			    0x1: DTMFDescriptor,
+			    0x2: SegmentationDescriptor,
+			    0x3: TimeDescriptor,
+	            0x4: Audio Descrioptor,
+		        or just return the Descriptor
 
 *
 */
 func (dscptr *Descriptor) MarshalJSON() ([]byte, error) {
 	switch dscptr.Tag {
 	case 0x0:
-		return dscptr.jsonAvailDescriptor()
+		return json.Marshal(&dscptr.AvailDescriptor)
+
 	case 0x1:
-		return dscptr.jsonDTMFDescriptor()
+		return json.Marshal(&dscptr.DTMFDescriptor)
+
 	case 0x2:
-		return dscptr.jsonSegmentationDescriptor()
+		return json.Marshal(&dscptr.SegmentationDescriptor)
+
 	case 0x3:
-		return dscptr.jsonTimeDescriptor()
-	case  0x4:
-		return dscptr.jsonAudioDescriptor()
+		return json.Marshal(&dscptr.TimeDescriptor)
+
+	case 0x4:
+		return json.Marshal(&dscptr.AudioDescriptor)
+
 	}
 	type Funk Descriptor
 	return json.Marshal(&struct{ *Funk }{(*Funk)(dscptr)})
@@ -194,7 +178,7 @@ func (dscptr *Descriptor) decodeAudioDescriptor(bd *bitDecoder, tag uint8, lengt
 	dscptr.Tag = tag
 	dscptr.Length = length
 	dscptr.Identifier = bd.asAscii(32)
-    dscptr.Name ="Audio Descriptor" 
+	dscptr.Name = "Audio Descriptor"
 	ccount := bd.uInt8(4)
 	bd.goForward(4)
 	for ccount > 0 {
@@ -206,8 +190,8 @@ func (dscptr *Descriptor) decodeAudioDescriptor(bd *bitDecoder, tag uint8, lengt
 		fsa := bd.asFlag()
 		dscptr.AudioComponents = append(dscptr.AudioComponents, AudioCmpt{ct, iso, bsm, nc, fsa})
 	}
-    dscptr.AudioDescriptor.TagLenNameId = dscptr.TagLenNameId
-    
+	dscptr.AudioDescriptor.TagLenNameId = dscptr.TagLenNameId
+
 }
 
 // Decode for  Avail Descriptors
@@ -217,7 +201,7 @@ func (dscptr *Descriptor) decodeAvailDescriptor(bd *bitDecoder, tag uint8, lengt
 	dscptr.Identifier = bd.asAscii(32)
 	dscptr.Name = "Avail Descriptor"
 	dscptr.ProviderAvailID = bd.uInt32(32)
-    dscptr.AvailDescriptor.TagLenNameId = dscptr.TagLenNameId
+	dscptr.AvailDescriptor.TagLenNameId = dscptr.TagLenNameId
 
 }
 
@@ -231,7 +215,7 @@ func (dscptr *Descriptor) decodeDTMFDescriptor(bd *bitDecoder, tag uint8, length
 	dscptr.DTMFCount = bd.uInt8(3)
 	//bd.goForward(5)
 	dscptr.DTMFChars = bd.uInt64(uint(8 * dscptr.DTMFCount))
-    dscptr.DTMFDescriptor.TagLenNameId = dscptr.TagLenNameId
+	dscptr.DTMFDescriptor.TagLenNameId = dscptr.TagLenNameId
 
 }
 
@@ -244,7 +228,7 @@ func (dscptr *Descriptor) decodeTimeDescriptor(bd *bitDecoder, tag uint8, length
 	dscptr.TAISeconds = bd.uInt64(48)
 	dscptr.TAINano = bd.uInt32(32)
 	dscptr.UTCOffset = bd.uInt16(16)
-    dscptr.TimeDescriptor.TagLenNameId = dscptr.TagLenNameId
+	dscptr.TimeDescriptor.TagLenNameId = dscptr.TagLenNameId
 
 }
 
@@ -262,7 +246,7 @@ func (dscptr *Descriptor) decodeSegmentationDescriptor(bd *bitDecoder, tag uint8
 		dscptr.decodeSegFlags(bd)
 		dscptr.decodeSegmentation(bd)
 	}
-    dscptr.SegmentationDescriptor.TagLenNameId = dscptr.TagLenNameId
+	dscptr.SegmentationDescriptor.TagLenNameId = dscptr.TagLenNameId
 
 }
 
@@ -322,7 +306,7 @@ func (dscptr *Descriptor) encodeAvailDescriptor(be *bitEncoder) {
 
 // Encode a segmentation descriptor
 func (dscptr *Descriptor) encodeSegmentationDescriptor(be *bitEncoder) {
-    dscptr.SegmentationDescriptor.TagLenNameId = dscptr.TagLenNameId
+	dscptr.SegmentationDescriptor.TagLenNameId = dscptr.TagLenNameId
 
 	be.AddHex64(dscptr.SegmentationEventID, 32)
 	be.Add(dscptr.SegmentationEventCancelIndicator, 1)
