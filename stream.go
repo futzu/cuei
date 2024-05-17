@@ -2,7 +2,9 @@ package cuei
 
 import (
 	"bytes"
+	"net"
 	"os"
+	"strings"
 )
 
 // packetData holds information about the packet carrying a SCTE-35
@@ -17,7 +19,7 @@ type packetData struct {
 const pktSz = 188
 
 // bufSz is the size of a read when parsing files.
-const bufSz = 8192 * pktSz
+const bufSz = 32768 * pktSz
 
 // Stream for parsing MPEGTS for SCTE-35
 type Stream struct {
@@ -33,6 +35,13 @@ type Stream struct {
 	Quiet    bool              // Don't call Cue.Show() when a Cue is found.
 }
 
+// CueAction what to do when you find a Cue
+func (stream *Stream) CueAction(cue *Cue) {
+	if stream.Quiet == false {
+		cue.Show()
+	}
+}
+
 func (stream *Stream) mkMaps() {
 	stream.Pid2Prgm = make(map[uint16]uint16)
 	stream.Pid2Type = make(map[uint16]uint8)
@@ -46,17 +55,44 @@ func (stream *Stream) mkMaps() {
 func (stream *Stream) Decode(fname string) []*Cue {
 	stream.Pids = &Pids{}
 	stream.mkMaps()
-	file, err := os.Open(fname)
 	var cues []*Cue
-	chk(err)
-	defer file.Close()
-	buffer := make([]byte, bufSz)
-	for {
-		_, err := file.Read(buffer)
-		if err != nil {
-			break
+	prefix := "udp://@"
+	if strings.HasPrefix(fname, prefix) {
+		stream.DecodeMulticast(fname, prefix)
+	} else {
+		file, err := os.Open(fname)
+		chk(err)
+		defer file.Close()
+		buffer := make([]byte, bufSz)
+		for {
+			_, err := file.Read(buffer)
+			if err != nil {
+				break
+			}
+			cues = append(cues, stream.DecodeBytes(buffer)...)
 		}
-		cues = append(cues, stream.DecodeBytes(buffer)...)
+	}
+	return cues
+
+}
+
+/*
+    Decode Multicast
+    Notes: 
+        * multicast urls start with udp://@
+        * datagram size should be 1316 
+*/
+func (stream *Stream) DecodeMulticast(fname string, prefix string) []*Cue {
+	var cues []*Cue
+	dgram := 1316
+	straddr, _ := strings.CutPrefix(fname, prefix)
+	addr, _ := net.ResolveUDPAddr("udp", straddr)
+	l, _ := net.ListenMulticastUDP("udp", nil, addr)
+	l.SetReadBuffer(1316)
+	for {
+		buffer := make([]byte, dgram)
+		l.ReadFromUDP(buffer)
+		stream.DecodeBytes(buffer)
 	}
 	return cues
 }
@@ -282,9 +318,7 @@ func (stream *Stream) parseScte35(pay []byte, pid uint16) {
 		cue := stream.mkCue(pid)
 		if cue.Decode(pay) {
 			stream.Cues = append(stream.Cues, cue)
-			if stream.Quiet == false {
-				cue.Show()
-			}
+			stream.CueAction(cue)
 		} else {
 			stream.Pids.delScte35Pid(pid)
 		}
