@@ -23,10 +23,9 @@ type BandwidthReservation struct {
 
 // SpliceTime is Used by Time Signal and Splice Insert
 type SpliceTime struct {
-	TimeSpecifiedFlag bool      `json:",omitempty"`
-	PTS               float64   `json:",omitempty"`
+	TimeSpecifiedFlag bool    `json:",omitempty"`
+	PTS               float64 `json:",omitempty"`
 }
-
 
 // Splice Insert
 type SpliceInsert struct {
@@ -62,61 +61,41 @@ type PrivateCommand struct {
 /*
 Command
 
-    These Splice Command types are consolidated into Command,
-    this is done to enable dot notation in a SCTE-35 Cue.  
+	These Splice Command types are consolidated into Command,
+	this is done to enable dot notation in a SCTE-35 Cue.
 
-        0x0: Splice Null,
-        0x5: Splice Insert,
-        0x6: Time Signal,
-        0x7: Bandwidth Reservation,
-        0xff: Private,
+	    0x0: Splice Null,
+	    0x5: Splice Insert,
+	    0x6: Time Signal,
+	    0x7: Bandwidth Reservation,
+	    0xff: Private Command,
 */
 type Command struct {
 	NameAndType
 	SpliceTime
-	BandwidthReservation    
-	SpliceInsert           
-	SpliceNull             
-	PrivateCommand         
-	TimeSignal           
+	BandwidthReservation
+	SpliceInsert
+	SpliceNull
+	PrivateCommand
+	TimeSignal
 }
 
-func (cmd *Command) jsonBandwidthReservation() ([]byte, error) {
-	return json.Marshal(&cmd.BandwidthReservation)
-}
-
-func (cmd *Command) jsonPrivateCommand() ([]byte, error) {
-	return json.Marshal(&cmd.PrivateCommand)
-}
-
-func (cmd *Command) jsonSpliceInsert() ([]byte, error) {
-	cmd.SpliceInsert.SpliceTime = cmd.SpliceTime
-	return json.Marshal(&cmd.SpliceInsert)
-}
-
-func (cmd *Command) jsonSpliceNull() ([]byte, error) {
-	return json.Marshal(&cmd.SpliceNull)
-}
-
-func (cmd *Command) jsonTimeSignal() ([]byte, error) {
-	cmd.TimeSignal.SpliceTime = cmd.SpliceTime
-	return json.Marshal(&cmd.TimeSignal)
-}
-
-// MarshalJSON trims down a Command instance to a specific type
-// and then turns it into JSON.
+/*
+MarshalJSON trims down a Command instance to a specific type
+and then turns it into JSON.
+*/
 func (cmd *Command) MarshalJSON() ([]byte, error) {
 	switch cmd.CommandType {
 	case 0x0:
-		return cmd.jsonSpliceNull()
+		return json.Marshal(&cmd.SpliceNull)
 	case 0x5:
-		return cmd.jsonSpliceInsert()
+		return json.Marshal(&cmd.SpliceInsert)
 	case 0x6:
-		return cmd.jsonTimeSignal()
+		return json.Marshal(&cmd.TimeSignal)
 	case 0x7:
-		return cmd.jsonBandwidthReservation()
+		return json.Marshal(&cmd.BandwidthReservation)
 	case 0xff:
-		return cmd.jsonPrivateCommand()
+		return json.Marshal(&cmd.PrivateCommand)
 	}
 	type Funk Command
 	return json.Marshal(&struct{ *Funk }{(*Funk)(cmd)})
@@ -154,8 +133,9 @@ func (cmd *Command) decode(cmdtype uint8, bd *bitDecoder) {
 
 }
 
-// Encode a Splice Command and return the bytes
-// mostly used by cuei.Cue
+/*
+Encode a Splice Command and return the bytes
+*/
 func (cmd *Command) encode() []byte {
 	blank := []byte{}
 	switch cmd.CommandType {
@@ -240,7 +220,8 @@ func (cmd *Command) encodeSpliceInsert() []byte {
 	be.Add(cmd.UniqueProgramID, 16)
 	be.Add(cmd.AvailNum, 8)
 	be.Add(cmd.AvailExpected, 8)
-	return be.Bites.Bytes()[1:] // drop Bytes[0] it's just a bumper to allow leading zero values
+	// drop Bytes[0] it's just a bumper to allow leading zero values
+	return be.Bites.Bytes()[1:]
 
 }
 
