@@ -6,6 +6,11 @@ import (
 	"testing"
 )
 
+//func BenchmarkStream(b *testing.B) {
+//	stream := cuei.NewStream()
+//	stream.Decode("/home/a/v2.ts")
+//}
+
 func ExampleJson2Cue() {
 
 	js := `{
@@ -46,13 +51,7 @@ func ExampleJson2Cue() {
 }
 `
 	cue := cuei.Json2Cue(js)
-	cue.Encode()
-	cue.Show()
-	cue.Command.PTS = 12345.12345
-	cue.Encode()
-	cue.Show()
-	cue2 := cuei.NewCue()
-	cue2.Decode(cue.Encode())
+    cue.Show()
 }
 
 func ExampleNewCue() {
@@ -83,28 +82,6 @@ func ExampleCue_Encode() {
 	cue.Decode(data)
 	// encode to bytes
 	fmt.Println(cue.Encode())
-	sp := cuei.SpliceInsert{
-		SpliceEventID:              1,
-		SpliceEventCancelIndicator: false,
-		OutOfNetworkIndicator:      true,
-		ProgramSpliceFlag:          true,
-		DurationFlag:               true,
-		BreakDuration:              60,
-		BreakAutoReturn:            true,
-		SpliceImmediateFlag:        true,
-		EventIDComplianceFlag:      true,
-		UniqueProgramID:            1,
-		AvailNum:                   0,
-		AvailExpected:              0,
-	}
-	cue.Command = &cuei.Command{}
-	cue.Command.CommandType = 5
-	cue.Command.Name = "Splice Insert"
-	cue.Command.SpliceInsert = sp
-	cue.Command.TimeSpecifiedFlag = true
-	cue.Command.PTS = 123456.9
-	cue.Encode()
-	cue.Show()
 
 }
 
@@ -178,4 +155,5 @@ func Test(t *testing.T) {
 	t.Run("Cue_Show", func(t *testing.T) {
 		ExampleCue_Show()
 	})
+
 }
