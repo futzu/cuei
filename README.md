@@ -38,8 +38,8 @@ func main(){
 }                                    
 ```
 ---
-### Latest version is `One`  `Two`   `five`
-* Cyclomatic complexity score for v1.2.5 is __1.88__
+### Latest version is `One`  `Two`   `seven`
+* Cyclomatic complexity score for v1.2.7 is __1.95__
 
 # Documentation
 
