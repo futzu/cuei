@@ -61,6 +61,8 @@ func main(){
 
   	* [Load a SCTE-35 Cue from JSON and Encode it](#load-json-and-encode)
 
+	* [Custom Cue Handling for MPEGTS Streams](#custom-cue-handling-for-mpegts-streams)
+
 ### `Install cuei` 
 
 ```go
@@ -385,4 +387,46 @@ Base64:
 Hex:
 	 0xfc302a0000002673c0fffff00f050000163a7fcffe7f0c4f7300000000000a00084355454900000000ec8b354e
 
+```
+
+### Custom Cue Handling for MPEGTS Streams
+
+* Initialize a New Stream
+* Read Bytes
+* Call Stream.DecodeBytes(Bytes) 
+* Process [] *Cue returned by Stream.DecodeBytes
+
+```go
+package main
+
+import (
+	"os"
+	"fmt"
+	"github.com/futzu/cuei"
+)
+
+func main() {
+
+    arg := os.Args[1]
+    stream := cuei.NewStream()   //Initialize a New Stream
+    stream.Quiet = true
+    bufSize := 32768 *188
+    file,_ := os.Open(arg)
+    if err != nil {
+		break
+    }
+    buffer := make([]byte,bufSize)
+    for {
+	_, err := file.Read(buffer)  // Read Bytes
+	if err != nil {
+		break
+	}
+	cues := stream.DecodeBytes(buffer)  //  Call Stream.DecodeBytes(Bytes) 
+           
+	for _,c := range cues {       // Process [] *Cue returned by Stream.DecodeBytes
+
+                fmt.Printf(" %v, %v\n",c.PacketData.Pts, c.Encode2B64())
+		}
+	}
+}
 ```
