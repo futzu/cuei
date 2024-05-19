@@ -487,7 +487,7 @@ func main() {
 	arg := os.Args[1]
 	stream := cuei.NewStream()  // Stream Instance
 	stream.Quiet = true
- 	dgram:=1316
+ 	dgram:=1316  // <-- multicast dgram size is 1316 (188*7) for mpegts
 	bufSize := 100 * dgram
 	addr, _ := net.ResolveUDPAddr("udp", arg)
 	l, _ := net.ListenMulticastUDP("udp", nil, addr)
@@ -496,8 +496,9 @@ func main() {
 		buffer := make([]byte, bufSize)  // Read Some Bytes
 		l.ReadFromUDP(buffer)
 		cues := stream.DecodeBytes(buffer)   // Call Stream.DecodeBytes
-		// iterate the Cues or whatever
-		for _, c := range cues {        // //  Process [] *Cue returned by Stream.DecodeBytes
+
+		for _, c := range cues {      //  Process [] *Cue returned by Stream.DecodeBytes
+
 			fmt.Printf(" %v, %v\n", c.PacketData.Pts, c.Encode2B64())
 		}
 	}
