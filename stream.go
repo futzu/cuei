@@ -21,6 +21,9 @@ const pktSz = 188
 // bufSz is the size of a read when parsing files.
 const bufSz = 32768 * pktSz
 
+// mcastPrefix Multicast URI prefix
+const mcastPrefix = "udp://@"
+
 // Stream for parsing MPEGTS for SCTE-35
 type Stream struct {
 	Cues     []*Cue
@@ -51,9 +54,8 @@ func (stream *Stream) Decode(fname string) []*Cue {
 	stream.Pids = &Pids{}
 	stream.MkMaps()
 	var cues []*Cue
-	prefix := "udp://@"
-	if strings.HasPrefix(fname, prefix) {
-		stream.DecodeMulticast(fname, prefix)
+	if strings.HasPrefix(fname, mcastPrefix) {
+		stream.DecodeMulticast(fname)
 	} else {
 		file, err := os.Open(fname)
 		chk(err)
@@ -77,10 +79,10 @@ func (stream *Stream) Decode(fname string) []*Cue {
         * multicast urls start with udp://@
         * datagram size should be 1316 
 */
-func (stream *Stream) DecodeMulticast(fname string, prefix string) []*Cue {
+func (stream *Stream) DecodeMulticast(fname string) []*Cue {
 	var cues []*Cue
 	dgram := 1316
-	straddr, _ := strings.CutPrefix(fname, prefix)
+	straddr, _ := strings.CutPrefix(fname, mcastPrefix)
 	addr, _ := net.ResolveUDPAddr("udp", straddr)
 	l, _ := net.ListenMulticastUDP("udp", nil, addr)
 	l.SetReadBuffer(1316)
