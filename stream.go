@@ -35,14 +35,9 @@ type Stream struct {
 	Quiet    bool              // Don't call Cue.Show() when a Cue is found.
 }
 
-// CueAction what to do when you find a Cue
-func (stream *Stream) CueAction(cue *Cue) {
-	if stream.Quiet == false {
-		cue.Show()
-	}
-}
 
-func (stream *Stream) mkMaps() {
+// MkMaps Make Stream Maps
+func (stream *Stream) MkMaps() {
 	stream.Pid2Prgm = make(map[uint16]uint16)
 	stream.Pid2Type = make(map[uint16]uint8)
 	stream.Prgm2Pcr = make(map[uint16]uint64)
@@ -54,7 +49,7 @@ func (stream *Stream) mkMaps() {
 // Decode fname (a file name) for SCTE-35
 func (stream *Stream) Decode(fname string) []*Cue {
 	stream.Pids = &Pids{}
-	stream.mkMaps()
+	stream.MkMaps()
 	var cues []*Cue
 	prefix := "udp://@"
 	if strings.HasPrefix(fname, prefix) {
@@ -318,7 +313,9 @@ func (stream *Stream) parseScte35(pay []byte, pid uint16) {
 		cue := stream.mkCue(pid)
 		if cue.Decode(pay) {
 			stream.Cues = append(stream.Cues, cue)
-			stream.CueAction(cue)
+			if !stream.Quiet{
+                cue.Show()
+            }
 		} else {
 			stream.Pids.delScte35Pid(pid)
 		}
@@ -342,6 +339,6 @@ func (stream *Stream) mkCue(pid uint16) *Cue {
 func NewStream() *Stream {
 	stream := &Stream{}
 	stream.Pids = &Pids{}
-	stream.mkMaps()
+	stream.MkMaps()
 	return stream
 }
