@@ -62,6 +62,9 @@ func main(){
   	* [Load a SCTE-35 Cue from JSON and Encode it](#load-json-and-encode)
 
 	* [Custom Cue Handling for MPEGTS Streams](#custom-cue-handling-for-mpegts-streams)
+   
+ 	* [Custom Cue Handling for MPEGTS Streams over Multicast](#custom-cue-handling-for-mpegts-streams-over-multicast)
+ 
 
 ### `Install cuei` 
 
@@ -460,4 +463,43 @@ func main() {
  60634.675144, /DAgAAAAAAAAAP/wDwUAAAABf//+AFJlwAABAAAAAMOOklg=
  60636.710511, /DAWAAAAAAAAAP/wBQb/RUfxAAAA0lhWhg==
  60636.710511, /DAgAAAAAAAAAP/wDwUAAAABf//+AFJlwAABAAAAAMOOklg=
+```
+
+### Custom Cue Handling for MPEGTS Streams Over Multicast
+
+* Create Stream Instance
+* Read Bytes
+* Call Stream.DecodeBytes(Bytes) 
+* Process [] *Cue returned by Stream.DecodeBytes
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/futzu/cuei"
+	"os"
+        "net"
+)
+
+
+
+func main() {
+	arg := os.Args[1]
+	stream := cuei.NewStream()  // Stream Instance
+	stream.Quiet = true
+ 	dgram:=1316
+	bufSize := 100 * dgram
+	addr, _ := net.ResolveUDPAddr("udp", arg)
+	l, _ := net.ListenMulticastUDP("udp", nil, addr)
+	l.SetReadBuffer(bufSize)
+	for {
+		buffer := make([]byte, bufSize)  // Read Some Bytes
+		l.ReadFromUDP(buffer)
+		cues := stream.DecodeBytes(buffer)   // Call Stream.DecodeBytes
+		// iterate the Cues or whatever
+		for _, c := range cues {        // //  Process [] *Cue returned by Stream.DecodeBytes
+			fmt.Printf(" %v, %v\n", c.PacketData.Pts, c.Encode2B64())
+		}
+	}
+}
 ```
