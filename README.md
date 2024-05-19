@@ -391,7 +391,7 @@ Hex:
 
 ### Custom Cue Handling for MPEGTS Streams
 
-* Initialize a New Stream
+* Create Stream Instance
 * Read Bytes
 * Call Stream.DecodeBytes(Bytes) 
 * Process [] *Cue returned by Stream.DecodeBytes
@@ -404,31 +404,39 @@ import (
 	"fmt"
 	"github.com/futzu/cuei"
 )
+package main
+
+import (
+        "fmt"
+        "github.com/futzu/cuei"
+        "os"
+)
 
 func main() {
 
-    arg := os.Args[1]
-    stream := cuei.NewStream()   //Initialize a New Stream
-    stream.Quiet = true
-    bufSize := 32768 *188
-    file,_ := os.Open(arg)
-    if err != nil {
-		break
-    }
-    buffer := make([]byte,bufSize)
-    for {
-	_, err := file.Read(buffer)  // Read Bytes
-	if err != nil {
-		break
-	}
-	cues := stream.DecodeBytes(buffer)  //  Call Stream.DecodeBytes(Bytes) 
-           
-	for _,c := range cues {       // Process [] *Cue returned by Stream.DecodeBytes
+        arg := os.Args[1]
+        stream := cuei.NewStream()  // Create Stream Instance
+        stream.Quiet = true
+        bufSize := 32768 * 188
+        file, err := os.Open(arg)
+        if err != nil {
+                fmt.Printf("%v not found\n", arg)
+        }
+        buffer := make([]byte, bufSize)
+        for {
+                _, err := file.Read(buffer)   // Read Some Bytes
+                if err != nil {
+                        break
+                }
+                cues := stream.DecodeBytes(buffer)  //Call stream.DecodeBytes
 
-                fmt.Printf(" %v, %v\n",c.PacketData.Pts, c.Encode2B64())
-		}
-	}
+                for _, c := range cues { //  Process [] *Cue returned by Stream.DecodeBytes
+
+                        fmt.Printf(" %v, %v\n", c.PacketData.Pts, c.Encode2B64())
+                }
+        }
 }
+
 ```
 * Output
 ```lua
