@@ -4,7 +4,7 @@
 
 
 
-### cuei is a SCTE-35 parser lib written in Go.<br>
+# cuei is a SCTE-35 lib written in Go.<br>
 *️⃣  CUEI is the FourCC / identifier for SCTE-35, that's where I got the name.
 ___
 
@@ -49,7 +49,11 @@ func main(){
 
 * [Examples](https://pkg.go.dev/github.com/futzu/cuei) 
 
-	* [Parse SCTE-35 from MPEGTS](#quick-demo) 
+	* [Parse SCTE-35 from MPEGTS](#quick-demo)
+   
+   	* [Custom Cue Handling for MPEGTS Streams](#custom-cue-handling-for-mpegts-streams)
+   
+ 	* [Custom Cue Handling for MPEGTS Streams over Multicast](#custom-cue-handling-for-mpegts-streams-over-multicast)
 	
 	* [Parse Base64 encoded SCTE-35](#parse-base64-encoded-scte-35) 
 	      
@@ -61,10 +65,7 @@ func main(){
 
   	* [Load a SCTE-35 Cue from JSON and Encode it](#load-json-and-encode)
 
-	* [Custom Cue Handling for MPEGTS Streams](#custom-cue-handling-for-mpegts-streams)
-   
- 	* [Custom Cue Handling for MPEGTS Streams over Multicast](#custom-cue-handling-for-mpegts-streams-over-multicast)
- 
+
 
 ### `Install cuei` 
 
