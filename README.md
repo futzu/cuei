@@ -460,12 +460,13 @@ func main() {
 ```
 
 ### Custom Cue Handling for MPEGTS Streams Over Multicast
-##### Need a multicast sender? Try the [Grande Unified Multicast Sender aka gums](https://github.com/futzu/gums)
+##### Need a multicast sender? Try [gums](https://github.com/futzu/gums)
 
-* Create Stream Instance
-* Read Bytes
-* Call Stream.DecodeBytes(Bytes) 
-* Process [] *Cue returned by Stream.DecodeBytes
+1. Create Stream Instance
+2. Connect to Multicast Network
+3. Read Bytes
+4. Call Stream.DecodeBytes(Bytes) 
+5. Process [] *Cue returned by Stream.DecodeBytes
 ```go
 package main
 
@@ -479,19 +480,19 @@ import (
 
 func main() {
 	arg := os.Args[1]
-	stream := cuei.NewStream()  // Stream Instance
+	stream := cuei.NewStream()  // Stream Instance   (1)
 	stream.Quiet = true
  	dgram:=1316  // <-- multicast dgram size is 1316 (188*7) for mpegts
 	bufSize := 100 * dgram
 	addr, _ := net.ResolveUDPAddr("udp", arg)
-	l, _ := net.ListenMulticastUDP("udp", nil, addr)
+	l, _ := net.ListenMulticastUDP("udp", nil, addr)  (2)
 	l.SetReadBuffer(bufSize)
 	for {
-		buffer := make([]byte, bufSize)  // Read Some Bytes
+		buffer := make([]byte, bufSize)  // Read Some Bytes (3)
 		l.ReadFromUDP(buffer)
-		cues := stream.DecodeBytes(buffer)   // Call Stream.DecodeBytes
+		cues := stream.DecodeBytes(buffer)   // Call Stream.DecodeBytes (4)
 
-		for _, c := range cues {      //  Process [] *Cue returned by Stream.DecodeBytes
+		for _, c := range cues {      //  Process [] *Cue returned by Stream.DecodeBytes (5)
 
 			fmt.Printf(" %v, %v\n", c.PacketData.Pts, c.Encode2B64())
 		}
