@@ -46,14 +46,15 @@ func main(){
 * [Install](#install-cuei)  
 
 
-* [Examples](https://pkg.go.dev/github.com/futzu/cuei) 
+* [Examples](https://pkg.go.dev/github.com/futzu/cuei)
+
+	* [Multicast](#custom-cue-handling-for-mpegts-streams-over-multicast) _(New!)_
+ 
 
 	* [Parse SCTE-35 from MPEGTS](#quick-demo)
    
    	* [Custom Cue Handling for MPEGTS Streams](#custom-cue-handling-for-mpegts-streams)
-   
- 	* [Custom Cue Handling for MPEGTS Streams over Multicast](#custom-cue-handling-for-mpegts-streams-over-multicast)
-	
+   	
 	* [Parse Base64 encoded SCTE-35](#parse-base64-encoded-scte-35) 
 	      
 	* [Use Dot Notation to access SCTE-35 Cue values](#use-dot-notation-to-access-scte-35-cue-values)
