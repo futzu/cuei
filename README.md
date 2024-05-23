@@ -463,7 +463,7 @@ func main() {
 ##### Need a multicast sender? Try [gums](https://github.com/futzu/gums)
 
 1. Create Stream Instance
-2. Connect to Multicast Network
+2. Multicast Connection
 3. Read Bytes
 4. Call Stream.DecodeBytes(Bytes) 
 5. Process [] *Cue returned by Stream.DecodeBytes
@@ -485,7 +485,7 @@ func main() {
  	dgram:=1316  // <-- multicast dgram size is 1316 (188*7) for mpegts
 	bufSize := 100 * dgram
 	addr, _ := net.ResolveUDPAddr("udp", arg)
-	l, _ := net.ListenMulticastUDP("udp", nil, addr)  (2)
+	l, _ := net.ListenMulticastUDP("udp", nil, addr)  // Multicast Connection (2)
 	l.SetReadBuffer(bufSize)
 	for {
 		buffer := make([]byte, bufSize)  // Read Some Bytes (3)
