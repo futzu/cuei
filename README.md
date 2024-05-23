@@ -459,6 +459,7 @@ func main() {
 ```
 
 ### Custom Cue Handling for MPEGTS Streams Over Multicast
+##### Need a multicast sender? Try the [Grande Unified Multicast Sender aka gums](https://github.com/futzu/gums)
 
 * Create Stream Instance
 * Read Bytes
