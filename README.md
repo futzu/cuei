@@ -202,12 +202,10 @@ func (cue2 *Cue2) Show() {        	// Override Show
 }
 
 func main(){
-
 	var cue2 Cue2
 	data := "/DA7AAAAAAAAAP/wFAUAAAABf+/+AItfZn4AKTLgAAEAAAAWAhRDVUVJAAAAAX//AAApMuABACIBAIoXZrM="
         cue2.Decode(data) 
         cue2.Show()
-	
 }
 
 ```
@@ -225,17 +223,13 @@ type Cue2 struct {
     cuei.Cue               		// Embed cuei.Cue
 }
 func (cue2 *Cue2) Show() {        	// Override Show
-
 	fmt.Println("Cue2.Show()")
 	fmt.Printf("%+v",cue2.Command) 
-	
 	fmt.Println("\n\ncuei.Cue.Show() from cue2.Show()")
-	
 	cue2.Cue.Show()			// Call the Show method from embedded cuei.Cue
 }
 
 func main(){
-
 	var cue2 Cue2
 	data := "/DA7AAAAAAAAAP/wFAUAAAABf+/+AItfZn4AKTLgAAEAAAAWAhRDVUVJAAAAAX//AAApMuABACIBAIoXZrM="
         cue2.Decode(data) 
@@ -261,7 +255,6 @@ import (
 )
 
 func main() {
-
 	arg := os.Args[1]
 	stream := cuei.NewStream()
 	cues :=	stream.Decode(arg)
@@ -274,6 +267,8 @@ func main() {
 
 ### `Load JSON and Encode`
 * cuei can accept SCTE-35 data as JSON and encode it to Base64, Bytes, or Hex string.
+* The function __cuei.Json2Cue()__ accepts SCTE-35 JSON as input and returns a *cuei.Cue
+
 ```go
 package main
 
@@ -321,15 +316,11 @@ func main() {
     "Crc32": "0xd7165c79"
 }
 `
-	cue :=  cuei.Json2Cue(js)
-	
-	cue.AdjustPts(28.0)   	 // Apply pts adjustment
-	
-	fmt.Println("\nBytes:\n\t", cue.Encode())	// Bytes
-	
-	fmt.Println("\nBase64:\n\t",cue.Encode2B64())  	// Base64
-	
-	fmt.Println("\nHex:\n\t",cue.Encode2Hex()) 	// Hex
+cue :=  cuei.Json2Cue(js)    // 
+cue.AdjustPts(28.0)   	 // Apply pts adjustment
+fmt.Println("\nBytes:\n\t", cue.Encode())	// Bytes
+fmt.Println("\nBase64:\n\t",cue.Encode2B64())  	// Base64
+fmt.Println("\nHex:\n\t",cue.Encode2Hex()) 	// Hex
 
 }
 
@@ -368,7 +359,7 @@ import (
 func main() {
 
   arg := os.Args[1]
-  stream := cuei.NewStream()  //   Create Stream Instance (1)
+  stream := cuei.NewStream()  //   (1)
   bufSize := 32768 * 188   // Always read in multiples of 188
   file, err := os.Open(arg)
   if err != nil {
@@ -376,13 +367,13 @@ func main() {
   }
   buffer := make([]byte, bufSize)
   for {
-  	_, err := file.Read(buffer)   // Read Some Bytes  (2)
+  	_, err := file.Read(buffer)   //  (2)
 	if err != nil {
 		break
 	}
-	cues := stream.DecodeBytes(buffer)  // Call stream.DecodeBytes (3)
+	cues := stream.DecodeBytes(buffer)  // (3)
 
-	for _, c := range cues {  //  Process [] *Cue  (4)
+	for _, c := range cues {  //   (4)
 		fmt.Printf(" %v, %v\n", c.PacketData.Pts, c.Encode2B64())
 	}
   }
@@ -435,7 +426,7 @@ import (
 
 func main() {
   arg := os.Args[1]
-  stream := cuei.NewStream()  // Stream Instance   (1)
+  stream := cuei.NewStream()  //  (1)
   stream.Quiet = true
   dgram:=1316  // <-- multicast dgram size is 1316 (188*7) for mpegts
   bufSize := 100 * dgram
@@ -443,11 +434,10 @@ func main() {
   l, _ := net.ListenMulticastUDP("udp", nil, addr)  // Multicast Connection 
   l.SetReadBuffer(bufSize)
   for {
-	buffer := make([]byte, bufSize)  // Read Some Bytes (2)
+	buffer := make([]byte, bufSize)  // (2)
 	l.ReadFromUDP(buffer)
-	cues := stream.DecodeBytes(buffer)   // Call Stream.DecodeBytes (3)
-
-	for _, c := range cues {      //  Process [] *Cue returned by Stream.DecodeBytes (4)
+	cues := stream.DecodeBytes(buffer)   //  (3)
+	for _, c := range cues {      //  (4)
 		fmt.Printf(" %v, %v\n", c.PacketData.Pts, c.Encode2B64())
 	}
   }
