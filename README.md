@@ -49,21 +49,17 @@ func main(){
 
 
 * [Examples](https://pkg.go.dev/github.com/futzu/cuei)
-	* Using cuei.Stream 
+	* cuei.Stream 
 		* [Parse SCTE-35 from MPEGTS](#quick-demo)
+   		* [Custom Cue Handling for MPEGTS Streams](#custom-cue-handling-for-mpegts-streams)
    		* [Multicast](#custom-cue-handling-for-mpegts-streams-over-multicast) _(New!)_
 
-   	* [Custom Cue Handling for MPEGTS Streams](#custom-cue-handling-for-mpegts-streams)
-   	
-	* [Parse Base64 encoded SCTE-35](#parse-base64-encoded-scte-35) 
-	      
-	* [Use Dot Notation to access SCTE-35 Cue values](#use-dot-notation-to-access-scte-35-cue-values)
-		
-	* [Shadow a Cue Struct Method ( override ) ](#shadow-a-cue-struct-method)
-	
-	* [Shadow a Cue Method and call the Shadowed Method ( like super in python )](#call-a-shadowed-method)
-
-  	* [Load a SCTE-35 Cue from JSON and Encode it](#load-json-and-encode)
+   	* cuei.Cue
+		* [Parse Base64 encoded SCTE-35](#parse-base64-encoded-scte-35) 
+		* [Use Dot Notation to access SCTE-35 Cue values](#use-dot-notation-to-access-scte-35-cue-values)
+		* [Shadow a Cue Struct Method ( override ) ](#shadow-a-cue-struct-method)
+		* [Shadow a Cue Method and call the Shadowed Method ( like super in python )](#call-a-shadowed-method)
+  		* [Load a SCTE-35 Cue from JSON and Encode it](#load-json-and-encode)
 
 
 
@@ -167,48 +163,8 @@ Next File: mpegts/out.ts
 
 
 ```
-*  Use cuei.Stream.DecodeBytes for more fine-grained control of MPEGTS stream parsing. 
-```go
-package main
-
-import (
-	"fmt"
-	"github.com/futzu/cuei"
-	"os"
-)
-
-func main() {
-
-	args := os.Args[1:] // Take multiple command line args
-	for _, arg := range args {
-		var cues []*cuei.Cue
-		stream := cuei.NewStream() // New StreamParser for each file
-		stream.Quiet = true // suppress printing SCTE-35 messages 
-		
-		file, err := os.Open(arg)
-		if err != nil {
-			break
-		}
-		defer file.Close()
-
-		buffer := make([]byte, cuei.BufSz) // Parse in chunks
-		for {
-			_, err := file.Read(buffer)
-			if err != nil {
-				break
-			}
-			cues = stream.DecodeBytes(buffer)   // StreamParser.Parse returns a [] *cuei.Cue 
-			for _,cue := range cues {
-			// do stuff with the cues like:
-				cue.Show()
-			// or
-			fmt.Printf("Command is a %v\n", cue.Command.Name)
-			}
 			
-		}
-	}
-}
-```
+	
 
 ### `Parse base64 encoded SCTE-35`
 ```go
@@ -392,17 +348,13 @@ Hex:
 	 0xfc302a0000002673c0fffff00f050000163a7fcffe7f0c4f7300000000000a00084355454900000000ec8b354e
 
 ```
-### cuei.Stream
-To parse SCTE-35 from MPEGTS video, there are 4 steps.
+## cuei.Stream
+### `Custom Cue Handling for MPEGTS Streams`
+##### Four Steps
 1) Create Stream Instance
-2) Read Bytes from the video stream (__in multiples of 188__) 
+2) Read Bytes from the video stream (__in multiples of 188__)
 3) Call Stream.DecodeBytes(Bytes) 
 4) Process [] *Cue returned by Stream.DecodeBytes
-
-
-
-### Custom Cue Handling for MPEGTS Streams
-
 
 ```go
 package main
@@ -416,22 +368,22 @@ import (
 func main() {
 
         arg := os.Args[1]
-        stream := cuei.NewStream()  // Create Stream Instance
+        stream := cuei.NewStream()  //   Create Stream Instance (1)
         stream.Quiet = true
-        bufSize := 32768 * 188
+        bufSize := 32768 * 188   // Always read in multiples of 188
         file, err := os.Open(arg)
         if err != nil {
                 fmt.Printf("%v not found\n", arg)
         }
         buffer := make([]byte, bufSize)
         for {
-                _, err := file.Read(buffer)   // Read Some Bytes
+                _, err := file.Read(buffer)   // Read Some Bytes  (2)
                 if err != nil {
                         break
                 }
-                cues := stream.DecodeBytes(buffer)  //Call stream.DecodeBytes
+                cues := stream.DecodeBytes(buffer)  // Call stream.DecodeBytes (3)
 
-                for _, c := range cues { //  Process [] *Cue returned by Stream.DecodeBytes
+                for _, c := range cues {  // 4) Process [] *Cue  (4)
 
                         fmt.Printf(" %v, %v\n", c.PacketData.Pts, c.Encode2B64())
                 }
@@ -463,14 +415,15 @@ func main() {
  60636.710511, /DAgAAAAAAAAAP/wDwUAAAABf//+AFJlwAABAAAAAMOOklg=
 ```
 
-### Custom Cue Handling for MPEGTS Streams Over Multicast
+### `Custom Cue Handling for MPEGTS Streams Over Multicast`
 ##### Need a multicast sender? Try [gums](https://github.com/futzu/gums)
 
-1. Create Stream Instance
-2. Multicast Connection
-3. Read Bytes
-4. Call Stream.DecodeBytes(Bytes) 
-5. Process [] *Cue returned by Stream.DecodeBytes
+<div> for multicast we use the same four steps,<br> the only difference is we read the bytes from the network instead of a local file. </div>
+
+1) Create Stream Instance
+2) Read Bytes from the video stream (__in multiples of 188__)
+3) Call Stream.DecodeBytes(Bytes) 
+4) Process [] *Cue returned by Stream.DecodeBytes
 ```go
 package main
 
@@ -489,14 +442,14 @@ func main() {
  	dgram:=1316  // <-- multicast dgram size is 1316 (188*7) for mpegts
 	bufSize := 100 * dgram
 	addr, _ := net.ResolveUDPAddr("udp", arg)
-	l, _ := net.ListenMulticastUDP("udp", nil, addr)  // Multicast Connection (2)
+	l, _ := net.ListenMulticastUDP("udp", nil, addr)  // Multicast Connection 
 	l.SetReadBuffer(bufSize)
 	for {
-		buffer := make([]byte, bufSize)  // Read Some Bytes (3)
+		buffer := make([]byte, bufSize)  // Read Some Bytes (2)
 		l.ReadFromUDP(buffer)
-		cues := stream.DecodeBytes(buffer)   // Call Stream.DecodeBytes (4)
+		cues := stream.DecodeBytes(buffer)   // Call Stream.DecodeBytes (3)
 
-		for _, c := range cues {      //  Process [] *Cue returned by Stream.DecodeBytes (5)
+		for _, c := range cues {      //  Process [] *Cue returned by Stream.DecodeBytes (4)
 
 			fmt.Printf(" %v, %v\n", c.PacketData.Pts, c.Encode2B64())
 		}
