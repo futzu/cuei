@@ -49,12 +49,10 @@ func main(){
 
 
 * [Examples](https://pkg.go.dev/github.com/futzu/cuei)
+	* Using cuei.Stream 
+		* [Parse SCTE-35 from MPEGTS](#quick-demo)
+   		* [Multicast](#custom-cue-handling-for-mpegts-streams-over-multicast) _(New!)_
 
-	* [Multicast](#custom-cue-handling-for-mpegts-streams-over-multicast) _(New!)_
- 
-
-	* [Parse SCTE-35 from MPEGTS](#quick-demo)
-   
    	* [Custom Cue Handling for MPEGTS Streams](#custom-cue-handling-for-mpegts-streams)
    	
 	* [Parse Base64 encoded SCTE-35](#parse-base64-encoded-scte-35) 
@@ -394,13 +392,17 @@ Hex:
 	 0xfc302a0000002673c0fffff00f050000163a7fcffe7f0c4f7300000000000a00084355454900000000ec8b354e
 
 ```
+### cuei.Stream
+To parse SCTE-35 from MPEGTS video, there are 4 steps.
+1) Create Stream Instance
+2) Read Bytes from the video stream (__in multiples of 188__) 
+3) Call Stream.DecodeBytes(Bytes) 
+4) Process [] *Cue returned by Stream.DecodeBytes
+
+
 
 ### Custom Cue Handling for MPEGTS Streams
 
-* Create Stream Instance
-* Read Bytes
-* Call Stream.DecodeBytes(Bytes) 
-* Process [] *Cue returned by Stream.DecodeBytes
 
 ```go
 package main
