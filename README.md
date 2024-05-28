@@ -367,32 +367,30 @@ import (
 
 func main() {
 
-        arg := os.Args[1]
-        stream := cuei.NewStream()  //   Create Stream Instance (1)
-        stream.Quiet = true
-        bufSize := 32768 * 188   // Always read in multiples of 188
-        file, err := os.Open(arg)
-        if err != nil {
-                fmt.Printf("%v not found\n", arg)
-        }
-        buffer := make([]byte, bufSize)
-        for {
-                _, err := file.Read(buffer)   // Read Some Bytes  (2)
-                if err != nil {
-                        break
-                }
-                cues := stream.DecodeBytes(buffer)  // Call stream.DecodeBytes (3)
+  arg := os.Args[1]
+  stream := cuei.NewStream()  //   Create Stream Instance (1)
+  bufSize := 32768 * 188   // Always read in multiples of 188
+  file, err := os.Open(arg)
+  if err != nil {
+    fmt.Printf("Unable to read %v\n", arg)
+  }
+  buffer := make([]byte, bufSize)
+  for {
+  	_, err := file.Read(buffer)   // Read Some Bytes  (2)
+	if err != nil {
+		break
+	}
+	cues := stream.DecodeBytes(buffer)  // Call stream.DecodeBytes (3)
 
-                for _, c := range cues {  // 4) Process [] *Cue  (4)
-
-                        fmt.Printf(" %v, %v\n", c.PacketData.Pts, c.Encode2B64())
-                }
-        }
+	for _, c := range cues {  //  Process [] *Cue  (4)
+		fmt.Printf(" %v, %v\n", c.PacketData.Pts, c.Encode2B64())
+	}
+  }
 }
 
 ```
 * Output
-```lua
+```php
 60638.745877, /DAWAAAAAAAAAP/wBQb/RUqw1AAAd6OnQA==
  60638.745877, /DAgAAAAAAAAAP/wDwUAAAABf//+AFJlwAABAAAAAMOOklg=
  60640.714511, /DAWAAAAAAAAAP/wBQb/RU1wqAAAoqaOaA==
@@ -436,23 +434,22 @@ import (
 
 
 func main() {
-	arg := os.Args[1]
-	stream := cuei.NewStream()  // Stream Instance   (1)
-	stream.Quiet = true
- 	dgram:=1316  // <-- multicast dgram size is 1316 (188*7) for mpegts
-	bufSize := 100 * dgram
-	addr, _ := net.ResolveUDPAddr("udp", arg)
-	l, _ := net.ListenMulticastUDP("udp", nil, addr)  // Multicast Connection 
-	l.SetReadBuffer(bufSize)
-	for {
-		buffer := make([]byte, bufSize)  // Read Some Bytes (2)
-		l.ReadFromUDP(buffer)
-		cues := stream.DecodeBytes(buffer)   // Call Stream.DecodeBytes (3)
+  arg := os.Args[1]
+  stream := cuei.NewStream()  // Stream Instance   (1)
+  stream.Quiet = true
+  dgram:=1316  // <-- multicast dgram size is 1316 (188*7) for mpegts
+  bufSize := 100 * dgram
+  addr, _ := net.ResolveUDPAddr("udp", arg)
+  l, _ := net.ListenMulticastUDP("udp", nil, addr)  // Multicast Connection 
+  l.SetReadBuffer(bufSize)
+  for {
+	buffer := make([]byte, bufSize)  // Read Some Bytes (2)
+	l.ReadFromUDP(buffer)
+	cues := stream.DecodeBytes(buffer)   // Call Stream.DecodeBytes (3)
 
-		for _, c := range cues {      //  Process [] *Cue returned by Stream.DecodeBytes (4)
-
-			fmt.Printf(" %v, %v\n", c.PacketData.Pts, c.Encode2B64())
-		}
+	for _, c := range cues {      //  Process [] *Cue returned by Stream.DecodeBytes (4)
+		fmt.Printf(" %v, %v\n", c.PacketData.Pts, c.Encode2B64())
 	}
+  }
 }
 ```
