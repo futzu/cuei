@@ -283,10 +283,10 @@ func (dscptr *Descriptor) decodeSegmentation(bd *bitDecoder) {
 	dscptr.SegmentsExpected = bd.uInt8(8)
 	subSegIDs := []uint16{0x30, 0x32, 0x34, 0x36, 0x38, 0x3A, 0x44, 0x46}
 	if IsIn(subSegIDs, uint16(dscptr.SegmentationTypeID)) {
-		dscptr.SubSegmentNum = bd.uInt8(8)
-		dscptr.SubSegmentsExpected = bd.uInt8(8)
-		//dscptr.SubSegmentNum = 0
-		//dscptr.SubSegmentsExpected = 0
+		//dscptr.SubSegmentNum = bd.uInt8(8)
+		//dscptr.SubSegmentsExpected = bd.uInt8(8)
+		dscptr.SubSegmentNum = 0
+		dscptr.SubSegmentsExpected = 0
 	}
 }
 
