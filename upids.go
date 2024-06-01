@@ -12,7 +12,6 @@ var uriUpids = map[uint8]string{
 	0x09: "ADI",
 	0x10: "UUID",
 	0x11: "ACR",
-	0x0a: "EIDR",
 	0x0b: "ATSC",
 	0x0c: "MPU",
 	0x0d: "MID",
@@ -100,13 +99,19 @@ func (upid *Upid) atsc(bd *bitDecoder, upidlen uint8) {
 	upid.ContentID = bd.asBytes(uint((upidlen - 4) << 3))
 }
 
-// Decode for EIDR Upid
+/** 
+Decode for EIDR Upid
+
+Heads up, EIDR doesn't encode yet, 
+I am still trying to figure out the format.
+**/
 func (upid *Upid) eidr(bd *bitDecoder, upidlen uint8) {
 	if upidlen == 12 {
-		head := bd.uInt64(16)
-		tail := bd.asHex(80)
-		upid.Value = fmt.Sprintf("10%v/%v", head, tail)
-	}
+		head := bd.uInt16(16)
+        // This works for Video Service and kind of works for Content. 
+		upid.Value = fmt.Sprintf("10.%v/%04X-%04X-%04X-%04X-%04X",head,bd.uInt16(16),bd.uInt16(16),bd.uInt16(16),bd.uInt16(16),bd.uInt16(16))
+	
+    }
 }
 
 // Decode for MPU Upid
