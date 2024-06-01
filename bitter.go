@@ -10,6 +10,7 @@ import (
 type bitDecoder struct {
 	idx  uint
 	bits string
+	last uint
 }
 
 // Load raw bytes and convert to bits
@@ -17,16 +18,27 @@ func (bd *bitDecoder) load(bites []byte) {
 	i := new(big.Int)
 	i.SetBytes(bites)
 	bd.bits = fmt.Sprintf("%b", i)
+	bd.last = uint(len(bd.bits))
 	bd.idx = 0
 }
 
 // chunk slices bitcount of bits and returns it as a uint64
 func (bd *bitDecoder) chunk(bitcount uint) *big.Int {
 	j := new(big.Int)
-	d := bd.idx + bitcount
-	j.SetString(bd.bits[bd.idx:d], 2)
-	bd.idx = d
+	if (bd.idx + bitcount) <= bd.last-32 {
+		d := bd.idx + bitcount
+		j.SetString(bd.bits[bd.idx:d], 2)
+		bd.idx = d
+	}
 	return j
+}
+
+// crc
+func (bd *bitDecoder) crc() string {
+	j := new(big.Int)
+	j.SetString(bd.bits[bd.last-32:], 2)
+	ashex := fmt.Sprintf("%#x", j)
+	return ashex
 }
 
 // uInt8 trims uint64 to 8 bits
