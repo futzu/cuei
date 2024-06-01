@@ -33,8 +33,8 @@ func (bd *bitDecoder) chunk(bitcount uint) *big.Int {
 	return j
 }
 
-// crc
-func (bd *bitDecoder) crc() string {
+// crc32
+func (bd *bitDecoder) crc32() string {
 	j := new(big.Int)
 	j.SetString(bd.bits[bd.last-32:], 2)
 	ashex := fmt.Sprintf("%#x", j)
