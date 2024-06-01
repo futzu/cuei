@@ -56,7 +56,8 @@ func (cue *Cue) decodeBytes(bites []byte) bool {
 		cue.Command.decode(cue.InfoSection.CommandType, &bd)
 		cue.Dll = bd.uInt16(16)
 		cue.dscptrLoop(cue.Dll, &bd)
-		cue.Crc32 = fmt.Sprintf(" 0x%x", bd.uInt32(32))
+		//cue.Crc32 = fmt.Sprintf(" 0x%x", bd.uInt32(32))
+		cue.Crc32 = bd.crc32()
 		return true
 	}
 	return false
@@ -150,7 +151,7 @@ func (cue *Cue) mkSpliceInsert() {
 	cue.Command.SpliceEventCancelIndicator = false
 	cue.Command.EventIDComplianceFlag = true
 	cue.Command.OutOfNetworkIndicator = false
-	cue.Command.TimeSpecifiedFlag = false
+	cue.Command.SpliceInsert.TimeSpecifiedFlag = false
 	cue.Command.DurationFlag = false
 	cue.Command.BreakAutoReturn = false
 	cue.Command.SpliceImmediateFlag = false
