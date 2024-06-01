@@ -127,7 +127,7 @@ func (cue *Cue) Encode() []byte {
 	be.Add(cue.Dll, 16)
 	be.AddBytes(dloop, uint(cue.Dll<<3))
 	cue.Crc32 = MkCrc32(be.Bites.Bytes())
-	be.AddHex32(cue.Crc32, 32)
+	be.AddHex64(cue.Crc32, 32)
 	return be.Bites.Bytes()
 }
 
