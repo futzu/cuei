@@ -99,19 +99,30 @@ func (upid *Upid) atsc(bd *bitDecoder, upidlen uint8) {
 	upid.ContentID = bd.asBytes(uint((upidlen - 4) << 3))
 }
 
-/** 
+/*
+*
 Decode for EIDR Upid
 
-Heads up, EIDR doesn't encode yet, 
+Heads up, EIDR doesn't encode yet,
 I am still trying to figure out the format.
-**/
+*
+*/
 func (upid *Upid) eidr(bd *bitDecoder, upidlen uint8) {
 	if upidlen == 12 {
 		head := bd.uInt16(16)
-        // This works for Video Service and kind of works for Content. 
-		upid.Value = fmt.Sprintf("10.%v/%04X-%04X-%04X-%04X-%04X",head,bd.uInt16(16),bd.uInt16(16),bd.uInt16(16),bd.uInt16(16),bd.uInt16(16))
-	
-    }
+		// This works for Video Service and kind of works for Content.
+		var astring string
+		nibbles := 5
+		i := 0
+		for i < nibbles {
+			chunk := fmt.Sprintf("%x%x%x%x", bd.uInt8(4), bd.uInt8(4), bd.uInt8(4), bd.uInt8(4))
+			astring = fmt.Sprintf("%v%v", astring, chunk)
+			i += 1
+		}
+		// Switching to Compact Binary Format
+		upid.Value = fmt.Sprintf("0x%x%v", head, astring)
+
+	}
 }
 
 // Decode for MPU Upid
