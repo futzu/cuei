@@ -155,6 +155,8 @@ func (upid *Upid) encode(be *bitEncoder, upidType uint8) {
 		upid.encodeIsan(be)
 	case 0x08:
 		upid.encodeAirId(be)
+	case 0x0a:
+		upid.encodeEidr(be)
 	default:
 		upid.encodeUri(be)
 	}
@@ -178,5 +180,15 @@ func (upid *Upid) encodeAirId(be *bitEncoder) {
 func (upid *Upid) encodeIsan(be *bitEncoder) {
 	if len(upid.Value) > 0 {
 		be.AddBytes([]byte(upid.Value), uint(len(upid.Value)<<3))
+	}
+}
+
+// encode for Eidr Upid
+func (upid *Upid) encodeEidr(be *bitEncoder) {
+	be.AddHex64(upid.Value[:6], 16)
+	substring := upid.Value[6:]
+	for _, c := range substring {
+		hexed := fmt.Sprintf("0x%s", string(c))
+		be.Add(Hex2uint8(hexed), 4)
 	}
 }
