@@ -189,6 +189,6 @@ func (upid *Upid) encodeEidr(be *bitEncoder) {
 	substring := upid.Value[6:]
 	for _, c := range substring {
 		hexed := fmt.Sprintf("0x%s", string(c))
-		be.Add(Hex2uint8(hexed), 4)
+		be.AddHex64(hexed, 4)
 	}
 }
