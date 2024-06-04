@@ -48,7 +48,7 @@ func (cue *Cue) Decode(i interface{}) bool {
 
 // last byte of the Cue without padding
 func (cue *Cue) lastByte(bites []byte) uint16 {
-	pre := uint16(4)
+	pre := uint16(3) //24 bits
 	seclen := uint16(bites[1]&15) << 8
 	seclen |= uint16(bites[2])
 	lastbyte := seclen + pre
