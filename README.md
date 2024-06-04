@@ -39,11 +39,13 @@ func main(){
 }                                    
 ```
 ---
-### Latest version is `One`  `Two`   `twenty-three`
+### Latest version is `One`  `Two`   `twenty-seven`
 * __cuei.Stream Now Supports Multicast!__
-* Cyclomatic complexity score for v1.2.25 is __1.96__
+* Cyclomatic complexity score for v1.2.27 is __1.96__
 
 # Documentation
+
+* [Releases](#releases)
 
 * [Install](#install-cuei)  
 
@@ -62,6 +64,10 @@ func main(){
   		* [Load a SCTE-35 Cue from JSON and Encode it](#load-json-and-encode)
 
 
+
+### `Releases`
+> I do a lot of releases, well sometimes. Whenever I make an improvement or fix a bug, I do a release.
+> Small changes as they happen not all the changes at once. 
 
 ### `Install cuei` 
 
