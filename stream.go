@@ -38,7 +38,6 @@ type Stream struct {
 	Quiet    bool              // Don't call Cue.Show() when a Cue is found.
 }
 
-
 // MkMaps Make Stream Maps
 func (stream *Stream) MkMaps() {
 	stream.Pid2Prgm = make(map[uint16]uint16)
@@ -74,10 +73,10 @@ func (stream *Stream) Decode(fname string) []*Cue {
 }
 
 /*
-    Decode Multicast
-    Notes: 
-        * multicast urls start with udp://@
-        * datagram size should be 1316 
+Decode Multicast
+Notes:
+  - multicast urls start with udp://@
+  - datagram size should be 1316
 */
 func (stream *Stream) DecodeMulticast(fname string) []*Cue {
 	var cues []*Cue
@@ -85,7 +84,7 @@ func (stream *Stream) DecodeMulticast(fname string) []*Cue {
 	straddr, _ := strings.CutPrefix(fname, mcastPrefix)
 	addr, _ := net.ResolveUDPAddr("udp", straddr)
 	l, _ := net.ListenMulticastUDP("udp", nil, addr)
-	l.SetReadBuffer(1316)
+	l.SetReadBuffer(1316 * 70000)
 	for {
 		buffer := make([]byte, dgram)
 		l.ReadFromUDP(buffer)
@@ -149,13 +148,15 @@ func (stream *Stream) parsePts(pay []byte, pid uint16) {
 func (stream *Stream) parsePcr(pkt []byte, pid uint16) {
 	if stream.afcFlag(pkt) {
 		if stream.pcrFlag(pkt) {
-			pcr := (uint64(pkt[6]) << 25)
-			pcr |= (uint64(pkt[7]) << 17)
-			pcr |= (uint64(pkt[8]) << 9)
-			pcr |= (uint64(pkt[9]) << 1)
-			pcr |= uint64(pkt[10]) >> 7
-			prgm := stream.Pid2Prgm[pid]
-			stream.Prgm2Pcr[prgm] = pcr
+			prgm, ok := stream.Pid2Prgm[pid]
+			if ok {
+				pcr := (uint64(pkt[6]) << 25)
+				pcr |= (uint64(pkt[7]) << 17)
+				pcr |= (uint64(pkt[8]) << 9)
+				pcr |= (uint64(pkt[9]) << 1)
+				pcr |= uint64(pkt[10]) >> 7
+				stream.Prgm2Pcr[prgm] = pcr
+			}
 		}
 	}
 }
@@ -217,12 +218,11 @@ func (stream *Stream) parse(pkt []byte) {
 		stream.parsePmt(*pay, *pid)
 	}
 	if stream.Pids.isPcrPid(*pid) {
-		if stream.parsePusi(pkt) {
-			stream.parsePts(*pay, *pid)
-		}
 		stream.parsePcr(pkt, *pid)
 	}
-
+	if stream.parsePusi(pkt) {
+		stream.parsePts(*pay, *pid)
+	}
 	if stream.Pids.isScte35Pid(*pid) {
 		stream.parseScte35(*pay, *pid)
 	}
@@ -315,9 +315,9 @@ func (stream *Stream) parseScte35(pay []byte, pid uint16) {
 		cue := stream.mkCue(pid)
 		if cue.Decode(pay) {
 			stream.Cues = append(stream.Cues, cue)
-			if !stream.Quiet{
-                cue.Show()
-            }
+			if !stream.Quiet {
+				cue.Show()
+			}
 		} else {
 			stream.Pids.delScte35Pid(pid)
 		}
@@ -340,7 +340,7 @@ func (stream *Stream) mkCue(pid uint16) *Cue {
 // initialize and return a *Stream
 func NewStream() *Stream {
 	stream := &Stream{}
-	stream.Pids = &Pids{}
+	//stream.Pids = &Pids{}
 	stream.MkMaps()
 	return stream
 }
