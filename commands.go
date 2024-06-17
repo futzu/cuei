@@ -5,32 +5,32 @@ import (
 	"fmt"
 )
 
-// Command Name and Type
-type NameAndType struct {
+// Splice Null
+type SpliceNull struct {
 	Name        string
 	CommandType uint8
 }
 
-// Splice Null
-type SpliceNull struct {
-	NameAndType
-}
-
 // Bandwidth Reservation
 type BandwidthReservation struct {
-	NameAndType
+	Name        string
+	CommandType uint8
 }
 
-// SpliceTime is Used by Time Signal and Splice Insert
-type SpliceTime struct {
-	TimeSpecifiedFlag bool    `json:",omitempty"`
-	PTS               float64 `json:",omitempty"`
+// Private Command
+type privateCommand struct {
+	Name         string
+	CommandType  uint8
+	PrivateBytes []byte
+	Identifier   uint32
 }
 
 // Splice Insert
-type SpliceInsert struct {
-	NameAndType
-	SpliceTime
+type spliceInsert struct {
+	Name                       string
+	CommandType                uint8
+	TimeSpecifiedFlag          bool    `json:",omitempty"`
+	PTS                        float64 `json:",omitempty"`
 	SpliceEventID              uint32
 	SpliceEventCancelIndicator bool
 	OutOfNetworkIndicator      bool
@@ -46,16 +46,11 @@ type SpliceInsert struct {
 }
 
 // Time Signal
-type TimeSignal struct {
-	NameAndType
-	SpliceTime
-}
-
-// Private Command
-type PrivateCommand struct {
-	NameAndType
-	PrivateBytes []byte
-	Identifier   uint32
+type timeSignal struct {
+	Name              string
+	CommandType       uint8
+	TimeSpecifiedFlag bool    `json:",omitempty"`
+	PTS               float64 `json:",omitempty"`
 }
 
 /*
@@ -71,31 +66,62 @@ Command
 	    0xff: Private Command,
 */
 type Command struct {
-	NameAndType
-	SpliceTime
-	BandwidthReservation
-	SpliceInsert
-	SpliceNull
-	PrivateCommand
-	TimeSignal
+	Name                       string
+	CommandType                uint8
+	PrivateBytes               []byte  `json:",omitempty"`
+	Identifier                 uint32  `json:",omitempty"`
+	SpliceEventID              uint32  `json:",omitempty"`
+	SpliceEventCancelIndicator bool    `json:",omitempty"`
+	EventIDComplianceFlag      bool    `json:",omitempty"`
+	OutOfNetworkIndicator      bool    `json:",omitempty"`
+	ProgramSpliceFlag          bool    `json:",omitempty"`
+	DurationFlag               bool    `json:",omitempty"`
+	BreakAutoReturn            bool    `json:",omitempty"`
+	BreakDuration              float64 `json:",omitempty"`
+	SpliceImmediateFlag        bool    `json:",omitempty"`
+	UniqueProgramID            uint16  `json:",omitempty"`
+	AvailNum                   uint8   `json:",omitempty"`
+	AvailExpected              uint8   `json:",omitempty"`
+	TimeSpecifiedFlag          bool    `json:",omitempty"`
+	PTS                        float64 `json:",omitempty"`
 }
 
-/*
-MarshalJSON trims down a Command instance to a specific type
-and then turns it into JSON.
-*/
+// only show timeSignal values in JSON, used by cmd.MarshalJSON()
+func (cmd *Command) jsonTimeSignal() ([]byte, error) {
+	ts := timeSignal{Name: cmd.Name,
+		CommandType:       cmd.CommandType,
+		TimeSpecifiedFlag: cmd.TimeSpecifiedFlag,
+		PTS:               cmd.PTS}
+	return json.Marshal(ts)
+}
+
+// only show spliceInsert values in JSON, used by cmd.MarshalJSON()
+func (cmd *Command) jsonSpliceInsert() ([]byte, error) {
+
+	si := spliceInsert{Name: cmd.Name,
+		CommandType:                cmd.CommandType,
+		SpliceEventID:              cmd.SpliceEventID,
+		SpliceEventCancelIndicator: cmd.SpliceEventCancelIndicator,
+		OutOfNetworkIndicator:      cmd.OutOfNetworkIndicator,
+		ProgramSpliceFlag:          cmd.ProgramSpliceFlag,
+		DurationFlag:               cmd.DurationFlag,
+		BreakDuration:              cmd.BreakDuration,
+		BreakAutoReturn:            cmd.BreakAutoReturn,
+		SpliceImmediateFlag:        cmd.SpliceImmediateFlag,
+		EventIDComplianceFlag:      cmd.EventIDComplianceFlag,
+		UniqueProgramID:            cmd.UniqueProgramID,
+		AvailNum:                   cmd.AvailNum,
+		AvailExpected:              cmd.AvailExpected,
+		PTS:                        cmd.PTS}
+	return json.Marshal(si)
+}
+
 func (cmd *Command) MarshalJSON() ([]byte, error) {
 	switch cmd.CommandType {
-	case 0x0:
-		return json.Marshal(&cmd.SpliceNull)
 	case 0x5:
-		return json.Marshal(&cmd.SpliceInsert)
+		return cmd.jsonSpliceInsert()
 	case 0x6:
-		return json.Marshal(&cmd.TimeSignal)
-	case 0x7:
-		return json.Marshal(&cmd.BandwidthReservation)
-	case 0xff:
-		return json.Marshal(&cmd.PrivateCommand)
+		return cmd.jsonTimeSignal()
 	}
 	type Funk Command
 	return json.Marshal(&struct{ *Funk }{(*Funk)(cmd)})
@@ -152,14 +178,12 @@ func (cmd *Command) encode() []byte {
 // Bandwidth Reservation Decode
 func (cmd *Command) decodeBandwidthReservation(bd *bitDecoder) {
 	cmd.Name = "Bandwidth Reservation"
-	cmd.BandwidthReservation.NameAndType = cmd.NameAndType
 	bd.goForward(0)
 }
 
 // Private Command Decode
 func (cmd *Command) decodePrivate(bd *bitDecoder) {
 	cmd.Name = "Private Command"
-	cmd.PrivateCommand.NameAndType = cmd.NameAndType
 	cmd.Identifier = bd.uInt32(32)
 	cmd.PrivateBytes = bd.asBytes(24)
 }
@@ -167,14 +191,12 @@ func (cmd *Command) decodePrivate(bd *bitDecoder) {
 // Splice Null Decode
 func (cmd *Command) decodeSpliceNull(bd *bitDecoder) {
 	cmd.Name = "Splice Null"
-	cmd.SpliceNull.NameAndType = cmd.NameAndType
 	bd.goForward(0)
 }
 
 // Splice Insert Decode
 func (cmd *Command) decodeSpliceInsert(bd *bitDecoder) {
 	cmd.Name = "Splice Insert"
-	cmd.SpliceInsert.NameAndType = cmd.NameAndType
 	cmd.SpliceEventID = bd.uInt32(32)
 	cmd.SpliceEventCancelIndicator = bd.asFlag()
 	bd.goForward(7)
@@ -186,7 +208,6 @@ func (cmd *Command) decodeSpliceInsert(bd *bitDecoder) {
 	bd.goForward(3)
 	if !cmd.SpliceImmediateFlag {
 		cmd.decodeSpliceTime(bd)
-		cmd.SpliceInsert.SpliceTime = cmd.SpliceTime
 	}
 	if cmd.DurationFlag == true {
 		cmd.parseBreak(bd)
@@ -199,8 +220,6 @@ func (cmd *Command) decodeSpliceInsert(bd *bitDecoder) {
 // Encode Splice Insert Splice Command
 func (cmd *Command) encodeSpliceInsert() []byte {
 	be := &bitEncoder{}
-	cmd.SpliceInsert.SpliceTime = cmd.SpliceTime
-	cmd.SpliceInsert.NameAndType = cmd.NameAndType
 	be.Add(1, 8) //bumper
 	be.Add(cmd.SpliceEventID, 32)
 	be.Add(cmd.SpliceEventCancelIndicator, 1)
@@ -264,15 +283,11 @@ func (cmd *Command) decodeSpliceTime(bd *bitDecoder) {
 func (cmd *Command) decodeTimeSignal(bd *bitDecoder) {
 	cmd.Name = "Time Signal"
 	cmd.decodeSpliceTime(bd)
-	cmd.TimeSignal.NameAndType = cmd.NameAndType
-	cmd.TimeSignal.SpliceTime = cmd.SpliceTime
 }
 
 // Encode Time Signal Splice Commands
 func (cmd *Command) encodeTimeSignal() []byte {
 	be := &bitEncoder{}
-	cmd.TimeSignal.SpliceTime = cmd.SpliceTime
-	cmd.TimeSignal.NameAndType = cmd.NameAndType
 	cmd.encodeSpliceTime(be)
 	return be.Bites.Bytes()
 }
