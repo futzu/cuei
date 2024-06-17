@@ -59,6 +59,11 @@ func mk90k(raw uint64) float64 {
 	return float64(uint64(nk*1000000)) / 1000000
 }
 
+// Mk90k converts ticks to seconds
+func Mk90k(raw uint64) float64 {
+	return mk90k(raw)
+}
+
 // mkJson structs to JSON
 func mkJson(i interface{}) string {
 	jason, err := json.MarshalIndent(&i, "", "    ")
