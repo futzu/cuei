@@ -11,7 +11,7 @@ type spliceNull struct {
 	CommandType uint8
 }
 
-// bandwidth Reservation
+// Bandwidth Reservation
 type bandwidthReservation struct {
 	Name        string
 	CommandType uint8
