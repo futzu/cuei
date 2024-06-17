@@ -6,12 +6,12 @@ import (
 )
 
 // Splice Null
-type SpliceNull struct {
+type spliceNull struct {
 	Name        string
 	CommandType uint8
 }
 
-// Bandwidth Reservation
+// bandwidth Reservation
 type BandwidthReservation struct {
 	Name        string
 	CommandType uint8
