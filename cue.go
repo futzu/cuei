@@ -48,9 +48,10 @@ func (cue *Cue) Decode(i interface{}) bool {
 
 // last byte of the Cue without padding
 func (cue *Cue) lastByte(bites []byte) uint16 {
-	pre := uint16(3) //24 bits
+	pre := uint16(3)
 	seclen := uint16(bites[1]&15) << 8
 	seclen |= uint16(bites[2])
+	fmt.Printf("SECTION LEN: %v\n", seclen)
 	lastbyte := seclen + pre
 	return lastbyte
 }
@@ -161,7 +162,7 @@ func (cue *Cue) mkSpliceInsert() {
 	cue.Command.SpliceEventCancelIndicator = false
 	cue.Command.EventIDComplianceFlag = true
 	cue.Command.OutOfNetworkIndicator = false
-	cue.Command.SpliceInsert.TimeSpecifiedFlag = false
+	cue.Command.TimeSpecifiedFlag = false
 	cue.Command.DurationFlag = false
 	cue.Command.BreakAutoReturn = false
 	cue.Command.SpliceImmediateFlag = false
@@ -175,10 +176,12 @@ func (cue *Cue) mkSpliceInsert() {
 
 /*
 *
-	Convert  Cue.Command  from a  Time Signal
-	to a Splice Insert and return a base64 string
-	 SegmentationTypeIds to trigger CUE-OUTs : 0x22, 0x30, 0x32, 0x34, 0x36, 0x44, 0x46
-	SegmentationTypeIds to trigger CUE-INs:  0x23, 0x31, 0x33, 0x35, 0x37, 0x45, 0x47
+
+		Convert  Cue.Command  from a  Time Signal
+		to a Splice Insert and return a base64 string
+	 	SegmentationTypeIds to trigger CUE-OUTs : 0x22, 0x30, 0x32, 0x34, 0x36, 0x44, 0x46
+		SegmentationTypeIds to trigger CUE-INs:  0x23, 0x31, 0x33, 0x35, 0x37, 0x45, 0x47
+
 *
 */
 func (cue *Cue) Six2Five() string {
