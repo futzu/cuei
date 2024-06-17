@@ -5,16 +5,8 @@ import (
 	"fmt"
 )
 
-// Tag, Length , Name and Identifier for Descriptors
-type TagLenNameId struct {
-	Tag        uint8
-	Length     uint8
-	Name       string
-	Identifier string
-}
-
 // AudioCmpt is a struct for AudioDescriptor Components
-type AudioCmpt struct {
+type audioCmpt struct {
 	ComponentTag  uint8
 	ISOCode       uint32
 	BitstreamMode uint8
@@ -23,28 +15,40 @@ type AudioCmpt struct {
 }
 
 // Audio Descriptor
-type AudioDescriptor struct {
-	TagLenNameId
-	AudioComponents []AudioCmpt
+type audioDescriptor struct {
+	Tag             uint8
+	Length          uint8
+	Identifier      string
+	Name            string
+	AudioComponents []audioCmpt
 }
 
 // Avail Descriptor
-type AvailDescriptor struct {
-	TagLenNameId
+type availDescriptor struct {
+	Tag             uint8
+	Length          uint8
+	Identifier      string
+	Name            string
 	ProviderAvailID uint32
 }
 
 // DTMF Descriptor
-type DTMFDescriptor struct {
-	TagLenNameId
-	PreRoll   uint8
-	DTMFCount uint8
-	DTMFChars uint64
+type dtmfDescriptor struct {
+	Tag        uint8
+	Length     uint8
+	Identifier string
+	Name       string
+	PreRoll    uint8
+	DTMFCount  uint8
+	DTMFChars  uint64
 }
 
 // Segmentation Descriptor
-type SegmentationDescriptor struct {
-	TagLenNameId
+type segmentationDescriptor struct {
+	Tag                                    uint8
+	Length                                 uint8
+	Identifier                             string
+	Name                                   string
 	SegmentationEventID                    string
 	SegmentationEventCancelIndicator       bool
 	SegmentationEventIDComplianceIndicator bool
@@ -68,8 +72,11 @@ type SegmentationDescriptor struct {
 }
 
 // Time Descriptor
-type TimeDescriptor struct {
-	TagLenNameId
+type timeDescriptor struct {
+	Tag        uint8
+	Length     uint8
+	Identifier string
+	Name       string
 	TAISeconds uint64
 	TAINano    uint32
 	UTCOffset  uint16
@@ -84,16 +91,44 @@ type TimeDescriptor struct {
 *
 */
 type Descriptor struct {
-	TagLenNameId
-	AudioDescriptor
-	AvailDescriptor
-	DTMFDescriptor
-	SegmentationDescriptor
-	TimeDescriptor
+	Tag                                    uint8
+	Length                                 uint8
+	Identifier                             string
+	Name                                   string
+	AudioComponents                        []audioCmpt `json:",omitempty"`
+	ProviderAvailID                        uint32      `json:",omitempty"`
+	PreRoll                                uint8       `json:",omitempty"`
+	DTMFCount                              uint8       `json:",omitempty"`
+	DTMFChars                              uint64      `json:",omitempty"`
+	TAISeconds                             uint64      `json:",omitempty"`
+	TAINano                                uint32      `json:",omitempty"`
+	UTCOffset                              uint16      `json:",omitempty"`
+	SegmentationEventID                    string      `json:",omitempty"`
+	SegmentationEventCancelIndicator       bool        `json:",omitempty"`
+	SegmentationEventIDComplianceIndicator bool        `json:",omitempty"`
+	ProgramSegmentationFlag                bool        `json:",omitempty"`
+	SegmentationDurationFlag               bool        `json:",omitempty"`
+	DeliveryNotRestrictedFlag              bool        `json:",omitempty"`
+	WebDeliveryAllowedFlag                 bool        `json:",omitempty"`
+	NoRegionalBlackoutFlag                 bool        `json:",omitempty"`
+	ArchiveAllowedFlag                     bool        `json:",omitempty"`
+	DeviceRestrictions                     string      `json:",omitempty"`
+	//   Components                       []segCmpt   `json:",omitempty"`
+	SegmentationDuration   float64 `json:",omitempty"`
+	SegmentationMessage    string  `json:",omitempty"`
+	SegmentationUpidType   uint8   `json:",omitempty"`
+	SegmentationUpidLength uint8   `json:",omitempty"`
+	SegmentationUpid       *Upid   `json:",omitempty"`
+	SegmentationTypeID     uint8   `json:",omitempty"`
+	SegmentNum             uint8   `json:",omitempty"`
+	SegmentsExpected       uint8   `json:",omitempty"`
+	SubSegmentNum          uint8   `json:",omitempty"`
+	SubSegmentsExpected    uint8   `json:",omitempty"`
 }
 
 /*
-		 *
+*
+
 		    Custom MarshalJSON
 		        Marshal a Descriptor into
 
@@ -106,23 +141,80 @@ type Descriptor struct {
 
 *
 */
+func (dscptr *Descriptor) jsonAvailDescriptor() ([]byte, error) {
+	avail := availDescriptor{
+		Tag:             dscptr.Tag,
+		Length:          dscptr.Length,
+		Identifier:      dscptr.Identifier,
+		Name:            dscptr.Name,
+		ProviderAvailID: dscptr.ProviderAvailID}
+
+	return json.Marshal(avail)
+}
+
+func (dscptr *Descriptor) jsonDTMFDescriptor() ([]byte, error) {
+	dtmf := dtmfDescriptor{
+		Tag:        dscptr.Tag,
+		Length:     dscptr.Length,
+		Identifier: dscptr.Identifier,
+		Name:       dscptr.Name,
+		PreRoll:    dscptr.PreRoll,
+		DTMFCount:  dscptr.DTMFCount,
+		DTMFChars:  dscptr.DTMFChars}
+	return json.Marshal(&dtmf)
+}
+
+func (dscptr *Descriptor) jsonSegmentationDescriptor() ([]byte, error) {
+	seg := segmentationDescriptor{
+		Tag:                                    dscptr.Tag,
+		Length:                                 dscptr.Length,
+		Identifier:                             dscptr.Identifier,
+		Name:                                   dscptr.Name,
+		SegmentationEventID:                    dscptr.SegmentationEventID,
+		SegmentationEventCancelIndicator:       dscptr.SegmentationEventCancelIndicator,
+		SegmentationEventIDComplianceIndicator: dscptr.SegmentationEventIDComplianceIndicator,
+		ProgramSegmentationFlag:                dscptr.ProgramSegmentationFlag,
+		SegmentationDurationFlag:               dscptr.SegmentationDurationFlag,
+		DeliveryNotRestrictedFlag:              dscptr.DeliveryNotRestrictedFlag,
+		WebDeliveryAllowedFlag:                 dscptr.WebDeliveryAllowedFlag,
+		NoRegionalBlackoutFlag:                 dscptr.NoRegionalBlackoutFlag,
+		ArchiveAllowedFlag:                     dscptr.ArchiveAllowedFlag,
+		DeviceRestrictions:                     dscptr.DeviceRestrictions,
+		SegmentationDuration:                   dscptr.SegmentationDuration,
+		SegmentationMessage:                    dscptr.SegmentationMessage,
+		SegmentationUpidType:                   dscptr.SegmentationUpidType,
+		SegmentationUpidLength:                 dscptr.SegmentationUpidLength,
+		SegmentationUpid:                       dscptr.SegmentationUpid,
+		SegmentationTypeID:                     dscptr.SegmentationTypeID,
+		SegmentNum:                             dscptr.SegmentNum,
+		SegmentsExpected:                       dscptr.SegmentsExpected,
+		SubSegmentNum:                          dscptr.SubSegmentNum,
+		SubSegmentsExpected:                    dscptr.SubSegmentsExpected}
+
+	return json.Marshal(seg)
+}
+
+/*
+	 *
+	    Custom MarshalJSON
+	        Marshal a Descriptor into
+
+	        0x0: AvailDescriptor,
+		    0x1: DTMFDescriptor,
+		    0x2: SegmentationDescriptor
+
+	        or just return the Descriptor
+
+*
+*/
 func (dscptr *Descriptor) MarshalJSON() ([]byte, error) {
 	switch dscptr.Tag {
 	case 0x0:
-		return json.Marshal(&dscptr.AvailDescriptor)
-
+		return dscptr.jsonAvailDescriptor()
 	case 0x1:
-		return json.Marshal(&dscptr.DTMFDescriptor)
-
+		return dscptr.jsonDTMFDescriptor()
 	case 0x2:
-		return json.Marshal(&dscptr.SegmentationDescriptor)
-
-	case 0x3:
-		return json.Marshal(&dscptr.TimeDescriptor)
-
-	case 0x4:
-		return json.Marshal(&dscptr.AudioDescriptor)
-
+		return dscptr.jsonSegmentationDescriptor()
 	}
 	type Funk Descriptor
 	return json.Marshal(&struct{ *Funk }{(*Funk)(dscptr)})
@@ -142,7 +234,7 @@ func (dscptr *Descriptor) Show() {
 
 /*
 *
-Decode returns a Splice Descriptor by tag.
+Decode a Splice Descriptor by tag.
 
 	The following Splice Descriptors are recognized.
 
@@ -188,9 +280,8 @@ func (dscptr *Descriptor) decodeAudioDescriptor(bd *bitDecoder, tag uint8, lengt
 		bsm := bd.uInt8(3)
 		nc := bd.uInt8(4)
 		fsa := bd.asFlag()
-		dscptr.AudioComponents = append(dscptr.AudioComponents, AudioCmpt{ct, iso, bsm, nc, fsa})
+		dscptr.AudioComponents = append(dscptr.AudioComponents, audioCmpt{ct, iso, bsm, nc, fsa})
 	}
-	dscptr.AudioDescriptor.TagLenNameId = dscptr.TagLenNameId
 
 }
 
@@ -201,7 +292,6 @@ func (dscptr *Descriptor) decodeAvailDescriptor(bd *bitDecoder, tag uint8, lengt
 	dscptr.Identifier = bd.asAscii(32)
 	dscptr.Name = "Avail Descriptor"
 	dscptr.ProviderAvailID = bd.uInt32(32)
-	dscptr.AvailDescriptor.TagLenNameId = dscptr.TagLenNameId
 
 }
 
@@ -215,7 +305,6 @@ func (dscptr *Descriptor) decodeDTMFDescriptor(bd *bitDecoder, tag uint8, length
 	dscptr.DTMFCount = bd.uInt8(3)
 	//bd.goForward(5)
 	dscptr.DTMFChars = bd.uInt64(uint(8 * dscptr.DTMFCount))
-	dscptr.DTMFDescriptor.TagLenNameId = dscptr.TagLenNameId
 
 }
 
@@ -228,7 +317,6 @@ func (dscptr *Descriptor) decodeTimeDescriptor(bd *bitDecoder, tag uint8, length
 	dscptr.TAISeconds = bd.uInt64(48)
 	dscptr.TAINano = bd.uInt32(32)
 	dscptr.UTCOffset = bd.uInt16(16)
-	dscptr.TimeDescriptor.TagLenNameId = dscptr.TagLenNameId
 
 }
 
@@ -246,7 +334,6 @@ func (dscptr *Descriptor) decodeSegmentationDescriptor(bd *bitDecoder, tag uint8
 		dscptr.decodeSegFlags(bd)
 		dscptr.decodeSegmentation(bd)
 	}
-	dscptr.SegmentationDescriptor.TagLenNameId = dscptr.TagLenNameId
 
 }
 
@@ -304,8 +391,6 @@ func (dscptr *Descriptor) encodeAvailDescriptor(be *bitEncoder) {
 
 // Encode a segmentation descriptor
 func (dscptr *Descriptor) encodeSegmentationDescriptor(be *bitEncoder) {
-	dscptr.SegmentationDescriptor.TagLenNameId = dscptr.TagLenNameId
-
 	be.AddHex64(dscptr.SegmentationEventID, 32)
 	be.Add(dscptr.SegmentationEventCancelIndicator, 1)
 	be.Add(dscptr.SegmentationEventIDComplianceIndicator, 1)
