@@ -39,9 +39,9 @@ func main(){
 }                                    
 ```
 ---
-### Latest version is `One`  `Two`   `twenty-seven`
+### Latest version is `One`  `Two`   `twenty-nine`
 * __cuei.Stream Now Supports Multicast!__
-* Cyclomatic complexity score for v1.2.27 is __1.96__
+* Cyclomatic complexity score for v1.2.29 is __1.96__
 
 # Documentation
 
