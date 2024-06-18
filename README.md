@@ -7,9 +7,6 @@
 # cuei is a SCTE-35 Parser lib written in Go.
 # Encoder/Decoder for SCTE-35
 <br>
-*️⃣  CUEI is the FourCC / identifier for SCTE-35, that's where I got the name.
-
-<br>
 
 
 - [x] Parses SCTE-35 Cues from MPEGTS or Bytes or Base64 or Hex or Int or Octal or even Base 36.
@@ -19,7 +16,20 @@
 - [x] Encodes Time Signals and Splice Inserts with Descriptors and Upids. 
  
 ---
-#### 
+####
+
+
+# `Heads Up!`  Update cuei to `@latest`
+
+###   🤸‍♀️ <span style="color:blue"> 🤸‍♀️   Oleksii has uncovered a few(several) bugs and yelled at me until I fixed them.   🤸‍♀️   🤸‍♀️ 
+  
+#### 🤸‍♀️  __Multicast__ is now built in to  🤸‍♀️  cuei.Stream.
+  
+####  🤸‍♀️  __EIDR Upids__ are now  🤸‍♀️ accurate to the 🤸‍♀️  __EIDR Compact Binary Specification.__  🤸‍♀️ 
+ 
+####  🤸‍♀️  __cuei__ has a __Cyclomatic Complexity__  of  `1.89`.  🤸‍♀️  __This code is cleaner than your dishes.__
+___
+
 
 ### Want to parse an MPEGTS video and print the SCTE-35?  🛰️
 
