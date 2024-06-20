@@ -67,8 +67,8 @@ type segmentationDescriptor struct {
 	SegmentationTypeID                     uint8
 	SegmentNum                             uint8
 	SegmentsExpected                       uint8
-	SubSegmentNum                          uint8
-	SubSegmentsExpected                    uint8
+	SubSegmentNum                          uint8 `json:",omitempty"`
+	SubSegmentsExpected                    uint8 `json:",omitempty"`
 }
 
 // Time Descriptor
@@ -91,40 +91,39 @@ type timeDescriptor struct {
 *
 */
 type Descriptor struct {
-	Tag                                     uint8
-	Length                                  uint8
-	Identifier                              string
-	Name                                    string
-	AudioComponents                         []audioCmpt `json:",omitempty"`
-	ProviderAvailID                         uint32      `json:",omitempty"`
-	PreRoll                                 uint8       `json:",omitempty"`
-	DTMFCount                               uint8       `json:",omitempty"`
-	DTMFChars                               uint64      `json:",omitempty"`
-	TAISeconds                              uint64      `json:",omitempty"`
-	TAINano                                 uint32      `json:",omitempty"`
-	UTCOffset                               uint16      `json:",omitempty"`
-	SegmentationEventID                     string      `json:",omitempty"`
-	SegmentationEventCancelIndicator        bool        `json:",omitempty"`
-	SegmentationEventIDComplianceIndicator  bool        `json:",omitempty"`
-	ProgramSegmentationFlag                 bool        `json:",omitempty"`
-	SegmentationDurationFlag                bool        `json:",omitempty"`
-	DeliveryNotRestrictedFlag               bool        `json:",omitempty"`
-	WebDeliveryAllowedFlag                  bool        `json:",omitempty"`
-	NoRegionalBlackoutFlag                  bool        `json:",omitempty"`
-	ArchiveAllowedFlag                      bool        `json:",omitempty"`
-	DeviceRestrictions                      string      `json:",omitempty"`
-	SegmentationDuration                    float64     `json:",omitempty"`
-	SegmentationMessage                     string      `json:",omitempty"`
-	SegmentationUpidType                    uint8       `json:",omitempty"`
-	SegmentationUpidLength                  uint8       `json:",omitempty"`
-	SegmentationUpid                        *Upid       `json:",omitempty"`
-	SegmentationTypeID                      uint8       `json:",omitempty"`
-	SegmentNum                              uint8       `json:",omitempty"`
-	SegmentsExpected                        uint8       `json:",omitempty"`
-	SubSegmentNum                           uint8       `json:",omitempty"`
-	SubSegmentsExpected                     uint8       `json:",omitempty"`
+	Tag                                    uint8
+	Length                                 uint8
+	Identifier                             string
+	Name                                   string
+	AudioComponents                        []audioCmpt `json:",omitempty"`
+	ProviderAvailID                        uint32
+	PreRoll                                uint8
+	DTMFCount                              uint8
+	DTMFChars                              uint64
+	TAISeconds                             uint64
+	TAINano                                uint32
+	UTCOffset                              uint16
+	SegmentationEventID                    string
+	SegmentationEventCancelIndicator       bool
+	SegmentationEventIDComplianceIndicator bool
+	ProgramSegmentationFlag                bool
+	SegmentationDurationFlag               bool
+	DeliveryNotRestrictedFlag              bool
+	WebDeliveryAllowedFlag                 bool
+	NoRegionalBlackoutFlag                 bool
+	ArchiveAllowedFlag                     bool
+	DeviceRestrictions                     string
+	SegmentationDuration                   float64
+	SegmentationMessage                    string
+	SegmentationUpidType                   uint8
+	SegmentationUpidLength                 uint8
+	SegmentationUpid                       *Upid
+	SegmentationTypeID                     uint8
+	SegmentNum                             uint8
+	SegmentsExpected                       uint8
+	SubSegmentNum                          uint8 `json:",omitempty"`
+	SubSegmentsExpected                    uint8 `json:",omitempty"`
 }
-
 
 func (dscptr *Descriptor) jsonAvailDescriptor() ([]byte, error) {
 	avail := availDescriptor{
@@ -178,17 +177,20 @@ func (dscptr *Descriptor) jsonSegmentationDescriptor() ([]byte, error) {
 	return json.Marshal(seg)
 }
 
-/**
-    Custom MarshalJSON
-        Marshal a Descriptor into
+/*
+*
 
-        0x0: AvailDescriptor,
-        0x1: DTMFDescriptor,
-        0x2: SegmentationDescriptor
+	Custom MarshalJSON
+	    Marshal a Descriptor into
 
-        or just return the Descriptor
+	    0x0: AvailDescriptor,
+	    0x1: DTMFDescriptor,
+	    0x2: SegmentationDescriptor
 
-**/
+	    or just return the Descriptor
+
+*
+*/
 func (dscptr *Descriptor) MarshalJSON() ([]byte, error) {
 	switch dscptr.Tag {
 	case 0x0:
