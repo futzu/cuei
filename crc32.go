@@ -43,5 +43,5 @@ func MkCrc32(data []byte) string {
 	for _, bite := range data {
 		crc = tbl[int(bite)^((crc>>twentyFour)&twoFiftyFive)] ^ ((crc << eight) & (initValue - twoFiftyFive))
 	}
-	return fmt.Sprintf(" 0x%x",uint32(crc))
+	return fmt.Sprintf("%#x", uint32(crc))
 }
