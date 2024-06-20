@@ -79,6 +79,8 @@ Notes:
   - datagram size should be 1316
 */
 func (stream *Stream) DecodeMulticast(fname string) []*Cue {
+	stream.Pids = &Pids{}
+	stream.MkMaps()
 	var cues []*Cue
 	dgram := 1316
 	straddr, _ := strings.CutPrefix(fname, mcastPrefix)
@@ -88,7 +90,7 @@ func (stream *Stream) DecodeMulticast(fname string) []*Cue {
 	for {
 		buffer := make([]byte, dgram)
 		l.ReadFromUDP(buffer)
-		stream.DecodeBytes(buffer)
+		cues = append(cues, stream.DecodeBytes(buffer)...)
 	}
 	return cues
 }
@@ -340,7 +342,7 @@ func (stream *Stream) mkCue(pid uint16) *Cue {
 // initialize and return a *Stream
 func NewStream() *Stream {
 	stream := &Stream{}
-	//stream.Pids = &Pids{}
+	stream.Pids = &Pids{}
 	stream.MkMaps()
 	return stream
 }
