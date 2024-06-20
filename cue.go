@@ -51,7 +51,6 @@ func (cue *Cue) lastByte(bites []byte) uint16 {
 	pre := uint16(3)
 	seclen := uint16(bites[1]&15) << 8
 	seclen |= uint16(bites[2])
-	fmt.Printf("SECTION LEN: %v\n", seclen)
 	lastbyte := seclen + pre
 	return lastbyte
 }
