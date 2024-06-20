@@ -16,7 +16,9 @@
 - [x] Encodes Time Signals and Splice Inserts with Descriptors and Upids. 
  
 ---
-####
+#  🤸‍♀️  cuei's Cyclomatic Complexity Score is `1.88` 🤸‍♀️  
+#  🤸‍♀️ This code is cleaner than your dishes. 🤸‍♀️ 
+
 
 
 # `Heads Up!`  Update cuei to `@latest`
@@ -27,7 +29,6 @@
   
 ####  🤸‍♀️  __EIDR Upids__ are now  🤸‍♀️ accurate to the 🤸‍♀️  __EIDR Compact Binary Specification.__  🤸‍♀️ 
  
-####  🤸‍♀️  __cuei__ has a __Cyclomatic Complexity__  of  `1.89`.  🤸‍♀️  __This code is cleaner than your dishes.__
 ___
 
 
