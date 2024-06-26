@@ -38,8 +38,8 @@ type Stream struct {
 	Quiet    bool              // Don't call Cue.Show() when a Cue is found.
 }
 
-// MkMaps Make Stream Maps
-func (stream *Stream) MkMaps() {
+// mkMaps Make Stream Maps
+func (stream *Stream) mkMaps() {
 	stream.Pid2Prgm = make(map[uint16]uint16)
 	stream.Pid2Type = make(map[uint16]uint8)
 	stream.Prgm2Pcr = make(map[uint16]uint64)
@@ -51,7 +51,7 @@ func (stream *Stream) MkMaps() {
 // Decode fname (a file name) for SCTE-35
 func (stream *Stream) Decode(fname string) []*Cue {
 	stream.Pids = &Pids{}
-	stream.MkMaps()
+	stream.mkMaps()
 	var cues []*Cue
 	if strings.HasPrefix(fname, mcastPrefix) {
 		stream.DecodeMulticast(fname)
@@ -80,7 +80,7 @@ Notes:
 */
 func (stream *Stream) DecodeMulticast(fname string) []*Cue {
 	stream.Pids = &Pids{}
-	stream.MkMaps()
+	stream.mkMaps()
 	var cues []*Cue
 	dgram := 1316
 	straddr, _ := strings.CutPrefix(fname, mcastPrefix)
@@ -132,17 +132,18 @@ func (stream *Stream) parsePusi(pkt []byte) bool {
 
 // parsePts parses a packet for PTS
 func (stream *Stream) parsePts(pay []byte, pid uint16) {
-	if stream.ptsFlag(pay) {
-		prgm, ok := stream.Pid2Prgm[pid]
-		if ok {
-			pts := uint64(pay[9]&14) << 29
-			pts |= uint64(pay[10]) << 22
-			pts |= (uint64(pay[11]) >> 1) << 15
-			pts |= uint64(pay[12]) << 7
-			pts |= uint64(pay[13]) >> 1
-			stream.Prgm2Pts[prgm] = pts
+	if len(pay) > 13 {
+		if stream.ptsFlag(pay) {
+			prgm, ok := stream.Pid2Prgm[pid]
+			if ok {
+				pts := uint64(pay[9]&14) << 29
+				pts |= uint64(pay[10]) << 22
+				pts |= (uint64(pay[11]) >> 1) << 15
+				pts |= uint64(pay[12]) << 7
+				pts |= uint64(pay[13]) >> 1
+				stream.Prgm2Pts[prgm] = pts
+			}
 		}
-
 	}
 }
 
@@ -207,6 +208,15 @@ func (stream *Stream) sectionDone(pay []byte, pid uint16, seclen uint16) bool {
 	return true
 }
 
+func (stream *Stream) stripScte35Pes(pay []byte, pid uint16) *[]byte {
+	scte35PesStart := []byte("\x00\x00\x01\xfc")
+	if bytes.Contains(pay, scte35PesStart) {
+		_, pay, _ = bytes.Cut(pay, scte35PesStart)
+	}
+	pay = splitByIdx(pay, []byte("\xfc"))
+	return &pay
+}
+
 // parse is the parser method for Stream
 func (stream *Stream) parse(pkt []byte) {
 	p := parsePid(pkt[1], pkt[2])
@@ -226,6 +236,7 @@ func (stream *Stream) parse(pkt []byte) {
 		stream.parsePts(*pay, *pid)
 	}
 	if stream.Pids.isScte35Pid(*pid) {
+		pay = stream.stripScte35Pes(*pay, *pid)
 		stream.parseScte35(*pay, *pid)
 	}
 }
@@ -307,7 +318,7 @@ func (stream *Stream) vrfyStreamType(pid uint16, streamtype uint8) {
 
 // parseSCTE35 parses SCTE35 packets
 func (stream *Stream) parseScte35(pay []byte, pid uint16) {
-	pay = stream.chkPartial(pay, pid, []byte("\xfc0"))
+	pay = stream.chkPartial(pay, pid, []byte("\xfc"))
 	if len(pay) == 0 {
 		stream.Pids.delScte35Pid(pid)
 		return
@@ -343,6 +354,6 @@ func (stream *Stream) mkCue(pid uint16) *Cue {
 func NewStream() *Stream {
 	stream := &Stream{}
 	stream.Pids = &Pids{}
-	stream.MkMaps()
+	stream.mkMaps()
 	return stream
 }
