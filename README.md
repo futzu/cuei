@@ -15,20 +15,6 @@
 - [x] Supports multiple MPEGTS Programs and multiple SCTE-35 streams 
 - [x] Encodes Time Signals and Splice Inserts with Descriptors and Upids. 
  
----
-#  🤸‍♀️  cuei's Cyclomatic Complexity Score is `1.88` 🤸‍♀️  
-#  🤸‍♀️ This code is cleaner than your dishes. 🤸‍♀️ 
-
-
-
-# `Heads Up!`  Update cuei to `@latest`
-
-###   🤸‍♀️ <span style="color:blue"> 🤸‍♀️   Oleksii has uncovered a few(several) bugs and yelled at me until I fixed them.   🤸‍♀️   🤸‍♀️ 
-  
-#### 🤸‍♀️  __Multicast__ is now built in to  🤸‍♀️  cuei.Stream.
-  
-####  🤸‍♀️  __EIDR Upids__ are now  🤸‍♀️ accurate to the 🤸‍♀️  __EIDR Compact Binary Specification.__  🤸‍♀️ 
- 
 ___
 
 
@@ -50,9 +36,8 @@ func main(){
 }                                    
 ```
 ---
-### Latest version is `One`  `Two`   `thirty-three`
-* __cuei.Stream Now Supports Multicast!__
-* Cyclomatic complexity score for v1.2.33 is __1.96__
+### Latest version is `One`  `Two`   `thirty-seven`
+* Cyclomatic complexity score for v1.2.37 is __1.96__
 
 # Documentation
 
