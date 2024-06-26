@@ -88,7 +88,7 @@ type Command struct {
 
 // only show timeSignal values in JSON, used by cmd.MarshalJSON()
 func (cmd *Command) jsonTimeSignal() ([]byte, error) {
-	ts := timeSignal{Name: cmd.Name,
+	ts := &timeSignal{Name: cmd.Name,
 		CommandType:       cmd.CommandType,
 		TimeSpecifiedFlag: cmd.TimeSpecifiedFlag,
 		PTS:               cmd.PTS}
@@ -98,7 +98,7 @@ func (cmd *Command) jsonTimeSignal() ([]byte, error) {
 // only show spliceInsert values in JSON, used by cmd.MarshalJSON()
 func (cmd *Command) jsonSpliceInsert() ([]byte, error) {
 
-	si := spliceInsert{Name: cmd.Name,
+	si := &spliceInsert{Name: cmd.Name,
 		CommandType:                cmd.CommandType,
 		SpliceEventID:              cmd.SpliceEventID,
 		SpliceEventCancelIndicator: cmd.SpliceEventCancelIndicator,
