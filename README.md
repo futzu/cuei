@@ -37,7 +37,7 @@ func main(){
 ```
 ---
 ### Latest version is `One`  `Two`   `thirty-seven`
-* Cyclomatic complexity score for v1.2.37 is __1.96__
+* Cyclomatic complexity score for v1.2.39 is __1.96__
 
 # Documentation
 
