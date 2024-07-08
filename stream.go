@@ -2,6 +2,8 @@ package cuei
 
 import (
 	"bytes"
+    "fmt"
+	"io"
 	"net"
 	"os"
 	"strings"
@@ -48,28 +50,34 @@ func (stream *Stream) mkMaps() {
 	stream.partial = make(map[uint16][]byte)
 }
 
-// Decode fname (a file name) for SCTE-35
-func (stream *Stream) Decode(fname string) []*Cue {
+// Decode SCTE-35 Cues from an io.Reader interface
+func (stream *Stream) DecodeReader(rdr io.Reader) []*Cue {
 	stream.Pids = &Pids{}
 	stream.mkMaps()
 	var cues []*Cue
+	buffer := make([]byte, bufSz)
+	for {
+		_, err := rdr.Read(buffer)
+		if err != nil {
+			break
+		}
+		cues = append(cues, stream.DecodeBytes(buffer)...)
+	}
+	return cues
+}
+
+// Decode fname (a file name) for SCTE-35
+func (stream *Stream) Decode(fname string) []*Cue {
+	var cues []*Cue
 	if strings.HasPrefix(fname, mcastPrefix) {
-		stream.DecodeMulticast(fname)
+		cues = stream.DecodeMulticast(fname)
 	} else {
 		file, err := os.Open(fname)
 		chk(err)
 		defer file.Close()
-		buffer := make([]byte, bufSz)
-		for {
-			_, err := file.Read(buffer)
-			if err != nil {
-				break
-			}
-			cues = append(cues, stream.DecodeBytes(buffer)...)
-		}
+		cues = stream.DecodeReader(file)
 	}
 	return cues
-
 }
 
 /*
@@ -142,6 +150,7 @@ func (stream *Stream) parsePts(pay []byte, pid uint16) {
 				pts |= uint64(pay[12]) << 7
 				pts |= uint64(pay[13]) >> 1
 				stream.Prgm2Pts[prgm] = pts
+                fmt.Println(pts)
 			}
 		}
 	}
@@ -231,10 +240,11 @@ func (stream *Stream) parse(pkt []byte) {
 	}
 	if stream.Pids.isPcrPid(*pid) {
 		stream.parsePcr(pkt, *pid)
-	}
-	if stream.parsePusi(pkt) {
-		stream.parsePts(*pay, *pid)
-	}
+    }
+		if stream.parsePusi(pkt) {
+			stream.parsePts(*pay, *pid)
+		}
+	
 	if stream.Pids.isScte35Pid(*pid) {
 		pay = stream.stripScte35Pes(*pay, *pid)
 		stream.parseScte35(*pay, *pid)
