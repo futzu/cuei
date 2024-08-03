@@ -31,14 +31,26 @@ func (infosec *InfoSection) decode(bd *bitDecoder) bool {
 		return false
 	}
 	infosec.SectionSyntaxIndicator = bd.asFlag()
+	if infosec.SectionSyntaxIndicator != false {
+		return false
+	}
+
 	infosec.Private = bd.asFlag()
+	if infosec.Private != false {
+		return false
+	}
 	infosec.SapType = bd.uInt8(2)
 	details, ok := table6[infosec.SapType]
 	if ok {
 		infosec.SapDetails = details
+	} else {
+		return false
 	}
 	infosec.SectionLength = bd.uInt16(12)
 	infosec.ProtocolVersion = bd.uInt8(8)
+	if infosec.ProtocolVersion > 0 {
+		return false
+	}
 	infosec.EncryptedPacket = bd.asFlag()
 	infosec.EncryptionAlgorithm = bd.uInt8(6)
 	infosec.PtsAdjustment = bd.as90k(33)
