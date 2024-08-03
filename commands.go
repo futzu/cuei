@@ -66,24 +66,24 @@ Command
 	    0xff: Private Command,
 */
 type Command struct {
-	Name                       string
-	CommandType                uint8
-	PrivateBytes               []byte
-	Identifier                 uint32
-	SpliceEventID              uint32
-	SpliceEventCancelIndicator bool
-	EventIDComplianceFlag      bool
-	OutOfNetworkIndicator      bool
-	ProgramSpliceFlag          bool
-	DurationFlag               bool
-	BreakAutoReturn            bool
-	BreakDuration              float64
-	SpliceImmediateFlag        bool
-	UniqueProgramID            uint16
-	AvailNum                   uint8
-	AvailExpected              uint8
-	TimeSpecifiedFlag          bool
-	PTS                        float64
+	Name                       string     	// All
+	CommandType                uint8	// .
+	PrivateBytes               []byte	// PrivateCommand
+	Identifier                 uint32	// .
+	SpliceEventID              uint32	// SpliceInsert
+	SpliceEventCancelIndicator bool		// .
+	EventIDComplianceFlag      bool		// .
+	OutOfNetworkIndicator      bool		// .
+	ProgramSpliceFlag          bool		// .
+	DurationFlag               bool		// .
+	BreakAutoReturn            bool		// .
+	BreakDuration              float64	// .
+	SpliceImmediateFlag        bool		// .
+	UniqueProgramID            uint16	// .
+	AvailNum                   uint8	// .
+	AvailExpected              uint8	// .
+	TimeSpecifiedFlag          bool 	// SpliceInsert, TimeSignal
+	PTS                        float64	// SpliceInsert, TimeSignal
 }
 
 // only show timeSignal values in JSON, used by cmd.MarshalJSON()
@@ -116,6 +116,7 @@ func (cmd *Command) jsonSpliceInsert() ([]byte, error) {
 	return json.Marshal(si)
 }
 
+// Custom JSON Marshalling
 func (cmd *Command) MarshalJSON() ([]byte, error) {
 	switch cmd.CommandType {
 	case 0x5:
@@ -141,20 +142,26 @@ func (cmd *Command) Show() {
 }
 
 // Decode a Splice Command
-func (cmd *Command) decode(cmdtype uint8, bd *bitDecoder) {
+func (cmd *Command) decode(cmdtype uint8, bd *bitDecoder) bool {
 	cmd.CommandType = cmdtype
 	switch cmdtype {
 	case 0x0:
 		cmd.decodeSpliceNull(bd)
+		return true
 	case 0x5:
 		cmd.decodeSpliceInsert(bd)
+		return true
 	case 0x6:
 		cmd.decodeTimeSignal(bd)
+		return true
 	case 0x7:
 		cmd.decodeBandwidthReservation(bd)
+		return true
 	case 0xff:
 		cmd.decodePrivate(bd)
-
+		return true
+	default:
+		return false
 	}
 
 }
