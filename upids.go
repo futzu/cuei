@@ -101,14 +101,14 @@ func (upid *Upid) atsc(bd *bitDecoder, upidlen uint8) {
 
 // Decode for EIDR Upid
 func (upid *Upid) eidr(bd *bitDecoder, upidlen uint8) {
-		head := bd.uInt16(16)
-		// Switching to Compact Binary Format
-		var astring string
-		nibbles := 20
-		for i := 0; i < nibbles; i++ {
-			astring = fmt.Sprintf("%v%x", astring, bd.uInt8(4))
-		}
-		upid.Value = fmt.Sprintf("0x%x%v", head, astring)
+	head := bd.uInt16(16)
+	// Switching to Compact Binary Format
+	var astring string
+	nibbles := 20
+	for i := 0; i < nibbles; i++ {
+		astring = fmt.Sprintf("%v%x", astring, bd.uInt8(4))
+	}
+	upid.Value = fmt.Sprintf("0x%x%v", head, astring)
 }
 
 // Decode for MPU Upid
