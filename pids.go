@@ -5,6 +5,7 @@ type Pids struct {
 	PmtPids    []uint16
 	PcrPids    []uint16
 	Scte35Pids []uint16
+	MaybePids  []uint16
 }
 
 func (pids *Pids) isPmtPid(pid uint16) bool {
@@ -46,4 +47,25 @@ func (pids *Pids) delScte35Pid(pid uint16) {
 	}
 
 	pids.Scte35Pids = pids.Scte35Pids[:n]
+}
+
+func (pids *Pids) isMaybePid(pid uint16) bool {
+	return IsIn(pids.MaybePids, pid)
+}
+
+func (pids *Pids) addMaybePid(pid uint16) {
+	if !(pids.isMaybePid(pid)) {
+		pids.MaybePids = append(pids.MaybePids, pid)
+	}
+}
+func (pids *Pids) delMaybePid(pid uint16) {
+	n := 0
+	for _, val := range pids.MaybePids {
+		if val != pid {
+			pids.MaybePids[n] = val
+			n++
+		}
+	}
+
+	pids.MaybePids = pids.MaybePids[:n]
 }
