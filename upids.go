@@ -12,9 +12,6 @@ var uriUpids = map[uint8]string{
 	0x09: "ADI",
 	0x10: "UUID",
 	0x11: "ACR",
-	0x0b: "ATSC",
-	0x0c: "MPU",
-	0x0d: "MID",
 	0x0e: "ADS Info",
 	0x0f: "URI",
 }
