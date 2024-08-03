@@ -2,7 +2,7 @@ package cuei
 
 import (
 	"bytes"
-  //  "fmt"
+	//   "fmt"
 	"io"
 	"net"
 	"os"
@@ -91,7 +91,7 @@ func (stream *Stream) DecodeMulticast(fname string) []*Cue {
 	stream.mkMaps()
 	var cues []*Cue
 	dgram := 1316
-	straddr := strings.Replace(fname, mcastPrefix,"",-1)
+	straddr := strings.Replace(fname, mcastPrefix, "", -1)
 	addr, _ := net.ResolveUDPAddr("udp", straddr)
 	l, _ := net.ListenMulticastUDP("udp", nil, addr)
 	l.SetReadBuffer(1316 * 70000)
@@ -192,6 +192,7 @@ func (stream *Stream) chkPartial(pay []byte, pid uint16, sep []byte) []byte {
 		pay = append(val, pay...)
 	}
 	return splitByIdx(pay, sep)
+	//return pay
 }
 
 // sameAsLast compares the current packet to the last packet by pid.
@@ -219,7 +220,7 @@ func (stream *Stream) sectionDone(pay []byte, pid uint16, seclen uint16) bool {
 func (stream *Stream) stripScte35Pes(pay []byte, pid uint16) *[]byte {
 	scte35PesStart := []byte("\x00\x00\x01\xfc")
 	if bytes.Contains(pay, scte35PesStart) {
-	//	_, pay, _ = bytes.Cut(pay, scte35PesStart)
+		//	_, pay, _ = bytes.Cut(pay, scte35PesStart)
 		pay = splitByIdx(pay, scte35PesStart)
 	}
 	pay = splitByIdx(pay, []byte("\xfc"))
@@ -240,11 +241,11 @@ func (stream *Stream) parse(pkt []byte) {
 	}
 	if stream.Pids.isPcrPid(*pid) {
 		stream.parsePcr(pkt, *pid)
-    }
-	if stream.parsePusi(pkt) {
-			stream.parsePts(*pay, *pid)
 	}
-	if stream.Pids.isScte35Pid(*pid) {
+	if stream.parsePusi(pkt) {
+		stream.parsePts(*pay, *pid)
+	}
+	if stream.Pids.isScte35Pid(*pid) || stream.Pids.isMaybePid(*pid) {
 		pay = stream.stripScte35Pes(*pay, *pid)
 		stream.parseScte35(*pay, *pid)
 	}
@@ -320,15 +321,24 @@ func (stream *Stream) parseStreams(silen uint16, pay []byte, idx uint16, prgm ui
 
 // vrfyStreamType checks for stream types 6 and 134 and adds them to Stream.Pids.Scte35Pids
 func (stream *Stream) vrfyStreamType(pid uint16, streamtype uint8) {
-	if streamtype == 6 || streamtype == 134 {
+	if streamtype == 6 {
+		stream.Pids.addMaybePid(pid)
+	}
+	if streamtype == 134 {
 		stream.Pids.addScte35Pid(pid)
 	}
 }
 
 // parseSCTE35 parses SCTE35 packets
 func (stream *Stream) parseScte35(pay []byte, pid uint16) {
+	if stream.sameAsLast(pay, pid) {
+		return
+	}
 	pay = stream.chkPartial(pay, pid, []byte("\xfc"))
-	if len(pay) == 0 {
+	if len(pay) < 13 {
+		if stream.Pids.isMaybePid(pid) {
+			stream.Pids.delMaybePid(pid)
+		}
 		return
 	}
 	seclen := parseLen(pay[1], pay[2])
@@ -338,6 +348,10 @@ func (stream *Stream) parseScte35(pay []byte, pid uint16) {
 			stream.Cues = append(stream.Cues, cue)
 			if !stream.Quiet {
 				cue.Show()
+			}
+		} else {
+			if stream.Pids.isMaybePid(pid) {
+				stream.Pids.delMaybePid(pid)
 			}
 		}
 	}
