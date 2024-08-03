@@ -181,13 +181,13 @@ func (dscptr *Descriptor) jsonTimeDescriptor() ([]byte, error) {
 /*
 *
 
-		Custom MarshalJSON
-		 
-   		Marshal a Descriptor into
-		    0x0: AvailDescriptor,
-		    0x1: DTMFDescriptor,
-		    0x2: SegmentationDescriptor
-		    0x3: TimeDescriptor
+			Custom MarshalJSON
+
+	   		Marshal a Descriptor into
+			    0x0: AvailDescriptor,
+			    0x1: DTMFDescriptor,
+			    0x2: SegmentationDescriptor
+			    0x3: TimeDescriptor
 
 *
 */
