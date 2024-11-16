@@ -46,40 +46,24 @@ func (cue *Cue) Decode(i interface{}) bool {
 	}
 }
 
-// last byte of the Cue without padding
-func (cue *Cue) lastByte(bites []byte) uint16 {
-	pre := uint16(3)
-	seclen := uint16(bites[1]&15) << 8
-	seclen |= uint16(bites[2])
-	lastbyte := seclen + pre
-	return lastbyte
-}
-
 // decodeBytes extracts bits for the Cue values.
 func (cue *Cue) decodeBytes(bites []byte) bool {
-	lastbyte := cue.lastByte(bites)
 	var bd bitDecoder
-	if len(bites[:lastbyte]) < 14 {
-		return false
-	}
-	bd.load(bites[:lastbyte])
+	bd.load(bites)
 	cue.InfoSection = &InfoSection{}
 	if cue.InfoSection.decode(&bd) {
 		cue.Command = &Command{}
-		if cue.Command.decode(cue.InfoSection.CommandType, &bd) {
-			cue.Dll = bd.uInt16(16)
-			if cue.dscptrLoop(cue.Dll, &bd) {
-				//cue.Crc32 = fmt.Sprintf(" 0x%x", bd.uInt32(32))
-				cue.Crc32 = bd.crc32()
-				return true
-			}
-		}
+		cue.Command.decode(cue.InfoSection.CommandType, &bd)
+		cue.Dll = bd.uInt16(16)
+		cue.dscptrLoop(cue.Dll, &bd)
+		cue.Crc32 = fmt.Sprintf(" 0x%x", bd.uInt32(32))
+		return true
 	}
 	return false
 }
 
 // DscptrLoop loops over any splice descriptors
-func (cue *Cue) dscptrLoop(dll uint16, bd *bitDecoder) bool {
+func (cue *Cue) dscptrLoop(dll uint16, bd *bitDecoder) {
 	var i uint16
 	i = 0
 	l := dll
@@ -87,16 +71,12 @@ func (cue *Cue) dscptrLoop(dll uint16, bd *bitDecoder) bool {
 		tag := bd.uInt8(8)
 		i++
 		length := bd.uInt16(8)
-		if length == 0 {
-			return false
-		}
 		i++
 		i += length
 		var sdr Descriptor
 		sdr.decode(bd, tag, uint8(length))
 		cue.Descriptors = append(cue.Descriptors, sdr)
 	}
-	return true
 }
 
 func (cue *Cue) rollLoop() []byte {
@@ -146,7 +126,7 @@ func (cue *Cue) Encode() []byte {
 	be.Add(cue.Dll, 16)
 	be.AddBytes(dloop, uint(cue.Dll<<3))
 	cue.Crc32 = MkCrc32(be.Bites.Bytes())
-	be.AddHex64(cue.Crc32, 32)
+	be.AddHex32(cue.Crc32, 32)
 	return be.Bites.Bytes()
 }
 
